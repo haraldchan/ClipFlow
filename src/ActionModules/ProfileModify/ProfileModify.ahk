@@ -1,5 +1,7 @@
-#Include "../../../Lib/ClipFlow/dict.ahk"
-#Include "../../../Lib/ClipFlow/DictIndex.ahk"
+#Include "./dict.ahk"
+#Include "./DictIndex.ahk"
+
+winGroup := ["ahk_class SunAwtFrame", "旅客信息"]
 
 class ProfileModify {
     static name := "Profile Modify"
