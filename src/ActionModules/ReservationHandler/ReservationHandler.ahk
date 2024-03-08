@@ -37,7 +37,9 @@ class ResvHandler {
             return
         }
         ; IniWrite(A_Clipboard, store, "ResvHandler", "JSON")   
-        configRead(CONFIG_FILE)["resvHandler"]["JSON"] := A_Clipboard
+        config := configRead(CONFIG_FILE)
+        config["resvHandler"]["JSON"] := A_Clipboard
+        configSave(CONFIG_FILE, config)
         ; clb := A_Clipboard
         ; resvInfoObj := Jxon_Load(&clb)
         resvInfoObj := JSON.parse(A_Clipboard)
