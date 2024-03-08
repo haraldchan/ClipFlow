@@ -8,11 +8,12 @@ TraySetIcon A_ScriptDir . "\src\Assets\CFTray.ico"
 
 version := "1.2.0"
 popupTitle := "ClipFlow " . version
-CONFIG_FILE := "./clipflow.config.json"
+CONFIG_PATH := "./clipflow.config.json"
 
 if (!FileExist(A_MyDocuments . "\clipflow.config.json")) {
-	FileCopy(CONFIG_FILE, A_MyDocuments)
+	FileCopy(CONFIG_PATH, A_MyDocuments)
 }
+CONFIG_FILE := A_MyDocuments . "\clipflow.config.json"
 
 ; Gui
 ClipFlow := Gui(, popupTitle)
