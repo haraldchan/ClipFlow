@@ -1,4 +1,5 @@
 ﻿#Include "../Tabs/FlowModes.ahk"
+#Include "../Tabs/History.ahk"
 
 Tabs(CF, popupTitle, config) {
 	
@@ -8,7 +9,7 @@ Tabs(CF, popupTitle, config) {
 		FlowModes(CF, config),
 
 		Tab3.UseTab(2),
-		CF.AddText("","test"),
+		History(CF, config),
 
 		Tab3.UseTab()
 	)
