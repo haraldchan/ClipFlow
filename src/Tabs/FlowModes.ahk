@@ -1,10 +1,14 @@
 ﻿#Include "../ActionModules/ProfileModify/ProfileModify.ahk"
 #Include "../ActionModules/InvoiceWechat.ahk"
+#Include "../ActionModules/ShareClip/ShareClip.ahk"
+#Include "../ActionModules/ReservationHandler/ReservationHandler.ahk"
 
 FlowModes(CF, config) {
 	modules := [
 		ProfileModify,
 		InvoiceWechat,
+		ShareClip,
+		ResvHandler,
 	]
 
 	moduleSelectedStored := config["app"]["moduleSelected"]
