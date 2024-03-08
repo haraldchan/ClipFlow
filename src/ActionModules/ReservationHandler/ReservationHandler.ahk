@@ -1,7 +1,5 @@
-#Include "../../../Lib/Classes/utils.ahk"
-#Include "../../../Lib/Classes/_JXON.ahk"
-#Include "./RH_Macros/RH_Fedex.ahk"
-#Include "./RH_Macros/RH_OTA.ahk"
+#Include "./RH_Fedex.ahk"
+#Include "./RH_OTA.ahk"
 
 store := A_MyDocuments . "\ClipFlow.ini"
 class ResvHandler {
@@ -38,9 +36,11 @@ class ResvHandler {
         if (!InStr(A_Clipboard, '"identifier":"ReservationHandler"')) {
             return
         }
-        IniWrite(A_Clipboard, store, "ResvHandler", "JSON")
-        clb := A_Clipboard
-        resvInfoObj := Jxon_Load(&clb)
+        ; IniWrite(A_Clipboard, store, "ResvHandler", "JSON")   
+        configRead(CONFIG_FILE)["resvHandler"]["JSON"] := A_Clipboard
+        ; clb := A_Clipboard
+        ; resvInfoObj := Jxon_Load(&clb)
+        resvInfoObj := JSON.parse(A_Clipboard)
 
         this.showCurrentResvDetails(resvInfoObj, App)
     }
@@ -130,8 +130,9 @@ class ResvHandler {
 
     static modifyReservation(App) {
         App.Hide()
-        bookingInfo := IniRead(store, "ResvHandler", "JSON")
-        bookingInfoObj := Jxon_Load(&bookingInfo)
+        ; bookingInfo := IniRead(store, "ResvHandler", "JSON")
+        ; bookingInfoObj := Jxon_Load(&bookingInfo)
+        bookingInfoObj := configRead(CONFIG_FILE)["resvHandler"][JSON]
 
         switch bookingInfoObj["agent"] {
             case "fedex":

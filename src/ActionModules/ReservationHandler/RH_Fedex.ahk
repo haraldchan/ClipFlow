@@ -1,6 +1,3 @@
-#Include "../../../../Lib/Classes/utils.ahk"
-#Include "../../../../Lib/ClipFlow/DictIndex.ahk"
-
 class FedexBookingEntry {
     static USE(infoObj, curIndex, initX := 194, initY := 183) {
         pmsCiDate := (StrSplit(infoObj["ETA"], ":"))[1] < 10

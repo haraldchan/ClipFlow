@@ -1,5 +1,3 @@
-#Include "../../../../Lib/ClipFlow/DictIndex.ahk"
-
 class BookingEntry {
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(infoObj, roomType, comment, pmsGuestNames, initX := 193, initY := 182) {
