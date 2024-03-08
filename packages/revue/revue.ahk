@@ -1,5 +1,5 @@
 #Include "./typeChecker.ahk"
-#Include "./JSON.ahk"
+#Include "../JSON.ahk"
 
 class ReactiveSignal {
     __New(val) {

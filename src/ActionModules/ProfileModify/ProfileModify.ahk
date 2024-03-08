@@ -1,5 +1,5 @@
-#Include "../../../Lib/ClipFlow/dict.ahk"
-#Include "../../../Lib/ClipFlow/DictIndex.ahk"
+#Include "./Dict.ahk"
+#Include "./DictIndex.ahk"
 
 class ProfileModify {
     static name := "Profile Modify"

@@ -1,9 +1,9 @@
 ﻿#Include "../../packages/revue/revue.ahk"
 #Include "../../packages/revue/typeChecker.ahk"
-#Include "../../packages/revue/JSON.ahk"
-#Include "../../packages/revue/utils.ahk"
-#Include "../../packages/revue/defineArrayMethods.ahk"
-#Include "../src/ActionModules/ProfileModify.ahk"
+#Include "../../packages/JSON.ahk"
+#Include "../../packages/utils.ahk"
+#Include "../../packages/defineArrayMethods.ahk"
+#Include "../ActionModules/ProfileModify/ProfileModify.ahk"
 
 Tabs(CF, popupTitle, CONFIG_FILE) {
 	
