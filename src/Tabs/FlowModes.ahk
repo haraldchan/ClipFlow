@@ -27,7 +27,7 @@ FlowModes(CF) {
 				.OnEvent("Click", (r*) => (
 					; config["app"]["moduleSelected"] := (r[1].value = 1) ? index : 0,
 					; configSave(CONFIG_FILE, config),
-					config.write("moduleSelected", (r[1].value = 1) ? index : 0),
+					config.write("moduleSelected", (r[1].value = 1) ? index : 1),
 					utils.cleanReload(winGroup)
 				)
 			)
