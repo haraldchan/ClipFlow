@@ -2,7 +2,7 @@
 #Include "../Tabs/History.ahk"
 
 ; Tabs(CF, popupTitle, config) {
-Tabs(CF, popupTitle) {
+Tabs(CF) {
 	; saveCurrentTab(curTab) {
 		; udpatedConfig := configRead(CONFIG_FILE)
 		; udpatedConfig["app"]["tabPos"] := curTab

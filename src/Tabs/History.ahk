@@ -14,11 +14,17 @@ History(CF) {
 		if (A_Clipboard = "") {
         	return
     	}
-    	if (config["clipHistory"].Length = 10) {
-    		config["clipHistory"].Pop()
-    	}
-    	config["clipHistory"].InsertAt(1, A_Clipboard)
+    	; if (config["clipHistory"].Length = 10) {
+    		; config["clipHistory"].Pop()
+    	; }
+		updated := []
+		if (config.read("clipHistory").Length = 10) {
+			updated := config.read("clipHistory").Pop()
+		}
+    	; config["clipHistory"].InsertAt(1, A_Clipboard)
     	; configSave(CONFIG_FILE, config)
+		updated.InsertAt(1, A_Clipboard)
+		config.write("clipHistory", updated)
 	}
 
 	fillBlank(history){

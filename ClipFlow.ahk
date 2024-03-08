@@ -34,7 +34,7 @@ config := useConfigJSON(
 ; Gui
 ClipFlow := Gui(, popupTitle)
 ; App(ClipFlow, popupTitle, CONFIG_FILE)
-App(ClipFlow, popupTitle)
+App(ClipFlow)
 ClipFlow.Show()
 
 ; hotkeys setup
