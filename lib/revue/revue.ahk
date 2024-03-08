@@ -1,7 +1,7 @@
 #Include "./typeChecker.ahk"
 #Include "../JSON.ahk"
 
-class ReactiveSignal {
+class signal {
     __New(val) {
         this.value := val is Object ? this.mapify(val) : val
         this.subs := []
@@ -51,9 +51,9 @@ class ReactiveSignal {
     }
 }
 
-class ComputedSignal {
+class computed {
     __New(signal, mutation) {
-        checkType(signal, ReactiveSignal, "First parameter is not a ReactiveSignal.")
+        checkType(signal, Signal, "First parameter is not a ReactiveSignal.")
         checkType(mutation, Func, "Second parameter is not a Function.")
 
         this.signal := signal
