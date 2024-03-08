@@ -1,14 +1,14 @@
 History(CF, config) {
+	clipHistory := signal(configRead(CONFIG_FILE)["clipHistory"])
+	fillBlank(clipHistory.value)
+
 	OnClipboardChange (*) => (
-		addToHistory(),
+		saveHistory(),
 		sleep(100),
 		updateHistoryList()
 	)
 
-	clipHistory := ReactiveSignal(configRead(CONFIG_FILE)["clipHistory"])
-	fillBlank(clipHistory.value)
-
-	addToHistory(*) {
+	saveHistory(*) {
 		if (A_Clipboard = "") {
         	return
     	}
