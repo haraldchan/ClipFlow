@@ -1,13 +1,9 @@
-#Include "../../../Lib/Classes/utils.ahk"
-#Include "../../../Lib/Classes/_JXON.ahk"
-#Include "../../App.ahk"
-
 class ShareClip {
     static name := "Share Clip"
     static title := "Flow Mode - " . this.name
-    static popupTitle := "ClipFlow - " . this.name
-    static scriptHost := SubStr(A_ScriptDir, 1, InStr(A_ScriptDir, "\", , -1, -1) - 1)
-    static shareClipFolder := this.scriptHost . "\Lib\ClipFlow\SharedClips"
+    ; static popupTitle := "ClipFlow - " . this.name
+    ; static scriptHost := SubStr(A_ScriptDir, 1, InStr(A_ScriptDir, "\", , -1, -1) - 1)
+    static shareClipFolder := A_ScriptDir . "\src\ActionModules\ShareClip\SharedClips"
     static shareTxt := Format("{1}\{2}.txt", this.shareClipFolder, FormatTime(A_Now, "yyyyMMdd"))
     static prefix := Format("发送自: {1}, {2} `r`n", A_UserName, FormatTime(A_Now))
     static archiveDays := 5
@@ -62,8 +58,9 @@ class ShareClip {
         }
 
         sendHistory(*) {
-            his := IniRead(store, "ClipHistory", "clipHisArr")
-            clipHistory := Jxon_Load(&his)
+            ; his := IniRead(store, "ClipHistory", "clipHisArr")
+            ; clipHistory := Jxon_Load(&his)
+            clipHistory := configRead(CONFIG_FILE)["clipHistory"]
             if (!clipHistory.Length) {
                 return
             }
