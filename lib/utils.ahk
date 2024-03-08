@@ -234,12 +234,3 @@ class interface {
         return checkedRowsData
     }
 }
-
-configRead(config) {
-    return JSON.parse(FileRead(config))
-}
-
- configSave(configFile, configMap) {
-    FileDelete(configFile)
-    FileAppend(JSON.stringify(configMap), configFile)
-}
