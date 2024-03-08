@@ -1,12 +1,12 @@
 ﻿#Include "../ActionModules/ProfileModify/ProfileModify.ahk"
 #Include "../ActionModules/InvoiceWechat.ahk"
 
-modules := [
-	ProfileModify,
-	InvoiceWechat,
-]
-
 FlowModes(CF, config) {
+	modules := [
+		ProfileModify,
+		InvoiceWechat,
+	]
+
 	moduleSelectedStored := config["app"]["moduleSelected"]
     moduleSelected := moduleSelectedStored > modules.Length ? 1 : moduleSelectedStored
 
@@ -21,7 +21,7 @@ FlowModes(CF, config) {
 				.OnEvent("Click", (r*) => (
 					config["app"]["moduleSelected"] := (r[1].value = 1) ? index : 0,
 					configSave(CONFIG_FILE, config),
-					utils.cleanReload([])
+					utils.cleanReload(winGroup)
 					)
 				)
 		),
