@@ -1,7 +1,5 @@
-#Include "./dict.ahk"
+#Include "./Dict.ahk"
 #Include "./DictIndex.ahk"
-
-winGroup := ["ahk_class SunAwtFrame", "旅客信息"]
 
 class ProfileModify {
     static name := "Profile Modify"
@@ -15,12 +13,18 @@ class ProfileModify {
         2、复制完成后请打开Opera Profile 界面，
           点击“开始填入”。
     )"
+    static assetFolder := A_ScriptDir . "\src\Assets"
     static profileAnchor := (A_OSVersion = "6.1.7601")
-            ? "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\ProfileAnchorWin7.PNG"
-            : "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\ProfileAnchor.PNG"
+            ? this.assetFolder . "\ProfileAnchorWin7.PNG"
+            : this.assetFolder . "\ProfileAnchor.PNG"
+            ; ? "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\ProfileAnchorWin7.PNG"
+            ; : "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\ProfileAnchor.PNG"
     static altAnchor := (A_OSVersion = "6.1.7601")
-            ? "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\AltAnchorWin7.PNG"
-            : "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\AltAnchor.PNG"
+            ? this.assetFolder . "\AltAnchorWin7.PNG"
+            : this.assetFolder . "\AltAnchor.PNG"
+            ; ? "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\AltAnchorWin7.PNG"
+            ; : "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\AltAnchor.PNG"
+
 
     static USE(App) {
         ; GUI
