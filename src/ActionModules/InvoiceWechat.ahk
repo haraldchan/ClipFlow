@@ -1,5 +1,3 @@
-#Include "../../../Lib/Classes/utils.ahk"
-
 class InvoiceWechat {
     static name := "Invoice Fill-in(Wechat)"
     static title := "Flow Mode - " . this.name
