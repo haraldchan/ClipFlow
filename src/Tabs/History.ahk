@@ -1,5 +1,7 @@
-History(CF, config) {
-	clipHistory := signal(configRead(CONFIG_FILE)["clipHistory"])
+; History(CF, config) {
+History(CF) {
+	; clipHistory := signal(configRead(CONFIG_FILE)["clipHistory"])
+	clipHistory := signal(config.read("clipHistory"))
 	fillBlank(clipHistory.value)
 
 	OnClipboardChange (*) => (
@@ -16,7 +18,7 @@ History(CF, config) {
     		config["clipHistory"].Pop()
     	}
     	config["clipHistory"].InsertAt(1, A_Clipboard)
-    	configSave(CONFIG_FILE, config)
+    	; configSave(CONFIG_FILE, config)
 	}
 
 	fillBlank(history){
@@ -30,7 +32,8 @@ History(CF, config) {
 	}
 
 	updateHistoryList(*){
-		updatedHistory := configRead(CONFIG_FILE)["clipHistory"]
+		; updatedHistory := configRead(CONFIG_FILE)["clipHistory"]
+		updatedHistory := config.read("clipHistory")
 		fillBlank(updatedHistory)
 	}
 

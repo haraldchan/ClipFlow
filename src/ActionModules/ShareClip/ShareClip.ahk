@@ -60,7 +60,8 @@ class ShareClip {
         sendHistory(*) {
             ; his := IniRead(store, "ClipHistory", "clipHisArr")
             ; clipHistory := Jxon_Load(&his)
-            clipHistory := configRead(CONFIG_FILE)["clipHistory"]
+            ; clipHistory := configRead(CONFIG_FILE)["clipHistory"]
+            clipHistory := config.read("clipHistory")
             if (!clipHistory.Length) {
                 return
             }

@@ -37,9 +37,10 @@ class ResvHandler {
             return
         }
         ; IniWrite(A_Clipboard, store, "ResvHandler", "JSON")   
-        config := configRead(CONFIG_FILE)
-        config["resvHandler"]["JSON"] := A_Clipboard
-        configSave(CONFIG_FILE, config)
+        ; config := configRead(CONFIG_FILE)
+        ; config["resvHandler"]["JSON"] := A_Clipboard
+        ; configSave(CONFIG_FILE, config)
+        config.write("JSON", A_Clipboard) 
         ; clb := A_Clipboard
         ; resvInfoObj := Jxon_Load(&clb)
         resvInfoObj := JSON.parse(A_Clipboard)
@@ -134,7 +135,8 @@ class ResvHandler {
         App.Hide()
         ; bookingInfo := IniRead(store, "ResvHandler", "JSON")
         ; bookingInfoObj := Jxon_Load(&bookingInfo)
-        bookingInfoObj := configRead(CONFIG_FILE)["resvHandler"][JSON]
+        ; bookingInfoObj := configRead(CONFIG_FILE)["resvHandler"]["JSON"]
+        bookingInfoObj := config.read("JSON")
 
         switch bookingInfoObj["agent"] {
             case "fedex":
