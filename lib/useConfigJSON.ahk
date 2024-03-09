@@ -24,6 +24,7 @@ class useConfigJSON {
                     }
                 }
             }
+            return "undefined"
         }
 
         config := JSON.parse(FileRead(this.path))
