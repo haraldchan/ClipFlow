@@ -13,6 +13,13 @@ History(CF) {
         	return
     	}
 		updated := config.read("clipHistory")
+		
+		for item in updated {
+			if (A_Clipboard = item) {
+				return
+			}
+		}
+
 		if (updated.Length = 10) {
 			updated.Pop()
 		}
