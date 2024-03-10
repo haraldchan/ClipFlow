@@ -3,7 +3,6 @@
 #Include "../ActionModules/ShareClip/ShareClip.ahk"
 #Include "../ActionModules/ReservationHandler/ReservationHandler.ahk"
 
-; FlowModes(CF, config) {
 FlowModes(CF) {
 	modules := [
 		ProfileModify,
@@ -12,7 +11,6 @@ FlowModes(CF) {
 		ResvHandler,
 	]
 
-	; moduleSelectedStored := config["app"]["moduleSelected"]
 	moduleSelectedStored := config.read("moduleSelected")
     moduleSelected := moduleSelectedStored > modules.Length ? 1 : moduleSelectedStored
 
@@ -25,8 +23,6 @@ FlowModes(CF) {
 			index := A_Index
 			CF.AddRadio(moduleRadioStyle(A_Index), module.name)
 				.OnEvent("Click", (r*) => (
-					; config["app"]["moduleSelected"] := (r[1].value = 1) ? index : 0,
-					; configSave(CONFIG_FILE, config),
 					config.write("moduleSelected", (r[1].value = 1) ? index : 1),
 					utils.cleanReload(winGroup)
 				)

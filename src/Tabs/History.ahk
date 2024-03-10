@@ -1,6 +1,4 @@
-; History(CF, config) {
 History(CF) {
-	; clipHistory := signal(configRead(CONFIG_FILE)["clipHistory"])
 	clipHistory := signal(config.read("clipHistory"))
 	fillBlank(clipHistory.value)
 
@@ -14,15 +12,10 @@ History(CF) {
 		if (A_Clipboard = "") {
         	return
     	}
-    	; if (config["clipHistory"].Length = 10) {
-    		; config["clipHistory"].Pop()
-    	; }
-		updated := []
-		if (config.read("clipHistory").Length = 10) {
-			updated := config.read("clipHistory").Pop()
+		updated := config.read("clipHistory")
+		if (updated.Length = 10) {
+			updated.Pop()
 		}
-    	; config["clipHistory"].InsertAt(1, A_Clipboard)
-    	; configSave(CONFIG_FILE, config)
 		updated.InsertAt(1, A_Clipboard)
 		config.write("clipHistory", updated)
 	}
@@ -38,7 +31,6 @@ History(CF) {
 	}
 
 	updateHistoryList(*){
-		; updatedHistory := configRead(CONFIG_FILE)["clipHistory"]
 		updatedHistory := config.read("clipHistory")
 		fillBlank(updatedHistory)
 	}
@@ -49,4 +41,3 @@ History(CF) {
 		)
 	)
 }
-

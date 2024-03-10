@@ -14,41 +14,47 @@ class useConfigJSON {
 
     read(key) {
         getValue(obj, key) {
-            if (obj is Object && !(obj is Array) && !(obj is Map)) {
-                for k, v in obj {
-                    if (k == key) {
-                        return v
-                    }
-                    if (obj.HasOwnProp(k)) {
-                        return getValue(v, key)
+            val := ""
+
+            for k, v in obj {
+                if (k = key) {
+                    return v
+                } else if (v is Object) {
+                    val := getValue(v, key)
+                    if (val != "") {
+                        return val
                     }
                 }
             }
-            return "undefined"
+
+            return val
         }
 
-        config := JSON.parse(FileRead(this.path))
-        return getValue(config, key)
+        configRead := JSON.parse(FileRead(this.path))
+        return getValue(configRead, key)
     }
 
-    write(key, val) {
+    write(keyToFind, newVal) {
+        
         writeValue(obj, key, val) {
-            if (obj is Object && !(obj is Array) && !(obj is Map)) {
-                for k in obj {
-                    if (k == key) {
-                        v := val
-                    }
-                    if (obj.HasOwnProp(k)) {
-                        writeValue(v, key, val)
-                    }
+            o := obj
+
+            for k, v in o {
+                if (k = key) {
+                    o[k] := val
+                    break
+                }
+                 else if (v is Object) {
+                    writeValue(v, key, newVal)
                 }
             }
+
+            return o
         }
 
         config := JSON.parse(FileRead(this.path))
-        writeValue(config, key, val)
         
         FileDelete(this.path)
-        FileAppend(JSON.stringify(config), this.path)
+        FileAppend(JSON.stringify(writeValue(config, keyToFind, newVal)), this.path)
     }
 }

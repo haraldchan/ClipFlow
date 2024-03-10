@@ -1,7 +1,7 @@
 class ShareClip {
     static name := "Share Clip"
     static title := "Flow Mode - " . this.name
-    ; static popupTitle := "ClipFlow - " . this.name
+    static popupTitle := "ClipFlow - " . this.name
     ; static scriptHost := SubStr(A_ScriptDir, 1, InStr(A_ScriptDir, "\", , -1, -1) - 1)
     static shareClipFolder := A_ScriptDir . "\src\ActionModules\ShareClip\SharedClips"
     static shareTxt := Format("{1}\{2}.txt", this.shareClipFolder, FormatTime(A_Now, "yyyyMMdd"))

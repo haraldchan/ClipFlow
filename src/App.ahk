@@ -12,17 +12,14 @@ App(CF) {
 	}
 
 	clearList(*) {
-	    ; FileDelete(CONFIG_FILE)
 		FileDelete(config.path)
-	    ; FileCopy(CONFIG_TEMPLATE, A_MyDocuments)
 		config.createLocal()
     	utils.cleanReload(winGroup)
 	}
 
 	return (
 		CF.AddCheckbox("h25 x15", "保持 ClipFlow 置顶    / 停止脚本: Ctrl+F12").OnEvent("Click", keepOnTop),
-		
-		; Tabs(CF, popupTitle, config),
+
 		Tabs(CF),
 
 		ClipFlow.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
