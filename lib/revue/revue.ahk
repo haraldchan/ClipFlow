@@ -6,6 +6,7 @@ class signal {
         this.value := val is Object ? this.mapify(val) : val
         this.subs := []
         this.comps := []
+        this.effects := []
     }
 
     get(mutateFunction := 0) {
@@ -17,6 +18,8 @@ class signal {
     }
 
     set(newSignalValue) {
+        prevValue := this.value
+
         if (newSignalValue = this.value) {
             return
         }
@@ -30,14 +33,25 @@ class signal {
             this.value := this.mapify(this.value)
         }
 
+        ; notify all subscribers to update
+        for ctrl in this.subs {
+            ctrl.update()
+        }
+
         ; notify all computed signals
         for comp in this.comps {
             comp.sync(this.value)
         }
 
-        ; notify all subscribers to update
-        for ctrl in this.subs {
-            ctrl.update()
+        ; run all effects
+        for effect in this.effects {
+            if (effect.MaxParams = 1) {
+                effect(this.value)
+            } else if (effect.MaxParams = 2) {
+                effect(this.value, prevValue)
+            } else {
+                effect()
+            }
         }
     }
 
@@ -49,6 +63,10 @@ class signal {
         this.comps.Push(computed)
     }
 
+    addEffect(effectFn) {
+        this.effects.Push(effectFn)
+    }
+
     mapify(obj) {
         if (!(obj is Object)) {
             return obj
@@ -58,27 +76,58 @@ class signal {
 }
 
 class computed {
-    __New(signal, mutation) {
-        checkType(signal, signal, "First parameter is not a ReactiveSignal.")
+    __New(_signal, mutation) {
+        checkType(_signal, signal, "First parameter is not a ReactiveSignal.")
         checkType(mutation, Func, "Second parameter is not a Function.")
 
-        this.signal := signal
+        this.signal := _signal
         this.mutation := mutation
-        this.value := this.mutation.Call(this.signal.get())
+        this.value := this.mutation.Call(this.signal.value)
         this.subs := []
+        this.comps := []
+        this.effects := []
 
-        signal.addComp(this)
+        this.signal.addComp(this)
     }
 
     sync(newVal) {
         this.value := this.mutation.Call(newVal)
+        
+        ; notify all subscribers to update
         for ctrl in this.subs {
             ctrl.update()
         }
+
+        ; notify all computed signals
+        for comp in this.comps {
+            comp.sync(this.value)
+        }
+
+        ; run all effectss
+        if (this.effects.Length > 0) {
+            for effect in this.effects {
+                effect()
+            }
+        }
+
     }
 
     addSub(controlInstance) {
         this.subs.Push(controlInstance)
+    }
+
+    addComp(computed) {
+        this.comps.Push(computed)
+    }
+
+    addEffect(effectFn) {
+        this.effects.Push(effectFn)
+    }
+}
+
+class effect {
+    __New(depend, effectFn) {
+        depend.addEffect(effectFn)
     }
 }
 
@@ -118,7 +167,7 @@ class AddReactive {
         if (event != 0) {
             this.event := event[1]
             this.callback := event[2]
-            this.ctrl.OnEvent(this.event, (*) => this.callback())
+            this.ctrl.OnEvent(this.event, this.callback)
         }
     }
 
@@ -208,7 +257,7 @@ class AddReactive {
     }
 
     setEvent(event, callback) {
-        this.ctrl.OnEvent(event, (*) => callback())
+        this.ctrl.OnEvent(event, this.callback)
     }
 
     disable(state) {
