@@ -1,15 +1,16 @@
 class useConfigJSON {
-    __New(configTemplate, configFileName) {
-        this.configTemplate := configTemplate
+    __New(configTemplateSrc, configFileName, configDest := A_MyDocuments) {
+        this.configTemplateSrc := configTemplateSrc
         this.configFilename := configFilename
+        this.configDest := configDest
         this.path := this.createLocal()
     }
 
     createLocal() {
-        if (!FileExist(A_MyDocuments . "\" . this.configFileName)) {
-            FileCopy(this.configTemplate, A_MyDocuments)
+        if (!FileExist(this.configDest . "\" . this.configFileName)) {
+            FileCopy(this.configTemplateSrc, this.configDest)
         }
-        return A_MyDocuments . "\" . this.configFileName
+        return this.configDest . "\" . this.configFileName
     }
 
     read(key) {
@@ -35,7 +36,6 @@ class useConfigJSON {
     }
 
     write(keyToFind, newVal) {
-        
         writeValue(obj, key, val) {
             o := obj
 
@@ -58,3 +58,4 @@ class useConfigJSON {
         FileAppend(JSON.stringify(writeValue(config, keyToFind, newVal)), this.path)
     }
 }
+
