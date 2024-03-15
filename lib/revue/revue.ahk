@@ -3,7 +3,11 @@
 
 class signal {
     __New(val) {
-        this.value := val is Object ? this.mapify(val) : val
+        this.value := ((val is Class) or (val is Func))
+            ? val
+            : val is Object
+                ? this.mapify(val)
+                : val
         this.subs := []
         this.comps := []
         this.effects := []
@@ -29,7 +33,7 @@ class signal {
             : newSignalValue
 
         ; change to Map()
-        if (newSignalValue is Object) {
+        if (!(newSignalValue is Class) && newSignalValue is Object) {
             this.value := this.mapify(this.value)
         }
 
@@ -92,7 +96,7 @@ class computed {
 
     sync(newVal) {
         this.value := this.mutation.Call(newVal)
-        
+
         ; notify all subscribers to update
         for ctrl in this.subs {
             ctrl.update()
@@ -143,11 +147,16 @@ class AddReactive {
         this.GuiObject := GuiObject
         this.options := options
         this.formattedString := textString
-        this.innerText := RegExMatch(textString, "\{\d+\}")
-            ? this.handleFormatStr(textString, depend, key)
-            : textString
+
+        if (controlType = "ComboBox") {
+            this.innerText := textString
+        } else {
+            this.innerText := RegExMatch(textString, "\{\d+\}")
+                ? this.handleFormatStr(textString, depend, key)
+                : textString
+        }
+
         this.depend := depend
-        this.key := key
 
         ; add control
         this.ctrl := this.GuiObject.Add(this.ctrlType, this.options, this.innerText)
@@ -257,7 +266,7 @@ class AddReactive {
     }
 
     setEvent(event, callback) {
-        this.ctrl.OnEvent(event, this.callback)
+        this.ctrl.OnEvent(event, callback)
     }
 
     disable(state) {
@@ -301,22 +310,22 @@ class AddReactiveRadio extends AddReactive {
 }
 
 
-; class AddReactiveComboBox extends AddReactive {
-;     __New(GuiObject, options, mapObj, depend := 0, key := 0, event := 0) {
-;         ; mapObj: a Map(value, optionText) map object
-;         this.key := key
-;         this.mapObj := mapObj
-;         this.vals := []
-;         this.text := []
-;         for val, text in this.mapObj {
-;             this.vals.Push(val)
-;             this.text.Push(text)
-;         }
-;         super.__New("ComboBox", GuiObject, options, this.text, depend, key, event)
-;     }
+class AddReactiveComboBox extends AddReactive {
+    __New(GuiObject, options, mapObj, depend := 0, key := 0, event := 0) {
+        ; mapObj: a Map(value, optionText) map object
+        this.key := key
+        this.mapObj := mapObj
+        this.vals := []
+        this.text := []
+        for val, text in this.mapObj {
+            this.vals.Push(val)
+            this.text.Push(text)
+        }
+        super.__New("ComboBox", GuiObject, options, this.text, depend, key, event)
+    }
 
-;     ; overiding the getValue() of ReactiveControl. Returning the value of mapObj instead.
-;     getValue() {
-;         return this.vals[this.ctrl.Value]
-;     }
-; }
+    ; overiding the getValue() of ReactiveControl. Returning the value of mapObj instead.
+    getValue() {
+        return this.vals[this.ctrl.Value]
+    }
+}
