@@ -40,12 +40,19 @@ defineArrayMethods(arr){
     map(arr, fn) {
         newArray := []
 
-        for item in arr {
-            newArray.Push(fn(item))
+        if (fn.MaxParams = 1) {
+            for item in arr {
+                newArray.Push(fn(item))
+            }
+        } else if (fn.MaxParams = 2) {
+            for item in arr {
+                newArray.Push(fn(item, A_Index))
+            }
         }
+
         return newArray
     }
-
+    
     reduce(arr, fn, initialValue) {
         initIsSet := !(initialValue = 0)
         accumulator := initIsSet ? initialValue : arr[1]
