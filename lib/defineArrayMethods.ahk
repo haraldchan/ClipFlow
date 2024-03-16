@@ -5,6 +5,9 @@ defineArrayMethods(arr){
     arr.Prototype.Map := map
     arr.Prototype.Reduce := reduce
     arr.Prototype.With := with
+    arr.Prototype.Concat := concat
+    arr.Prototype.Unshift := unshift
+    arr.Prototype.toReversed := toReversed
 
     some(arr, fn){
         for item in arr {
@@ -74,6 +77,45 @@ defineArrayMethods(arr){
             newArray.Push(item)
         }
         newArray[index] := newValue
+        return newArray
+    }
+
+    concat(arr, val){
+        newArray := arr
+
+        if (val is Array) {
+            for item in val {
+                newArray.Push(item)
+            }
+        } else {
+            newArray.Push(val)
+        }
+        return newArray
+    }
+
+    unshift(arr, val){
+        newArray := arr
+
+        if (val is Array) {
+
+            for item in val.toReversed() {
+                newArray.InsertAt(1, item)
+            }
+        } else {
+            newArray.InsertAt(1, val)
+        }
+        return newArray    
+    }
+
+    toReversed(arr){
+        newArray := []
+        index := arr.Length
+
+        loop arr.Length {
+            newArray.Push(arr[index])
+            index--
+        }
+
         return newArray
     }
 }
