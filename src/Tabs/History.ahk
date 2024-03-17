@@ -1,7 +1,6 @@
 History(CF) {
-	clipHistory := signal(config.read("clipHistory"))
-	fillBlank(clipHistory.value)
-
+	clipHistory := signal(fillBlank(config.read("clipHistory")))
+	; fillBlank(clipHistory.value)
 	OnClipboardChange (*) => (
 		saveHistory(),
 		sleep(100),
