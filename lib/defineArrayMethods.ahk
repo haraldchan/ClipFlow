@@ -1,13 +1,14 @@
 defineArrayMethods(arr) {
-    arr.Prototype.Some := some
-    arr.Prototype.Every := every
-    arr.Prototype.Filter := filter
-    arr.Prototype.Map := map
-    arr.Prototype.Reduce := reduce
-    arr.Prototype.With := with
-    arr.Prototype.Concat := concat
-    arr.Prototype.Unshift := unshift
+    arr.Prototype.some := some
+    arr.Prototype.every := every
+    arr.Prototype.filter := filter
+    arr.Prototype.map := map
+    arr.Prototype.reduce := reduce
+    arr.Prototype.with := with
+    arr.Prototype.concat := concat
+    arr.Prototype.unshift := unshift
     arr.Prototype.toReversed := toReversed
+    arr.Prototype.unique := unique
 
     some(arr, fn) {
         for item in arr {
@@ -121,6 +122,18 @@ defineArrayMethods(arr) {
         loop arr.Length {
             newArray.Push(arr[index])
             index--
+        }
+
+        return newArray
+    }
+
+    unique(arr){
+        newArray := arr
+
+        loop newArray.Length {
+            curItem := newArray[1]
+            newArray := newArray.filter(item => item != curItem)
+            newArray.Push(curItem)
         }
 
         return newArray
