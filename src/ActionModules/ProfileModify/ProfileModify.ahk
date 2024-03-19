@@ -25,7 +25,6 @@ class ProfileModify {
             ; ? "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\AltAnchorWin7.PNG"
             ; : "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\AltAnchor.PNG"
 
-
     static USE(App) {
         ; GUI
         ui := [
@@ -41,23 +40,35 @@ class ProfileModify {
         copyBtn.OnEvent("Click", psbCopy)
         psbCopy(*) {
             App.Hide()
+            this.suspendQM2()
             Sleep 200
             global profileCache := this.copy()
             copyBtn.Enabled := false
             pasteBtn.Enabled := true
             ; App.Show()
             pasteBtn.Focus()
+            this.suspendQM2()
         }
         
         pasteBtn.OnEvent("Click", psbPaste)
         psbPaste(*) {
             App.Hide()
+            this.suspendQM2()
             this.paste(profileCache)
             Sleep 200
             copyBtn.Enabled := true
             pasteBtn.Enabled := false
             copyBtn.Focus()
+            this.suspendQM2()
         }
+    }
+
+    static suspendQM2(){
+        QM2Path := "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\QM2 for FrontDesk\QM2.ahk"
+
+		DetectHiddenWindows true
+		SetTitleMatchMode 2
+		PostMessage 0x0111, 65305,,, QM2Path . " - AutoHotkey"  ; Suspend.
     }
 
     static copy() {
