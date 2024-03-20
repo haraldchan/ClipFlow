@@ -57,9 +57,11 @@ class ProfileModify {
 
     static suspendQM2(){
         QM2Path := "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\QM2 for FrontDesk\QM2.ahk"
+
+        DetectHiddenWindows true
+        SetTitleMatchMode 2
+
         if (WinExist("QM2 for FrontDesk 2.2.0")) {
-            DetectHiddenWindows true
-            SetTitleMatchMode 2
             PostMessage 0x0111, 65305,,, QM2Path . " - AutoHotkey"  ; Suspend.
         }
     }
