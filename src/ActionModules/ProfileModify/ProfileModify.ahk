@@ -17,13 +17,9 @@ class ProfileModify {
     static profileAnchor := (A_OSVersion = "6.1.7601")
             ? this.assetFolder . "\ProfileAnchorWin7.PNG"
             : this.assetFolder . "\ProfileAnchor.PNG"
-            ; ? "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\ProfileAnchorWin7.PNG"
-            ; : "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\ProfileAnchor.PNG"
     static altAnchor := (A_OSVersion = "6.1.7601")
             ? this.assetFolder . "\AltAnchorWin7.PNG"
             : this.assetFolder . "\AltAnchor.PNG"
-            ; ? "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\AltAnchorWin7.PNG"
-            ; : "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow\src\assets\AltAnchor.PNG"
 
     static USE(App) {
         ; GUI
@@ -64,11 +60,11 @@ class ProfileModify {
     }
 
     static suspendQM2(){
-        QM2Path := "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\QM2 for FrontDesk\QM2.ahk"
+        QM2Path := "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\QM2 for FrontDesk\QM 2.ahk"
 
-		DetectHiddenWindows true
-		SetTitleMatchMode 2
-		PostMessage 0x0111, 65305,,, QM2Path . " - AutoHotkey"  ; Suspend.
+        DetectHiddenWindows true
+        SetTitleMatchMode 2
+        PostMessage 0x0111, 65305,,, QM2Path . " - AutoHotkey"  ; Suspend.
     }
 
     static copy() {
