@@ -36,26 +36,22 @@ class ProfileModify {
         copyBtn.OnEvent("Click", psbCopy)
         psbCopy(*) {
             App.Hide()
-            this.suspendQM2()
             Sleep 200
             global profileCache := this.copy()
             copyBtn.Enabled := false
             pasteBtn.Enabled := true
             ; App.Show()
             pasteBtn.Focus()
-            this.suspendQM2()
         }
         
         pasteBtn.OnEvent("Click", psbPaste)
         psbPaste(*) {
             App.Hide()
-            this.suspendQM2()
             this.paste(profileCache)
             Sleep 200
             copyBtn.Enabled := true
             pasteBtn.Enabled := false
             copyBtn.Focus()
-            this.suspendQM2()
         }
     }
 
@@ -75,6 +71,7 @@ class ProfileModify {
         } catch {
             MsgBox("请先打开 旅客信息 窗口", this.popupTitle)
             utils.cleanReload(winGroup)
+            return
         }
         checkGuestType := [PixelGetColor(464, 87), PixelGetColor(553, 87), PixelGetColor(649, 87)]
         loop checkGuestType.Length {
@@ -83,6 +80,9 @@ class ProfileModify {
                 break
             }
         }
+
+        this.suspendQM2()
+
         return this.capture(gType)
     }
     
@@ -314,7 +314,10 @@ class ProfileModify {
             } catch {
                 MsgBox("请先打开 Opera 窗口。", this.popupTitle)
             }
-        }
+        } 
+
+        this.suspendQM2()
+
         return guestProfile
     }
 
@@ -329,6 +332,9 @@ class ProfileModify {
             anchorX := 205
             anchorY := 203           
         }
+
+        this.suspendQM2()
+
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         CoordMode "Mouse", "Screen"
         BlockInput true
@@ -433,5 +439,7 @@ class ProfileModify {
             WinActivate "ahk_exe hotel.exe"
             }
         } 
+
+        this.suspendQM2()
     }
 }
