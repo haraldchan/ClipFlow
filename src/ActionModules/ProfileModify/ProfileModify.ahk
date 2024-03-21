@@ -378,15 +378,11 @@ class ProfileModify {
         Send "{Tab}"
         Sleep 50
         Send Format("{Text}{1}", guestProfileMap["idNum"])
+        Sleep 50
 
-        loopDiff := guestProfileMap["address"] = "" ? 14 : 13
-        loop loopDiff { 
-            Send "{Tab}" 
-        } 
+        MouseMove anchorX + 393, anchorY + 28
         Sleep 50
-        Send "{Enter}"
-        Sleep 50
-        Send "{Escape}"
+        Click 3
         Send Format("{Text}{1}", guestProfileMap["idType"])
         Sleep 50
         Send "{Tab}"
