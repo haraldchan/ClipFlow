@@ -355,9 +355,7 @@ class ProfileModify {
         Sleep 50
         Send Format("{Text}{1}", guestProfileMap["gender"])
 
-        loop 2 { 
-            Send "{Tab}" 
-        } 
+        Send "{Tab}" 
         Sleep 50
         Send Format("{Text}{1}", guestProfileMap["address"])
 
