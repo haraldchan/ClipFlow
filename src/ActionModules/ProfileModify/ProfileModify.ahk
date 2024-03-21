@@ -379,14 +379,18 @@ class ProfileModify {
         Sleep 50
         Send Format("{Text}{1}", guestProfileMap["idNum"])
 
-        loop 14 { 
+        loopDiff := guestProfileMap["address"] = "" ? 14 : 13
+        loop loopDiff { 
             Send "{Tab}" 
         } 
         Sleep 50
         Send "{Enter}"
+        Sleep 50
         Send "{Escape}"
         Send Format("{Text}{1}", guestProfileMap["idType"])
-
+        Sleep 50
+        Send "{Tab}"
+        Sleep 50
         ; }
         if (guestProfileMap.Has("nameAlt")) {
             ; { with hanzi name
@@ -412,6 +416,7 @@ class ProfileModify {
             Send "{Tab}"
             Sleep 50
             Send "!o"
+            Sleep 100
         }
         BlockInput false
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
