@@ -11,23 +11,18 @@ FlowModes(CF) {
 		ResvHandler,
 	]
 
+	moduleNames := modules.map(module => module.name)
+
 	moduleSelectedStored := config.read("moduleSelected")
     moduleSelected := moduleSelectedStored > modules.Length ? 1 : moduleSelectedStored
 
-  	moduleRadioStyle(index) {
-  		return index = moduleSelected ? "h15 x30 y+10 Checked" : "h15 x30 y+10"
-  	}
-
 	return (
-		modules.map(module => 
-			index := A_Index
-			CF.AddRadio(moduleRadioStyle(A_Index), module.name)
-				.OnEvent("Click", (r*) => (
-					config.write("moduleSelected", (r[1].value = 1) ? index : 1),
-					utils.cleanReload(winGroup)
-				)
-			)
+		CF.AddDropDownList("y+10 w250 Choose" . moduleSelected, moduleNames)
+		.OnEvent("Change", (d*) => 
+			config.write("moduleSelected", d[1].value)
+			utils.cleanReload(winGroup)
 		),
+		; ,
 		modules[moduleSelected].USE(CF)
 	)
 }
