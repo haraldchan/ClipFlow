@@ -4,6 +4,16 @@ class useConfigJSON {
         this.configFilename := configFilename
         this.configDest := configDest
         this.path := this.createLocal()
+
+    }
+
+    updateKeys() {
+        localConfig := JSON.parse(FileRead(this.path))
+        tempConfig := JSON.parse(FileRead(this.configTemplateSrc))
+
+        if (localConfig.Capacity != tempConfig.Capacity) {
+            this.path := this.createLocal()
+        }
     }
 
     createLocal() {
