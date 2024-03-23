@@ -17,41 +17,87 @@ class ProfileModify {
     static AltNameAnchorPath := A_ScriptDir . "\src\Assets\AltNameAnchor.png"
 
     static USE(App) {
+        profileStored := JSON.parse(config.read("profileModify"))
+        currentGuest := signal(profileStored)
+        fieldIndex := Map(
+            "address", "地址",
+            "birthday", "生日",
+            "country", "国籍",
+            "gender", "性别",
+            "idNum", "证件号码",
+            "idType", "证件类型",
+            "language", "语言",
+            "nameAlt", "全名",
+            "nameFirst", "名字",
+            "nameLast", "姓氏",
+            "province", "省份"
+        )
+
         ; GUI
         ui := [
-            App.AddGroupBox("R6 w250 y+20", this.title),
-            App.AddText("xp+10 yp+20", this.desc),
-            App.AddButton("vcopyBtn Default xp h35 w110 y+15", "开始复制"),
-            App.AddButton("vpasteBtn Disabled xp+10 h35 w110 x+10 ", "开始填入"),
+            App.AddGroupBox("R18 w250 y+20", this.title),
+            App.AddText("xp10 yp+20", this.desc),
+
+            App.AddText("vtitle y+12 h20 w230", "当前客人信息"),
+
+            App.AddListView("vguestInfo y+5 w230 h270", ["信息字段", "证件信息"]),
+
+            App.AddButton("vcopyBtn Default xp h35 w110 y+5", "复制 (&C)"),
+            App.AddButton("vpasteBtn xp+10 h35 w110 x+10 ", "填入 (&V)"),
         ]
         
         copyBtn := interface.getCtrlByName("copyBtn", ui)
         pasteBtn := interface.getCtrlByName("pasteBtn", ui)
+        guestInfo := interface.getCtrlByName("guestInfo", ui)
+        interface.getCtrlByName("title", ui).SetFont("bold s11 q4","")
+
+        for key, field in fieldIndex {
+            val := currentGuest.value.has(key) ? currentGuest.value[key] : ""
+            guestInfo.Add(, field, val)
+        }
+
         ; function
+        guestInfo.OnEvent("DoubleClick", copyField)
+        copyField(LV, row) {
+            if (config.read("profileModify") = "") {
+                return
+            }
+            A_Clipboard := LV.GetText(row, 2)
+            key := LV.GetText(row, 1)
+            copiedPopup := Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard)
+            MsgBox(copiedPopup, this.popupTitle, "4096 T1")
+        }
+
         copyBtn.OnEvent("Click", psbCopy)
         psbCopy(*) {
             App.Hide()
             Sleep 200
-            global profileCache := this.copy()
-            copyBtn.Enabled := false
-            pasteBtn.Enabled := true
-            ; App.Show()
+            currentGuest.set(this.copy())
+            config.write("profileModify", JSON.stringify(currentGuest.value))
+            this.updateList(currentGuest.value, fieldIndex, guestInfo)
+
+            WinActivate "ahk_class SunAwtFrame"
+            App.Show()
             pasteBtn.Focus()
         }
         
         pasteBtn.OnEvent("Click", psbPaste)
         psbPaste(*) {
             App.Hide()
-            this.paste(profileCache)
-            Sleep 200
-            copyBtn.Enabled := true
-            pasteBtn.Enabled := false
+            this.paste(currentGuest.value)
             copyBtn.Focus()
         }
     }
 
+    static updateList(curGuest, fieldIndex , LV) {
+        for k, v in curGuest {
+            LV.Modify(A_Index,, fieldIndex[k] , v)
+        }
+        MsgBox("已更新     ", "Profile Modify New", "4096 T1")
+    }
+
     static suspendQM2(){
-        QM2Path := "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\QM2 for FrontDesk\QM2.ahk"
+        QM2Path := "QM2.ahk"
 
         DetectHiddenWindows true
         SetTitleMatchMode 2
@@ -263,7 +309,7 @@ class ProfileModify {
             } else if (StrLen(infoArr[3]) = 9) {
                 guestProfile["idType"] := (SubStr(guestProfile["idNum"], 1, 1) = "C") ? "MRP" : "IDP"
             } else {
-                guestProfile["idType"] := ""
+                guestProfile["idType"] := " "
             }
             guestProfile["address"] := infoArr[5]
             guestProfile["province"] := getProvince(infoArr[6])
@@ -286,34 +332,15 @@ class ProfileModify {
             }
         } else if (gType = 3)  {
             ; from abroad
+            guestProfile["nameAlt"] := " "
             guestProfile["language"] := "E"
             guestProfile["idType"] := "NOP"
             guestProfile["address"] := ""
             guestProfile["nameLast"] := infoArr[4]
             guestProfile["nameFirst"] := infoArr[5]
             guestProfile["country"] :=  getCountryCode(infoArr[6])
-            guestProfile["province"] := ""
+            guestProfile["province"] := " "
         }
-
-        for k, v in guestProfile {
-            popupInfo .= Format("{1}：{2}`n", k, v)
-        }
-        toOpera := MsgBox(Format("
-            (   
-            即将填入的信息：
-
-            {1}
-
-            确定(Enter)：     打开 Opera
-            取消(Esc)：       留在 旅客信息
-            )", popupInfo), this.popupTitle, "OKCancel 4096")
-        if (toOpera = "OK") {
-            try {
-                WinActivate "ahk_class SunAwtFrame"
-            } catch {
-                MsgBox("请先打开 Opera 窗口。", this.popupTitle)
-            }
-        } 
 
         this.suspendQM2()
 
