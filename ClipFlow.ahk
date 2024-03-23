@@ -10,14 +10,17 @@ popupTitle := "ClipFlow " . version
 winGroup := ["ahk_class SunAwtFrame", "旅客信息"]
 config := useConfigJSON(
 	"./clipflow.config.json",
-	"clipflow.config.json"
+	"clipflow.config.json",
 )
 
 ; Gui
 ClipFlow := Gui(, popupTitle)
-App(ClipFlow)
-ClipFlow.Show()
+ClipFlow.SetFont(, "微软雅黑")
 ClipFlow.OnEvent("Close", (*) => utils.quitApp("ClipFlow", popupTitle, winGroup))
+
+App(ClipFlow)
+
+ClipFlow.Show()
 
 ; hotkeys setup
 Pause:: ClipFlow.Show()
