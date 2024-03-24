@@ -14,7 +14,7 @@ class ProfileModify {
           点击“开始填入”。
     )"
 
-    static AltNameAnchorPath := A_ScriptDir . "\src\Assets\AltNameAnchor.png"
+    static AltNameAnchorPath := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
 
     static USE(App) {
         profileStored := JSON.parse(config.read("profileModify"))
@@ -349,10 +349,17 @@ class ProfileModify {
 
     static paste(guestProfileMap) {
         CoordMode "Pixel", "Screen"
-        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AltNameAnchorPath))  {
+        anchorX := 0
+        anchorY := 0
+
+        if (WinGetMinMax("ahk_class SunAwtFrame") = 1) {
+            anchorX := 451 - 10
+            anchorY := 278
+        } else if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, this.AltNameAnchorPath))  {
             anchorX := FoundX - 10
             anchorY := FoundY
         } else {
+            msgbox("not found",,"T1")
             return
         }
 
@@ -364,58 +371,57 @@ class ProfileModify {
         ; { fillin common info: nameLast, nameFirst, language, gender, country, birthday, idType, idNum
         MouseMove anchorX, anchorY
         Click 3
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["nameLast"])
-        Sleep 50
 
         Send "{Tab}"
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["nameFirst"])
 
         loop 2 { 
             Send "{Tab}" 
         } 
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["language"])
 
         Send "{Tab}"
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["gender"])
 
         Send "{Tab}" 
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["address"])
 
         loop 6 { 
             Send "{Tab}" 
         } 
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["country"])
 
         Send "{Tab}"
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["province"])
 
         loop 9 { 
             Send "{Tab}" 
         } 
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["birthday"])
 
         Send "{Tab}"
-        Sleep 50
+        Sleep 100
         Send Format("{Text}{1}", guestProfileMap["idNum"])
-        Sleep 50
+        Sleep 100
 
         MouseMove anchorX + 393, anchorY + 28
-        Sleep 50
+        Sleep 100
         Click 3
         Send Format("{Text}{1}", guestProfileMap["idType"])
-        Sleep 50
+        Sleep 100
         Send "{Tab}"
-        Sleep 50
+        Sleep 100
         ; }
-        if (guestProfileMap.Has("nameAlt")) {
+        if (guestProfileMap["nameAlt"] != " ") {
             ; { with hanzi name
             ; fillin: nameAlt, gender(in nameAlt window)
             MouseMove anchorX + 10, anchorY + 10 ; open alt name win
@@ -424,20 +430,20 @@ class ProfileModify {
             Sleep 3500
 
             Send Format("{Text}{1}", guestProfileMap["nameAlt"])
-            Sleep 50
+            Sleep 100
 
             loop 3 { 
                 Send "{Tab}" 
             } 
-            Sleep 50
+            Sleep 100
             Send Format("{Text}{1}", "C")
 
             Send "{Tab}" 
-            Sleep 50
+            Sleep 100
             Send Format("{Text}{1}", guestProfileMap["gender"])
-            Sleep 50
+            Sleep 100
             Send "{Tab}"
-            Sleep 50
+            Sleep 100
             Send "!o"
             Sleep 100
         }
