@@ -8,10 +8,10 @@ class ProfileModify {
     static desc := "
     (
         1、请先打开“旅客信息”界面，点击
-          “开始复制”；
+          “复制 (Alt+C)”；
 
         2、复制完成后请打开Opera Profile 界面，
-          点击“开始填入”。
+          点击“填入 (Alt+V)”。
     )"
 
     static AltNameAnchorPath := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
@@ -19,6 +19,12 @@ class ProfileModify {
     static USE(App) {
         profileStored := JSON.parse(config.read("profileModify"))
         currentGuest := signal(profileStored)
+        effect(currentGuest, (new) => 
+            MsgBox(
+                Format("已读取。 当前客人：{1}", new["nameAlt"] = " " ? (new["nameFirst"] . " " . new["nameLast"]) : new["nameAlt"])
+                , "Profile Modify", "4096 T2")
+            )
+
         fieldIndex := Map(
             "address", "地址",
             "birthday", "生日",
@@ -93,7 +99,6 @@ class ProfileModify {
         for k, v in curGuest {
             LV.Modify(A_Index,, fieldIndex[k] , v)
         }
-        MsgBox("已更新     ", "Profile Modify New", "4096 T1")
     }
 
     static suspendQM2(){
@@ -112,9 +117,8 @@ class ProfileModify {
         try {
             WinActivate "旅客信息"
         } catch {
-            MsgBox("请先打开 旅客信息 窗口", this.popupTitle)
+            MsgBox("请先打开 旅客信息 窗口", this.popupTitle, "T1")
             utils.cleanReload(winGroup)
-            return
         }
         checkGuestType := [PixelGetColor(464, 87), PixelGetColor(553, 87), PixelGetColor(649, 87)]
         loop checkGuestType.Length {
@@ -353,7 +357,7 @@ class ProfileModify {
         anchorY := 0
 
         if (WinGetMinMax("ahk_class SunAwtFrame") = 1) {
-            anchorX := 451 - 10
+            anchorX := 451 - 1
             anchorY := 278
         } else if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, this.AltNameAnchorPath))  {
             anchorX := FoundX - 10
