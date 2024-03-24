@@ -78,7 +78,9 @@ class ProfileModify {
         psbCopy(*) {
             App.Hide()
             Sleep 200
+            useSingleScript()
             currentGuest.set(this.copy())
+            useSingleScript()
             config.write("profileModify", JSON.stringify(currentGuest.value))
             this.updateList(currentGuest.value, fieldIndex, guestInfo)
 
@@ -90,7 +92,9 @@ class ProfileModify {
         pasteBtn.OnEvent("Click", psbPaste)
         psbPaste(*) {
             App.Hide()
+            useSingleScript()
             this.paste(currentGuest.value)
+            useSingleScript()
             copyBtn.Focus()
         }
     }
@@ -128,7 +132,7 @@ class ProfileModify {
             }
         }
 
-        this.suspendQM2()
+        ; this.suspendQM2()
 
         return this.capture(gType)
     }
@@ -346,7 +350,7 @@ class ProfileModify {
             guestProfile["province"] := " "
         }
 
-        this.suspendQM2()
+        ; this.suspendQM2()
 
         return guestProfile
     }
@@ -357,7 +361,7 @@ class ProfileModify {
         anchorY := 0
 
         if (WinGetMinMax("ahk_class SunAwtFrame") = 1) {
-            anchorX := 451 - 1
+            anchorX := 451 - 10
             anchorY := 278
         } else if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, this.AltNameAnchorPath))  {
             anchorX := FoundX - 10
@@ -367,7 +371,7 @@ class ProfileModify {
             return
         }
 
-        this.suspendQM2()
+        ; this.suspendQM2()
 
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         CoordMode "Mouse", "Screen"
@@ -471,6 +475,6 @@ class ProfileModify {
             }
         } 
 
-        this.suspendQM2()
+        ; this.suspendQM2()
     }
 }
