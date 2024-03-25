@@ -1,6 +1,7 @@
 #Include "./utils.ahk"
 #Include "./defineArrayMethods.ahk"
 #Include "./useConfigJSON.ahk"
+#Include "./useSingleScript.ahk"
 
 #Include "./revue/revue.ahk"
 #Include "./revue/typeChecker.ahk"
