@@ -17,13 +17,19 @@ class ProfileModify {
     static AltNameAnchorPath := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
 
     static USE(App) {
-        profileStored := JSON.parse(config.read("profileModify"))
-        currentGuest := signal(profileStored)
-        effect(currentGuest, (new) => 
-            MsgBox(
-                Format("已读取。 当前客人：{1}", new["nameAlt"] = " " ? (new["nameFirst"] . " " . new["nameLast"]) : new["nameAlt"])
-                , "Profile Modify", "4096 T2")
-            )
+        ui := [
+            App.AddGroupBox("R18 w250 y+20", this.title),
+            App.AddText("xp10 yp+20", this.desc),
+            App.AddText("vtitle y+12 h20 w230", "当前客人信息"),
+            App.AddListView("vguestInfo y+5 w230 h270", ["信息字段", "证件信息"]),
+            App.AddButton("vcopyBtn Default xp h35 w110 y+5", "复制 (&C)"),
+            App.AddButton("vpasteBtn xp+10 h35 w110 x+10 ", "填入 (&V)"),
+        ]
+
+        copyBtn := interface.getCtrlByName("copyBtn", ui)
+        pasteBtn := interface.getCtrlByName("pasteBtn", ui)
+        guestInfo := interface.getCtrlByName("guestInfo", ui)
+        interface.getCtrlByName("title", ui).SetFont("bold s11 q4", "")
 
         fieldIndex := Map(
             "address", "地址",
@@ -39,30 +45,22 @@ class ProfileModify {
             "province", "省份"
         )
 
-        ; GUI
-        ui := [
-            App.AddGroupBox("R18 w250 y+20", this.title),
-            App.AddText("xp10 yp+20", this.desc),
-
-            App.AddText("vtitle y+12 h20 w230", "当前客人信息"),
-
-            App.AddListView("vguestInfo y+5 w230 h270", ["信息字段", "证件信息"]),
-
-            App.AddButton("vcopyBtn Default xp h35 w110 y+5", "复制 (&C)"),
-            App.AddButton("vpasteBtn xp+10 h35 w110 x+10 ", "填入 (&V)"),
-        ]
-        
-        copyBtn := interface.getCtrlByName("copyBtn", ui)
-        pasteBtn := interface.getCtrlByName("pasteBtn", ui)
-        guestInfo := interface.getCtrlByName("guestInfo", ui)
-        interface.getCtrlByName("title", ui).SetFont("bold s11 q4","")
-
         for key, field in fieldIndex {
             val := currentGuest.value.has(key) ? currentGuest.value[key] : ""
             guestInfo.Add(, field, val)
         }
 
-        ; function
+        profileStored := JSON.parse(config.read("profileModify"))
+        currentGuest := signal(profileStored)
+        effect(currentGuest, (new) => 
+            MsgBox(
+                Format("已读取。 当前客人：{1}", new["nameAlt"] = " " ? (new["nameFirst"] . " " . new["nameLast"]) : new["nameAlt"])
+                , "Profile Modify", "4096 T2")
+            this.updateList(new, fieldIndex, guestInfo)
+            config.write("profileModify", JSON.stringify(new))
+        )
+
+        ; events
         guestInfo.OnEvent("DoubleClick", copyField)
         copyField(LV, row) {
             if (config.read("profileModify") = "") {
@@ -70,8 +68,7 @@ class ProfileModify {
             }
             A_Clipboard := LV.GetText(row, 2)
             key := LV.GetText(row, 1)
-            copiedPopup := Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard)
-            MsgBox(copiedPopup, this.popupTitle, "4096 T1")
+            MsgBox(Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard), this.popupTitle, "4096 T1")
         }
 
         copyBtn.OnEvent("Click", psbCopy)
@@ -81,14 +78,12 @@ class ProfileModify {
             useSingleScript()
             currentGuest.set(this.copy())
             useSingleScript()
-            config.write("profileModify", JSON.stringify(currentGuest.value))
-            this.updateList(currentGuest.value, fieldIndex, guestInfo)
 
             WinActivate "ahk_class SunAwtFrame"
             App.Show()
             pasteBtn.Focus()
         }
-        
+
         pasteBtn.OnEvent("Click", psbPaste)
         psbPaste(*) {
             App.Hide()
@@ -99,20 +94,20 @@ class ProfileModify {
         }
     }
 
-    static updateList(curGuest, fieldIndex , LV) {
+    static updateList(curGuest, fieldIndex, LV) {
         for k, v in curGuest {
-            LV.Modify(A_Index,, fieldIndex[k] , v)
+            LV.Modify(A_Index, , fieldIndex[k], v)
         }
     }
 
-    static suspendQM2(){
+    static suspendQM2() {
         QM2Path := "QM2.ahk"
 
         DetectHiddenWindows true
         SetTitleMatchMode 2
 
         if (WinExist("QM2 for FrontDesk 2.2.0")) {
-            PostMessage 0x0111, 65305,,, QM2Path . " - AutoHotkey"  ; Suspend.
+            PostMessage 0x0111, 65305, , , QM2Path . " - AutoHotkey"  ; Suspend.
         }
     }
 
@@ -136,11 +131,11 @@ class ProfileModify {
 
         return this.capture(gType)
     }
-    
+
     static capture(gType) {
         CoordMode "Mouse", "Window"
         BlockInput true
-        if (WinExist("旅客信息")){
+        if (WinExist("旅客信息")) {
             WinSetAlwaysOnTop true, "旅客信息"
         }
         capturedInfo := []
@@ -154,7 +149,7 @@ class ProfileModify {
         ; capture: gender
         MouseMove 565, 147
         Sleep 50
-        Click 
+        Click
         Sleep 50
         Click "Right"
         Sleep 50
@@ -194,13 +189,13 @@ class ProfileModify {
             Click "Up"
             Sleep 50
             Send "^c"
-            Sleep 50           
+            Sleep 50
             capturedInfo.Push(A_Clipboard)
             Sleep 50
             ; capture: province
             MouseMove 587, 292
             Sleep 50
-            Click 
+            Click
             Sleep 50
             Click "Right"
             Sleep 50
@@ -284,7 +279,7 @@ class ProfileModify {
             ; capture: country
             MouseMove 670, 322
             Sleep 50
-            Click 
+            Click
             Sleep 50
             Click "Right"
             Sleep 50
@@ -338,7 +333,7 @@ class ProfileModify {
                 guestProfile["idType"] := "TWT"
                 guestProfile["province"] := "TW"
             }
-        } else if (gType = 3)  {
+        } else if (gType = 3) {
             ; from abroad
             guestProfile["nameAlt"] := " "
             guestProfile["language"] := "E"
@@ -346,7 +341,7 @@ class ProfileModify {
             guestProfile["address"] := ""
             guestProfile["nameLast"] := infoArr[4]
             guestProfile["nameFirst"] := infoArr[5]
-            guestProfile["country"] :=  getCountryCode(infoArr[6])
+            guestProfile["country"] := getCountryCode(infoArr[6])
             guestProfile["province"] := " "
         }
 
@@ -363,11 +358,11 @@ class ProfileModify {
         if (WinGetMinMax("ahk_class SunAwtFrame") = 1) {
             anchorX := 451 - 10
             anchorY := 278
-        } else if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, this.AltNameAnchorPath))  {
+        } else if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, this.AltNameAnchorPath)) {
             anchorX := FoundX - 10
             anchorY := FoundY
         } else {
-            msgbox("not found",,"T1")
+            msgbox("not found", , "T1")
             return
         }
 
@@ -386,9 +381,9 @@ class ProfileModify {
         Sleep 100
         Send Format("{Text}{1}", guestProfileMap["nameFirst"])
 
-        loop 2 { 
-            Send "{Tab}" 
-        } 
+        loop 2 {
+            Send "{Tab}"
+        }
         Sleep 100
         Send Format("{Text}{1}", guestProfileMap["language"])
 
@@ -396,13 +391,13 @@ class ProfileModify {
         Sleep 100
         Send Format("{Text}{1}", guestProfileMap["gender"])
 
-        Send "{Tab}" 
+        Send "{Tab}"
         Sleep 100
         Send Format("{Text}{1}", guestProfileMap["address"])
 
-        loop 6 { 
-            Send "{Tab}" 
-        } 
+        loop 6 {
+            Send "{Tab}"
+        }
         Sleep 100
         Send Format("{Text}{1}", guestProfileMap["country"])
 
@@ -410,9 +405,9 @@ class ProfileModify {
         Sleep 100
         Send Format("{Text}{1}", guestProfileMap["province"])
 
-        loop 9 { 
-            Send "{Tab}" 
-        } 
+        loop 9 {
+            Send "{Tab}"
+        }
         Sleep 100
         Send Format("{Text}{1}", guestProfileMap["birthday"])
 
@@ -440,13 +435,13 @@ class ProfileModify {
             Send Format("{Text}{1}", guestProfileMap["nameAlt"])
             Sleep 100
 
-            loop 3 { 
-                Send "{Tab}" 
-            } 
+            loop 3 {
+                Send "{Tab}"
+            }
             Sleep 100
             Send Format("{Text}{1}", "C")
 
-            Send "{Tab}" 
+            Send "{Tab}"
             Sleep 100
             Send Format("{Text}{1}", guestProfileMap["gender"])
             Sleep 100
@@ -471,9 +466,9 @@ class ProfileModify {
             if (WinExist("旅客信息")) {
                 WinActivate "旅客信息"
             } else {
-            WinActivate "ahk_exe hotel.exe"
+                WinActivate "ahk_exe hotel.exe"
             }
-        } 
+        }
 
         ; this.suspendQM2()
     }
