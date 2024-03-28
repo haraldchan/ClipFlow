@@ -17,6 +17,9 @@ class ProfileModify {
     static AltNameAnchorPath := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
 
     static USE(App) {
+        profileStored := JSON.parse(config.read("profileModify"))
+        currentGuest := signal(profileStored)
+        
         ui := [
             App.AddGroupBox("R18 w250 y+20", this.title),
             App.AddText("xp10 yp+20", this.desc),
@@ -50,8 +53,7 @@ class ProfileModify {
             guestInfo.Add(, field, val)
         }
 
-        profileStored := JSON.parse(config.read("profileModify"))
-        currentGuest := signal(profileStored)
+
         effect(currentGuest, (new) => 
             MsgBox(
                 Format("已读取。 当前客人：{1}", new["nameAlt"] = " " ? (new["nameFirst"] . " " . new["nameLast"]) : new["nameAlt"])
