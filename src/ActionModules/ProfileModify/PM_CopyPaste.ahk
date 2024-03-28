@@ -15,7 +15,7 @@ class PM_CopyPaste {
         try {
             WinActivate "旅客信息"
         } catch {
-            MsgBox("请先打开 旅客信息 窗口", this.popupTitle, "T1")
+            MsgBox("请先打开 旅客信息 窗口", "Profile Modify", "T1")
             utils.cleanReload(winGroup)
         }
         checkGuestType := [PixelGetColor(464, 87), PixelGetColor(553, 87), PixelGetColor(649, 87)]
@@ -189,7 +189,6 @@ class PM_CopyPaste {
         }
         WinSetAlwaysOnTop false, "旅客信息"
         BlockInput false
-        ; return this.parseGuestInfo(gType, capturedInfo)
 
         return capturedInfo
     }
@@ -244,8 +243,6 @@ class PM_CopyPaste {
             guestProfile["province"] := " "
         }
 
-        ; this.suspendQM2()
-
         return guestProfile
     }
 
@@ -265,8 +262,6 @@ class PM_CopyPaste {
             msgbox("not found", , "T1")
             return
         }
-
-        ; this.suspendQM2()
 
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         CoordMode "Mouse", "Screen"
@@ -359,7 +354,7 @@ class PM_CopyPaste {
 
                 确定(Enter)：    回到 旅客信息
                 取消(Esc)：      留在 Opera
-            )", this.popupTitle, "OKCancel T2 4096")
+            )", "Profile Modify", "OKCancel T2 4096")
         if (backToPsb = "OK") {
             Send "!o"
             Sleep 1500
@@ -369,7 +364,5 @@ class PM_CopyPaste {
                 WinActivate "ahk_exe hotel.exe"
             }
         }
-
-        ; this.suspendQM2()
     }
 }
