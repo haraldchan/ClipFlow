@@ -30,7 +30,7 @@ PM_App(App, popupTitle) {
     listInitialize(curGuest, fieldIndex) {
         LV := ""
         for ctrl in App {
-            if (Type(ctrl) = "ListView") {
+            if (ctrl.Type = "ListView") {
                 for key, field in fieldIndex {
                     val := curGuest.has(key) ? curGuest[key] : ""
                     ctrl.Add(, field, val)
@@ -41,7 +41,7 @@ PM_App(App, popupTitle) {
 
     updateList(curGuest, fieldIndex) {
         for ctrl in App {
-            if (Type(ctrl) = "ListView") {
+            if (ctrl.Type = "ListView") {
                 for k, v in curGuest {
                     ctrl.Modify(A_Index, , fieldIndex[k], v)
                 }
@@ -50,8 +50,7 @@ PM_App(App, popupTitle) {
     }
 
     effect(currentGuest, (new) =>
-        guestName := new["nameAlt"] = " " ? (new["nameFirst"] . " " . new["nameLast"]) : new["nameAlt"]
-        MsgBox(Format("已读取。 当前客人：{1}", guestName), popupTitle, "4096 T2")
+        MsgBox(Format("已读取。 当前客人：{1}", new["nameAlt"] = " " ? (new["nameFirst"] . " " . new["nameLast"]) : new["nameAlt"]), popupTitle, "4096 T2")
         updateList(new, fieldIndex)
         config.write("profileModify", JSON.stringify(new)))
 
@@ -101,6 +100,7 @@ PM_App(App, popupTitle) {
         App.AddListView("vguestInfo y+5 w230 h270", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
         App.AddButton("Default vcopy xp h35 w110 y+5", "复制 (&C)").OnEvent("Click", psbCopy),
         App.AddButton("vpaste xp+10 h35 w110 x+10 ", "填入 (&V)").OnEvent("Click", pmsFill),
+        ; initializing ListView
         listInitialize(currentGuest.value, fieldIndex)
     )
 }
