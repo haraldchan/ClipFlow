@@ -40,12 +40,9 @@ PM_App(App, popupTitle) {
     }
 
     updateList(curGuest, fieldIndex) {
-        for ctrl in App {
-            if (ctrl.Type = "ListView") {
-                for k, v in curGuest {
-                    ctrl.Modify(A_Index, , fieldIndex[k], v)
-                }
-            }
+        LV := App.getCtrlByType("ListView")
+        for k, v in curGuest {
+            LV.Modify(A_Index, , fieldIndex[k], v)
         }
     }
 
@@ -70,12 +67,7 @@ PM_App(App, popupTitle) {
         currentGuest.set(PM_CopyPaste.copy())
         useSingleScript()
 
-        for ctrl in App {
-            if (ctrl.name = "paste") {
-                ctrl.Focus()
-            }
-        }
-
+        App.getCtrlByName("paste").Focus()
         WinActivate "ahk_class SunAwtFrame"
         App.Show()
     }
@@ -86,11 +78,7 @@ PM_App(App, popupTitle) {
         PM_CopyPaste.paste(currentGuest.value)
         useSingleScript()
 
-        for ctrl in App {
-            if (ctrl.name = "copy") {
-                ctrl.Focus()
-            }
-        }
+        App.getCtrlByName("copy").Focus()
     }
 
     return (
