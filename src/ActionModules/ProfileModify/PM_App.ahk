@@ -28,14 +28,11 @@ PM_App(App, popupTitle) {
     )
 
     listInitialize(curGuest, fieldIndex) {
-        LV := ""
-        for ctrl in App {
-            if (ctrl.Type = "ListView") {
-                for key, field in fieldIndex {
-                    val := curGuest.has(key) ? curGuest[key] : ""
-                    ctrl.Add(, field, val)
-                }
-            }
+        LV := App.getCtrlByType("ListView")
+
+        for key, field in fieldIndex {
+            val := curGuest.has(key) ? curGuest[key] : ""
+            LV.Add(, field, val)
         }
     }
 
