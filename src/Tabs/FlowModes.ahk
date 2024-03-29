@@ -24,7 +24,6 @@ FlowModes(CF) {
 			config.write("moduleSelected", d[1].value)
 			utils.cleanReload(winGroup)
 		),
-		; ,
 		modules[moduleSelected].USE(CF)
 	)
 }
