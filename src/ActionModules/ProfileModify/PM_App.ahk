@@ -38,15 +38,31 @@ PM_App(App, popupTitle) {
 
     updateList(curGuest, fieldIndex) {
         LV := App.getCtrlByType("ListView")
+        
         for k, v in curGuest {
             LV.Modify(A_Index, , fieldIndex[k], v)
         }
     }
 
+    showCopiedInfo(guest) {
+        guestName := guest["nameAlt"] = " " 
+            ? guest["nameFirst"] . " " . guest["nameLast"] 
+            : guest["nameAlt"]
+
+        result := MsgBox(Format("已读取。 当前客人：{1}`n`n 转到Opera? ", guestName), popupTitle, "4096 OKCancel T10")
+        if (result = "OK") {
+            try {
+                WinActivate "ahk_class SunAwtFrame"
+            }
+        }
+    }
+
     effect(currentGuest, (new) =>
-        MsgBox(Format("已读取。 当前客人：{1}", new["nameAlt"] = " " ? (new["nameFirst"] . " " . new["nameLast"]) : new["nameAlt"]), popupTitle, "4096 T2")
+        config.write("profileModify", JSON.stringify(new))
         updateList(new, fieldIndex)
-        config.write("profileModify", JSON.stringify(new)))
+        showCopiedInfo(new)
+    )
+
 
     copyListField(LV, row) {
         if (config.read("profileModify") = "") {
@@ -65,8 +81,6 @@ PM_App(App, popupTitle) {
         useSingleScript()
 
         App.getCtrlByName("paste").Focus()
-        WinActivate "ahk_class SunAwtFrame"
-        App.Show()
     }
 
     pmsFill(*) {
