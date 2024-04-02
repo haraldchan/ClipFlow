@@ -1,5 +1,6 @@
 ﻿#Include "../ActionModules/ProfileModify/ProfileModify.ahk"
 #Include "../ActionModules/ProfileModify/ProfileModifyNew.ahk"
+#Include "../ActionModules/ProfileModifyNext/ProfileModifyNext.ahk"
 #Include "../ActionModules/InvoiceWechat.ahk"
 #Include "../ActionModules/ShareClip/ShareClip.ahk"
 #Include "../ActionModules/ReservationHandler/ReservationHandler.ahk"
@@ -8,6 +9,7 @@ FlowModes(CF) {
 	modules := [
 		ProfileModify,
 		ProfileModifyNew,
+		ProfileModifyNext,
 		InvoiceWechat,
 		ShareClip,
 		ResvHandler,
