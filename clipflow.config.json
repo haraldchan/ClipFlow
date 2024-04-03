@@ -5,6 +5,10 @@
   },
   "clipHistory":[],
   "profileModify":"",
+  "profileModifyNext": {
+    "centralPath": "",
+    "localPath" : ""
+  },
   "resvHandler":{
     "JSON":{}
   }
