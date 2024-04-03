@@ -3,7 +3,17 @@
 PMN_App(App, popupTitle, db) {
     currentGuest := signal("")
     listContent := signal([])
-    OnClipboardChange (*) => currentGuest.set(JSON.parse(A_Clipboard))
+
+    ; Capturing guest profile and saving it.
+    OnClipboardChange (*) => listenCapture()
+
+    listenCapture() {
+        if (!InStr(A_Clipboard, ProfileModifyNext.identifier)) {
+            return
+        }
+        currentGuest.set(JSON.parse(A_Clipboard))
+        MsgBox(Format("已获取： {1}", currentGuest.value["name"]), popupTitle, "4096 T1")
+    }
 
     saveCaptured(curGuest) {
         fileName := A_Now . A_MSec . ".json"
@@ -13,26 +23,35 @@ PMN_App(App, popupTitle, db) {
 
     effect(currentGuest, newGuest => saveCaptured(newGuest))
 
+    ; re-render ListView when filtering/searching
     searchDate := signal(FormatTime(A_Now, "yyyyMMdd"))
-    searchFilter := signal("")
-    searchPeriod := signal(60)
+    filter := signal({ search: "", period: 60 })
 
     handleQuery(filter := "", period := 60) {
         sleep 100
-        
+
         LV := App.getCtrlByType("ListView")
         LV.Delete()
         dataRead := []
 
         if (filter = "") {
-            loop files db.centralPath . "\" . FormatTime(A_Now, "yyyyMMdd") . "\" . "*.json" {
-                dataRead.Push(JSON.parse(FileRead(A_LoopFileFullPath)))
-                if (DateDiff(A_Now, SubStr(A_LoopFileName, 1, 12), "M") > period) {
+            loop files db.centralPath . "\" . searchDate.value . "\" . "*.json" {
+                if (searchDate.value = FormatTime(A_Now, "yyyyMMdd") &&
+                    DateDiff(A_Now, SubStr(A_LoopFileName, 1, 12), "M") > period
+                ) {
                     break
                 }
+
+                dataRead.Push(JSON.parse(FileRead(A_LoopFileFullPath)))
             }
         } else {
             loop files db.centralPath . "\" . searchDate.value . "\" . "*.json" {
+                if (searchDate.value = FormatTime(A_Now, "yyyyMMdd") &&
+                    DateDiff(A_Now, SubStr(A_LoopFileName, 1, 12), "M") > period
+                ) {
+                    break
+                }
+
                 guestRead := JSON.parse(FileRead(A_LoopFileFullPath))
                 if (filter is Number) {
                     if (InStr(guestRead["roomNum"], filter)) {
@@ -42,9 +61,6 @@ PMN_App(App, popupTitle, db) {
                     if (InStr(guestRead["name"], filter)) {
                         dataRead.Push(guestRead)
                     }
-                }
-                if (DateDiff(A_Now, SubStr(A_LoopFileName, 1, 12), "M") > period) {
-                    break
                 }
             }
         }
@@ -67,17 +83,24 @@ PMN_App(App, popupTitle, db) {
         }
     }
 
-    effect(searchFilter, handleQuery(searchFilter.value, searchPeriod.value))
-    effect(searchPeriod, handleQuery(searchFilter.value, searchPeriod.value))
+    effect(filter, new => handleQuery(new.search, new.period))
+
+    ; reset and update
+    handleListReset() {
+        filter.set({ search: "", period: 0 })
+        App.getCtrlByName("search").value := filter.value.search
+        App.getCtrlByName("period").value := filter.value.period
+    }
 
     return (
         App.AddGroupBox("R18 w450 y+20", popupTitle),
         App.AddText("", "筛选姓名/房号"),
         App.AddDateTime("vdate", "ShortDate").OnEvent("Change", (d*) => searchDate.set(FormatTime(d[1].value, "yyyyMMdd"))),
-        App.AddEdit("vfilter", searchFilter.value).OnEvent("Change", (e*) => searchFilter.set(e[1].value)),
-        App.AddEdit("vperiod Number", searchPeriod.value).OnEvent("Change", (e*) => searchPeriod.set(e[1].value = "" ? 60 : e[1].value)),
+        App.AddEdit("vsearch", filter.value.search).OnEvent("Change", (e*) => filter.set({ search: e[1].value, period: filter.value.period })),
+        App.AddEdit("vperiod Number", filter.value.period).OnEvent("Change", (e*) => filter.set({ search: filter.value.search, period: e[1].value = "" ? 60 : e[1].value })),
         App.AddText("", "分钟内"),
-        App.AddButton("", "更新").OnEvent("Click", (*) => handleQuery(searchFilter.value, searchPeriod)),
+        ; manual updating
+        App.AddButton("", "更新").OnEvent("Click", (*) => handleListReset()),
         App.AddButton("", "填入"),
         GuestProfileList(App, db, listContent)
     )
