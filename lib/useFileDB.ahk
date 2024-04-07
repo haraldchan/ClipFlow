@@ -1,3 +1,5 @@
+#Include "./JSON.ahk"
+
 class useFileDB {
 	__New(centralPath, localPath := 0){
 		this.centralPath := centralPath
@@ -14,20 +16,19 @@ class useFileDB {
 		}
 	}
 
-	findByPeriod(queryPeriod) {
+	findByPeriod(db, queryDate, queryMinPeriod) {
 		matchFilePaths := []
 		loop files, (db . "\" . queryDate . "\*.json") {
-			if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= queryPeriod) {
+			if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= queryMinPeriod) {
 				matchFilePaths.Push(A_LoopFileFullPath)
 			}
 		} 	
 		return matchFilePaths
 	}
 
-	load(queryDate := FormatTime(A_Now, "yyyyMMdd"), period := 60 , db := this.centralPath){
-		this.findByPeriod(period)
+	load(db := this.centralPath, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryMinPeriod := 60){
 
-		loadedData := this.findByPeriod(period).map(file => JSON.parse(FileRead(file)))
+		loadedData := this.findByPeriod(db, queryDate, queryMinPeriod).map(file => JSON.parse(FileRead(file)))
 
 		return loadedData
 	}
