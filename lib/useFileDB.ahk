@@ -14,18 +14,20 @@ class useFileDB {
 		}
 	}
 
-	load(queryDate := FormatTime(A_Now, "yyyyMMdd"), period := 60 , db := this.centralPath){
-		findMatchTimeFiles(queryPeriod) {
-			matchFilePaths := []
-			loop files, (db . "\" . queryDate . "\*.json") {
-				if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= queryPeriod) {
-					matchFilePaths.Push(A_LoopFileFullPath)
-				}
-			} 
-			return matchFilePaths
-		}
+	findByPeriod(queryPeriod) {
+		matchFilePaths := []
+		loop files, (db . "\" . queryDate . "\*.json") {
+			if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= queryPeriod) {
+				matchFilePaths.Push(A_LoopFileFullPath)
+			}
+		} 	
+		return matchFilePaths
+	}
 
-		loadedData := findMatchTimeFiles(period).map(file => JSON.parse(FileRead(file)))
+	load(queryDate := FormatTime(A_Now, "yyyyMMdd"), period := 60 , db := this.centralPath){
+		this.findByPeriod(period)
+
+		loadedData := this.findByPeriod(period).map(file => JSON.parse(FileRead(file)))
 
 		return loadedData
 	}
