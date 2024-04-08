@@ -3,6 +3,7 @@
 #Include "./defineGuiMethods.ahk"
 #Include "./useConfigJSON.ahk"
 #Include "./useSingleScript.ahk"
+#Include "./useFileDB.ahk"
 
 #Include "./revue/revue.ahk"
 #Include "./revue/typeChecker.ahk"
