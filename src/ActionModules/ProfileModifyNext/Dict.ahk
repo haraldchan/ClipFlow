@@ -719,3 +719,7 @@ province := [
     ["青海","QHS"],
     ["江西","JXS"],
 ]
+
+idTypeMap := Map(
+    "身份证", "IDC"
+)

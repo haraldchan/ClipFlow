@@ -57,10 +57,18 @@ getFullnamePinyin(fullname) {
         lastnameLength := 1
     }
 
-    firstnameSplit := StrSplit(SubStr(fullname, lastnameLength+1), "")
+    firstnameSplit := StrSplit(SubStr(fullname, lastnameLength + 1), "")
     firstname := ""
     loop firstnameSplit.Length {
         firstname .= getPinyin(firstnameSplit[A_Index]) . " "
     }
     return [lastname, firstname]
+}
+
+getIdTypeCode(idType) {
+    for type, code in idTypeMap {
+        if (type = idType) {
+            return code
+        }
+    }
 }
