@@ -6,13 +6,13 @@ class useFileDB {
 		this.localPath := localPath
 	}
 
-	add(jsonObject){
+	add(jsonString){
 		dateFolder := "\" . FormatTime(A_Now, "yyyyMMdd")
 		fileName := "\" . A_Now . A_MSec . ".json"
-		FileAppend(JSON.stringify(jsonObject), this.centralPath . dateFolder . fileName)
+		FileAppend(jsonString, this.centralPath . dateFolder . fileName)
 		Sleep 100
 		if (this.localPath != 0) {
-			FileAppend(JSON.stringify(jsonObject), this.localPath . dateFolder . fileName)
+			FileAppend(jsonString, this.localPath . dateFolder . fileName)
 		}
 	}
 
