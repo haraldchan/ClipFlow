@@ -1,107 +1,96 @@
 #Include "./GuestProfileList.ahk"
 
-PMN_App(App, popupTitle, db) {
+PMN_App(App, popupTitle, db, identifier) {
     currentGuest := signal("")
     listContent := signal([])
+    queryFilter := signal({
+        date: FormatTime(A_Now, "yyyyMMdd"),
+        nameRoom: "",
+        period: 60
+    })
 
-    ; Capturing guest profile and saving it.
-    OnClipboardChange (*) => listenCapture()
-
-    listenCapture() {
-        if (!InStr(A_Clipboard, ProfileModifyNext.identifier)) {
+    OnClipboardChange (*) => handleCaptured(identifier, db, currentGuest)
+    handleCaptured(identifier, db, currentGuest) {
+        if (!InStr(A_Clipboard, identifier)) {
             return
         }
+        ; save to db
         currentGuest.set(JSON.parse(A_Clipboard))
-        MsgBox(Format("已获取： {1}", currentGuest.value["name"]), popupTitle, "4096 T1")
+        db.add(A_Clipboard)
     }
 
-    saveCaptured(curGuest) {
-        fileName := A_Now . A_MSec . ".json"
-        FileAppend(JSON.stringify(curGuest), db.centralPath . "\" . FormatTime(A_Now, "yyyyMMdd") . "\" . fileName)
-        FileAppend(JSON.stringify(curGuest), db.localPath . "\" . FormatTime(A_Now, "yyyyMMdd") . "\" . fileName)
-    }
+    ; ideally, when the window is called or update button clicked, listContent should update
+    handleListContentUpdate() {
+        loadedItems := db.load(, queryFilter.value.date, queryFilter.value.period)
+        filteredItems := []
 
-    effect(currentGuest, newGuest => saveCaptured(newGuest))
-
-    ; re-render ListView when filtering/searching
-    searchDate := signal(FormatTime(A_Now, "yyyyMMdd"))
-    filter := signal({ search: "", period: 60 })
-
-    handleQuery(filter := "", period := 60) {
-        sleep 100
-
-        LV := App.getCtrlByType("ListView")
-        LV.Delete()
-        dataRead := []
-
-        if (filter = "") {
-            loop files db.centralPath . "\" . searchDate.value . "\" . "*.json" {
-                if (searchDate.value = FormatTime(A_Now, "yyyyMMdd") &&
-                    DateDiff(A_Now, SubStr(A_LoopFileName, 1, 12), "M") > period
-                ) {
-                    break
+        if (queryFilter.value.nameRoom = "") {
+            filteredItems := loadedItems
+        } else if (queryFilter.value.nameRoom is Number) {
+            for item in loadedItems {
+                if (InStr(item["roomNum"], queryFilter.value.nameRoom)) {
+                    filteredItems.Push(item)
                 }
-
-                dataRead.Push(JSON.parse(FileRead(A_LoopFileFullPath)))
             }
         } else {
-            loop files db.centralPath . "\" . searchDate.value . "\" . "*.json" {
-                if (searchDate.value = FormatTime(A_Now, "yyyyMMdd") &&
-                    DateDiff(A_Now, SubStr(A_LoopFileName, 1, 12), "M") > period
+            for item in loadedItems {
+                if (InStr(item["name"], queryFilter.value.nameRoom) ||
+                    InStr(item["nameLast"], queryFilter.value.nameRoom) ||
+                    InStr(item["nameFirst"], queryFilter.value.nameRoom)
                 ) {
-                    break
-                }
-
-                guestRead := JSON.parse(FileRead(A_LoopFileFullPath))
-                if (filter is Number) {
-                    if (InStr(guestRead["roomNum"], filter)) {
-                        dataRead.Push(guestRead)
-                    }
-                } else {
-                    if (InStr(guestRead["name"], filter)) {
-                        dataRead.Push(guestRead)
-                    }
+                    filteredItems.Push(item)
                 }
             }
         }
+        listContent.set(filteredItems)
+    }
 
-        listContent.set(dataRead)
+    handleListItemsUpdate(updatedData) {
+        LV := App.getCtrlByType("ListView")
 
-        if (listContent.value != []) {
+        for item in updatedData {
             for item in listContent.value {
+                listName := item["guestType"] = "国外旅客"
+                    ? item["nameLast"] . ", " . item["nameFirst"]
+                    : item["name"]
+
                 LV.Add(,
-                    item["name"],
                     item["roomNum"],
-                    item["gender"],
-                    item["birthday"],
-                    item["address"],
+                    listName,
                     item["idType"],
                     item["idNum"],
-                    item["loggedTime"],
+                    item["address"],
                 )
             }
         }
     }
 
-    effect(filter, new => handleQuery(new.search, new.period))
-
-    ; reset and update
-    handleListReset() {
-        filter.set({ search: "", period: 0 })
-        App.getCtrlByName("search").value := filter.value.search
-        App.getCtrlByName("period").value := filter.value.period
-    }
+    effect(listContent, updated => handleListItemsUpdate(updated))
 
     return (
         App.AddGroupBox("R18 w450 y+20", popupTitle),
+        ; date
+        App.AddDateTime("vdate", "ShortDate Choose" . queryFilter.value.date).OnEvent("Change", (d*) => queryFilter.set({
+            date: FormatTime(d[1].value, "yyyyMMdd"),
+            nameRoom: queryFilter.value.nameRoom,
+            period: queryFilter.value.period
+        })),
+        ; name or room number
         App.AddText("", "筛选姓名/房号"),
-        App.AddDateTime("vdate", "ShortDate").OnEvent("Change", (d*) => searchDate.set(FormatTime(d[1].value, "yyyyMMdd"))),
-        App.AddEdit("vsearch", filter.value.search).OnEvent("Change", (e*) => filter.set({ search: e[1].value, period: filter.value.period })),
-        App.AddEdit("vperiod Number", filter.value.period).OnEvent("Change", (e*) => filter.set({ search: filter.value.search, period: e[1].value = "" ? 60 : e[1].value })),
-        App.AddText("", "分钟内"),
+        App.AddEdit("vnameRoom", queryFilter.value.nameRoom).OnEvent("Change", (e*) => queryFilter.set({
+            date: queryFilter.value.date,
+            nameRoom: e[1].value,
+            period: queryFilter.value.period
+        })),
+        ; period
+        App.AddEdit("vperiod Number", queryFilter.value.period).OnEvent("Change", (e*) => queryFilter.set({
+            date: queryFilter.value.date,
+            nameRoom: queryFilter.value.nameRoom,
+            period: e[1].value
+        })),
         ; manual updating
-        App.AddButton("", "更新").OnEvent("Click", (*) => handleListReset()),
-        App.AddButton("", "填入"),
+        App.AddButton("vupdate", "更新").OnEvent("Click", (*) => handleListContentUpdate()),
+        App.AddButton("vfillIn", "填入"),
         GuestProfileList(App, db, listContent)
     )
 }
