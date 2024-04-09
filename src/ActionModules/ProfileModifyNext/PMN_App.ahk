@@ -2,7 +2,6 @@
 #Include "./PMN_FillIn.ahk"
 
 PMN_App(App, popupTitle, db, identifier) {
-    currentGuest := signal("")
     listContent := signal([])
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
@@ -10,13 +9,12 @@ PMN_App(App, popupTitle, db, identifier) {
         period: 60
     })
 
-    OnClipboardChange (*) => handleCaptured(identifier, db, currentGuest)
-    handleCaptured(identifier, db, currentGuest) {
+    OnClipboardChange (*) => handleCaptured(identifier, db)
+    handleCaptured(identifier, db) {
         if (!InStr(A_Clipboard, identifier)) {
             return
         }
         ; save to db
-        currentGuest.set(JSON.parse(A_Clipboard))
         db.add(A_Clipboard)
         handleListItemsUpdate()
     }
@@ -104,7 +102,7 @@ PMN_App(App, popupTitle, db, identifier) {
         LV.Focus()
     }
 
-    fillSelectedGuest(){
+    fillPmsProfile(){
         LV := App.getCtrlByType("ListView")
         if (LV.GetNext() = 0) {
             return
@@ -137,7 +135,7 @@ PMN_App(App, popupTitle, db, identifier) {
         App.AddText("x+1 yp+5 h25", "分钟"),
         ; manual updating
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListItemsUpdate()),
-        App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillSelectedGuest()),
+        App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile()),
         GuestProfileList(App, db, listContent)
     )
 }
