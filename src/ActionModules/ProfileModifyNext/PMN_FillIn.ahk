@@ -40,6 +40,8 @@ class PMN_FillIn {
             parsedInfo["province"] := getProvince(currentGuest["addr"])
         } else if (currentGuest["guestType"] = "港澳台旅客") {
             parsedInfo["province"] := getProvince(currentGuest["region"])
+        } else {
+            parsedInfo["province"] := " "
         }
         ; id number
         parsedInfo["idNum"] := currentGuest["idNum"]
