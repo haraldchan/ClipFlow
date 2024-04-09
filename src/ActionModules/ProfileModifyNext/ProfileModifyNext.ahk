@@ -1,5 +1,4 @@
 #Include "./PMN_App.ahk"
-#Include ../../../lib/useFileDB.ahk
 
 class ProfileModifyNext {
     static name := "Profile Modify Next"
@@ -7,10 +6,10 @@ class ProfileModifyNext {
     static popupTitle := "ClipFlow - " . this.name
     static identifier := "04047fce826f48f751891b4721f7ac70" ; MD5 hash: ProfileModifyNext
     static db := useFileDB(
-        A_ScriptDir . "\src\ActionModules\ProfileModifyNext\GuestProfiles"
+    "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow" . "\src\ActionModules\ProfileModifyNext\GuestProfiles"
     )
 
     static USE(App) {
-        PMN_App(App, this.popupTitle, this.db, this.identifier)
+        PMN_App(App, this.title, this.db, this.identifier)
     }
 }
