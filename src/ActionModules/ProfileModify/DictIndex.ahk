@@ -65,3 +65,11 @@ getFullnamePinyin(fullname) {
     }
     return [lastname, firstname]
 }
+
+getIdTypeCode(idType) {
+    for type, code in idTypeMap {
+        if (type = idType) {
+            return code
+        }
+    }
+}
