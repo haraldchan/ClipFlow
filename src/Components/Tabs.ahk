@@ -17,7 +17,7 @@ Tabs(CF, onTop, onTopCheckBox) {
 	}
 
 	return (
-		Tab3 := CF.AddTab3("w280 x15" . " Choose1", ["Flow Modes", "History"]),
+		Tab3 := CF.AddTab3("x15" . " Choose" . config.read("tabPos"), ["Flow Modes", "History"]),
 		Tab3.OnEvent("Change", (*) => 
 			config.write("tabPos", Tab3.Value)
 			historyOnTop(Tab3.Value)
