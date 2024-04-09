@@ -1,18 +1,13 @@
 GuestProfileList(App, db, listContent) {
     DEFAULT_LOAD_MIN := 60
 
-    colTitleMap := (
+    colTitleMap := Map(
         "roomNum", "房号",
         "name", "姓名",
         "idType", "证件类型",
         "idNum", "证件号码",
-        "address", "地址",
+        "addr", "地址",
     )
-
-    colTitles := []
-    for key, val in colTitleMap {
-        colTitles.Push(val)
-    }
 
     handleListInitialize() {
         LV := App.getCtrlByType("ListView")
@@ -28,13 +23,22 @@ GuestProfileList(App, db, listContent) {
                 listName,
                 item["idType"],
                 item["idNum"],
-                item["address"],
+                item["addr"],
             )
         }
+        ; column width setting
+        LV.ModifyCol(1, 50)
+        LV.ModifyCol(2, 100)
+        LV.ModifyCol(3, 80)
+        LV.ModifyCol(4, 180)
+        LV.ModifyCol(5, 115)
+
+        LV.Modify(1, "Select")
+        LV.Focus()
     }
 
     return (
-        App.AddListView("w430", colTitles),
+        App.AddListView("w530 h360 xp-452 y+10", ["房号", "姓名", "类型", "证件号码", "地址"]),
         handleListInitialize()
     )
 }
