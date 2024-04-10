@@ -51,10 +51,8 @@ PMN_App(App, popupTitle, db, identifier) {
             for item in loadedItems {
                 if (item["guestType"] = "内地旅客") {
                     ; from mainland
-
                     if (InStr(item["name"], searchInput)) {
                         filteredItems.unshift(item)
-                        continue
                     }
                 } else if (item["guestType"] = "港澳台旅客") {
                     ; from HK/MO/TW
@@ -63,7 +61,6 @@ PMN_App(App, popupTitle, db, identifier) {
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                        continue
                     }          
                 } else {
                     ; from abroad
@@ -81,6 +78,7 @@ PMN_App(App, popupTitle, db, identifier) {
 
     handleListItemsUpdate() {
         handleListContentUpdate()
+        
         LV := App.getCtrlByType("ListView")
         LV.Delete()
 
@@ -136,6 +134,7 @@ PMN_App(App, popupTitle, db, identifier) {
         ; manual updating
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListItemsUpdate()),
         App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile()),
+        ; profile list
         GuestProfileList(App, db, listContent)
     )
 }
