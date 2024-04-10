@@ -1,14 +1,5 @@
 GuestProfileList(App, db, listContent) {
-    DEFAULT_LOAD_MIN := 60
-
-    colTitleMap := Map(
-        "roomNum", "房号",
-        "name", "姓名",
-        "idType", "证件类型",
-        "idNum", "证件号码",
-        "addr", "地址",
-    )
-
+    
     handleListInitialize() {
         LV := App.getCtrlByType("ListView")
 
