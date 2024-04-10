@@ -27,7 +27,7 @@ class useFileDB {
 		Sleep 100
 		; cleanup outdated if cleanPeriod is unset/0
 		if (this.cleanPeriod > 0) {
-			this.cleanup(this.cleanPeriod)
+			this.cleanup()
 		}
 	}
 
@@ -35,17 +35,15 @@ class useFileDB {
 		matchFilePaths := []
 		loop files, (db . "\" . queryDate . "\*.json") {
 			if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= queryPeriodInput) {
-				; MsgBox(A_LoopFileFullPath)
 				matchFilePaths.unshift(A_LoopFileFullPath)
 			}
 		}
 		return matchFilePaths
 	}
 
-	cleanup(db) {
-		loop files, db, "D" {
-			msgbox(A_LoopFileFullPath)
-			if (DateDiff(A_Now, A_LoopFileTimeCreated, "Days") > this.cleanPeriod) {
+	cleanup() {
+		loop files, this.using . "\*", "D" {
+			if (DateDiff(A_Now, A_LoopFileName, "Days") > this.cleanPeriod) {
 				DirDelete(A_LoopFileFullPath, true)
 			}
 		}
