@@ -19,9 +19,13 @@ class useFileDB {
 	add(jsonString) {
 		dateFolder := "\" . FormatTime(A_Now, "yyyyMMdd")
 		fileName := "\" . A_Now . A_MSec . ".json"
+		; create dateFolder if not exist yet
+		if (!DirExist(this.using . dateFolder)) {
+			DirCreate(this.using . dateFolder)
+		}
 		FileAppend(jsonString, this.using . dateFolder . fileName, "UTF-8")
 		Sleep 100
-		
+		; cleanup outdated if cleanPeriod is unset/0
 		if (this.cleanPeriod > 0) {
 			this.cleanup(this.cleanPeriod)
 		}
