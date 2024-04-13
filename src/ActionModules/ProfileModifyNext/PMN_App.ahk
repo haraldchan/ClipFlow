@@ -1,5 +1,6 @@
 #Include "./GuestProfileList.ahk"
 #Include "./PMN_FillIn.ahk"
+#Include "./PMN_Setting.ahk"
 
 PMN_App(App, popupTitle, db, identifier) {
     listContent := signal([])
@@ -15,9 +16,7 @@ PMN_App(App, popupTitle, db, identifier) {
             return
         } else if (InStr(A_Clipboard, identifier)) {
             for key, val in JSON.parse(A_Clipboard) {
-                if (val = "") {
-                    return
-                }
+                
             }
         }
         ; save to db
@@ -30,7 +29,7 @@ PMN_App(App, popupTitle, db, identifier) {
         loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
         filteredItems := []
 
-        typeConvert(content) {
+        typeConvert(content){
             converted := ""
             try {
                 converted := Number(content)
@@ -62,20 +61,20 @@ PMN_App(App, popupTitle, db, identifier) {
                     }
                 } else if (item["guestType"] = "港澳台旅客") {
                     ; from HK/MO/TW
-                    if (InStr(item["name"], searchInput) ||
+                    if (InStr(item["name"], searchInput) || 
                         InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                    }
+                    }          
                 } else {
                     ; from abroad
                     if (InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                    }
-                }
+                    }                       
+                }                
             }
         }
 
@@ -84,7 +83,7 @@ PMN_App(App, popupTitle, db, identifier) {
 
     handleListItemsUpdate() {
         handleListContentUpdate()
-
+        
         LV := App.getCtrlByType("ListView")
         LV.Delete()
 
@@ -92,7 +91,7 @@ PMN_App(App, popupTitle, db, identifier) {
             listName := item["guestType"] = "国外旅客"
                 ? item["nameLast"] . ", " . item["nameFirst"]
                 : item["name"]
-
+                
             LV.Add(,
                 item["roomNum"],
                 listName,
@@ -106,7 +105,7 @@ PMN_App(App, popupTitle, db, identifier) {
         LV.Focus()
     }
 
-    fillPmsProfile() {
+    fillPmsProfile(){
         LV := App.getCtrlByType("ListView")
         if (LV.GetNext() = 0) {
             return
@@ -141,6 +140,10 @@ PMN_App(App, popupTitle, db, identifier) {
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListItemsUpdate()),
         App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile()),
         ; profile list
-        GuestProfileList(App, db, listContent)
+        GuestProfileList(App, db, listContent),
+        ; setting window
+        PMN_Window(PMN_Setting),
+        App.AddText("y+5 xp+480", "设置").OnEvent("Click", (*) => PMN_Setting.Show()),
+        App.AddPicture("w15 h15 x+5", A_ScriptDir . "\src\Assets\setting_icon.png").OnEvent("Click", (*) => PMN_Setting.Show())
     )
 }
