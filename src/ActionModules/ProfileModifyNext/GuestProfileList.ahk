@@ -1,35 +1,27 @@
 GuestProfileList(App, db, listContent) {
     
-    handleListInitialize() {
+    formatList() {
         LV := App.getCtrlByType("ListView")
-
-        listContent.set(db.load())
-        for item in listContent.value {
-            listName := item["guestType"] = "国外旅客"
-                ? item["nameLast"] . ", " . item["nameFirst"]
-                : item["name"]
-
-            LV.Add(,
-                item["roomNum"],
-                listName,
-                item["idType"],
-                item["idNum"],
-                item["addr"],
-            )
-        }
         ; column width setting
         LV.ModifyCol(1, 50)
         LV.ModifyCol(2, 100)
         LV.ModifyCol(3, 80)
         LV.ModifyCol(4, 180)
         LV.ModifyCol(5, 115)
+    }
 
-        LV.Modify(1, "Select")
-        LV.Focus()
+    colTitleGrid := {
+        keys: ["roomNum","name", "idType", "idNum", "addr"],
+        titles: ["房号", "姓名", "类型", "证件号码", "地址"]
+    }
+
+    options := {
+        lvOptions: "w530 h340 xp-452 y+10",
+        itemOptions: ""
     }
 
     return (
-        App.AddListView("w530 h360 xp-452 y+10", ["房号", "姓名", "类型", "证件号码", "地址"]),
-        handleListInitialize()
+        App.AddReactiveListView(options, colTitleGrid, listContent),
+        formatList()
     )
 }

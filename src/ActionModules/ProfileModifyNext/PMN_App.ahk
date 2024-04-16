@@ -3,7 +3,7 @@
 #Include "./PMN_Setting.ahk"
 
 PMN_App(App, popupTitle, db, identifier) {
-    listContent := signal([])
+    listContent := signal(db.load())
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
         nameRoom: "",
@@ -21,10 +21,9 @@ PMN_App(App, popupTitle, db, identifier) {
         }
         ; save to db
         db.add(A_Clipboard)
-        handleListItemsUpdate()
+        handleListContentUpdate()
     }
 
-    ; ideally, when the window is called or update button clicked, listContent should update
     handleListContentUpdate() {
         loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
         filteredItems := []
@@ -81,30 +80,6 @@ PMN_App(App, popupTitle, db, identifier) {
         listContent.set(filteredItems)
     }
 
-    handleListItemsUpdate() {
-        handleListContentUpdate()
-        
-        LV := App.getCtrlByType("ListView")
-        LV.Delete()
-
-        for item in listContent.value {
-            listName := item["guestType"] = "国外旅客"
-                ? item["nameLast"] . ", " . item["nameFirst"]
-                : item["name"]
-                
-            LV.Add(,
-                item["roomNum"],
-                listName,
-                item["idType"],
-                item["idNum"],
-                item["addr"],
-            )
-        }
-
-        LV.Modify(1, "Select")
-        LV.Focus()
-    }
-
     fillPmsProfile(){
         LV := App.getCtrlByType("ListView")
         if (LV.GetNext() = 0) {
@@ -137,7 +112,7 @@ PMN_App(App, popupTitle, db, identifier) {
         })),
         App.AddText("x+1 yp+5 h25", "分钟"),
         ; manual updating
-        App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListItemsUpdate()),
+        App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
         App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile()),
         ; profile list
         GuestProfileList(App, db, listContent),
