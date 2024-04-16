@@ -25,7 +25,17 @@ PMN_App(App, popupTitle, db, identifier) {
     }
 
     handleListContentUpdate() {
-        loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
+        HALF_YEAR_MIN := 262080
+
+        if (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")) {
+            adjustedPeriod := queryFilter.value["period"]
+            App.getCtrlByName("period").Enabled := true
+        } else {
+            adjustedPeriod := HALF_YEAR_MIN
+            App.getCtrlByName("period").Enabled := false
+        }
+
+        loadedItems := db.load(, queryFilter.value["date"], adjustedPeriod)
         filteredItems := []
 
         typeConvert(content){
@@ -81,6 +91,11 @@ PMN_App(App, popupTitle, db, identifier) {
     }
 
     fillPmsProfile(){
+        if (!WinExist("ahk_class SunAwtFrame")) {
+            MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
+            return
+        }
+
         LV := App.getCtrlByType("ListView")
         if (LV.GetNext() = 0) {
             return
@@ -95,7 +110,9 @@ PMN_App(App, popupTitle, db, identifier) {
             date: FormatTime(d[1].value, "yyyyMMdd"),
             nameRoom: queryFilter.value["nameRoom"],
             period: queryFilter.value["period"]
-        })),
+        })
+        handleListContentUpdate()
+        ),
         ; name or room number
         App.AddText("x+10 yp+5 h20", "姓名/房号"),
         App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"]).OnEvent("Change", (e*) => queryFilter.set({
