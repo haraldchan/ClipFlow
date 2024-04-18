@@ -16,7 +16,7 @@ GuestProfileList(App, db, listContent) {
     }
 
     options := {
-        lvOptions: "w530 h340 xp-452 y+10",
+        lvOptions: "LV0x4000 Grid w530 h340 xp-452 y+10",
         itemOptions: ""
     }
 
