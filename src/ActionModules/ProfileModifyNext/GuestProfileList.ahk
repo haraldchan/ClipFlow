@@ -20,8 +20,14 @@ GuestProfileList(App, db, listContent) {
         itemOptions: ""
     }
 
+    copyIdNumber(LV, row) {
+        A_Clipboard := LV.GetText(row, 4)
+        key := LV.GetText(row, 2)
+        MsgBox(Format("已复制证件号码: `n`n{1} : {2}", key, A_Clipboard), popupTitle, "4096 T1")
+    }
+
     return (
-        App.AddReactiveListView(options, colTitleGrid, listContent),
+        App.AddReactiveListView(options, colTitleGrid, listContent,,["DoubleClick", copyIdNumber]),
         formatList()
     )
 }
