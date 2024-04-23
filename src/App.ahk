@@ -21,7 +21,7 @@ App(CF) {
 
 		Tabs(CF, onTop, onTopCheckBox),
 
-		ClipFlow.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
-		ClipFlow.AddButton("h30 w130 x+20", "Refresh").OnEvent("Click", (*) => utils.cleanReload(winGroup))
+		CF.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
+		CF.AddButton("h30 w130 x+20", "Refresh").OnEvent("Click", (*) => utils.cleanReload(winGroup))
 	)
 }
