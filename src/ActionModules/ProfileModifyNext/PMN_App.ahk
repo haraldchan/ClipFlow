@@ -14,27 +14,25 @@ PMN_App(App, popupTitle, db, identifier) {
     handleCaptured(identifier, db) {
         if (!InStr(A_Clipboard, identifier)) {
             return
-        } 
+        }
         ; save to db
         db.add(A_Clipboard)
         handleListContentUpdate()
     }
 
     handleListContentUpdate() {
-        HALF_YEAR_MIN := 262080
-
         if (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")) {
             adjustedPeriod := queryFilter.value["period"]
             App.getCtrlByName("period").Enabled := true
         } else {
-            adjustedPeriod := HALF_YEAR_MIN
+            adjustedPeriod := 60 * 24 * db.cleanPeriod
             App.getCtrlByName("period").Enabled := false
         }
 
         loadedItems := db.load(, queryFilter.value["date"], adjustedPeriod)
         filteredItems := []
 
-        typeConvert(content){
+        typeConvert(content) {
             converted := ""
             try {
                 converted := Number(content)
@@ -66,27 +64,27 @@ PMN_App(App, popupTitle, db, identifier) {
                     }
                 } else if (item["guestType"] = "港澳台旅客") {
                     ; from HK/MO/TW
-                    if (InStr(item["name"], searchInput) || 
+                    if (InStr(item["name"], searchInput) ||
                         InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                    }          
+                    }
                 } else {
                     ; from abroad
                     if (InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                    }                       
-                }                
+                    }
+                }
             }
         }
 
         listContent.set(filteredItems)
     }
 
-    fillPmsProfile(){
+    fillPmsProfile() {
         if (!WinExist("ahk_class SunAwtFrame")) {
             MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
             return
@@ -107,8 +105,7 @@ PMN_App(App, popupTitle, db, identifier) {
             nameRoom: queryFilter.value["nameRoom"],
             period: queryFilter.value["period"]
         })
-        handleListContentUpdate()
-        ),
+            handleListContentUpdate()),
         ; name or room number
         App.AddText("x+10 yp+5 h20", "姓名/房号"),
         App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"]).OnEvent("Change", (e*) => queryFilter.set({
