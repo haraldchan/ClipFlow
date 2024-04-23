@@ -14,11 +14,7 @@ PMN_App(App, popupTitle, db, identifier) {
     handleCaptured(identifier, db) {
         if (!InStr(A_Clipboard, identifier)) {
             return
-        } else if (InStr(A_Clipboard, identifier)) {
-            for key, val in JSON.parse(A_Clipboard) {
-                
-            }
-        }
+        } 
         ; save to db
         db.add(A_Clipboard)
         handleListContentUpdate()
