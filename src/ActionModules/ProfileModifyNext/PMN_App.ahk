@@ -17,6 +17,7 @@ PMN_App(App, popupTitle, db, identifier) {
         }
         ; save to db
         db.add(A_Clipboard)
+        Sleep 500
         handleListContentUpdate()
     }
 
