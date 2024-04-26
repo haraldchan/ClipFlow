@@ -177,6 +177,9 @@ class AddReactive {
         if(controlType = "ListView") {
             this.ctrl := this.GuiObject.Add(this.ctrlType, this.lvOptions, this.innerText)
             this.handleListViewUpdate()
+            for width in this.colWidths {
+                this.ctrl.ModifyCol(A_Index, width)
+            }
         } else {
             this.ctrl := this.GuiObject.Add(this.ctrlType, this.options, this.innerText)
         }
@@ -268,9 +271,6 @@ class AddReactive {
         } else if (this.ctrl is Gui.ListView) {
             ; update list items
             this.handleListViewUpdate()
-            for width in this.colWidths {
-                this.ctrl.ModifyCol(A_Index, width)
-            }
         }
     }
 
