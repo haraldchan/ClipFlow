@@ -1,18 +1,19 @@
 GuestProfileList(App, db, listContent) {
     
-    formatList() {
-        LV := App.getCtrlByType("ListView")
-        ; column width setting
-        LV.ModifyCol(1, 50)
-        LV.ModifyCol(2, 100)
-        LV.ModifyCol(3, 80)
-        LV.ModifyCol(4, 180)
-        LV.ModifyCol(5, 115)
-    }
+    ; formatList() {
+    ;     LV := App.getCtrlByType("ListView")
+    ;     ; column width setting
+    ;     LV.ModifyCol(1, 50)
+    ;     LV.ModifyCol(2, 100)
+    ;     LV.ModifyCol(3, 80)
+    ;     LV.ModifyCol(4, 180)
+    ;     LV.ModifyCol(5, 115)
+    ; }
 
-    colTitleGrid := {
+    columnDetails := {
         keys: ["roomNum","name", "idType", "idNum", "addr"],
-        titles: ["房号", "姓名", "类型", "证件号码", "地址"]
+        titles: ["房号", "姓名", "类型", "证件号码", "地址"],
+        widths: [50, 100, 80, 180, 115]
     }
 
     options := {
@@ -27,7 +28,7 @@ GuestProfileList(App, db, listContent) {
     }
 
     return (
-        App.AddReactiveListView(options, colTitleGrid, listContent,,["DoubleClick", copyIdNumber]),
-        formatList()
+        App.AddReactiveListView(options, columnDetails, listContent,,["DoubleClick", copyIdNumber]),
+        ; formatList()
     )
 }

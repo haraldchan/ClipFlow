@@ -161,10 +161,11 @@ class AddReactive {
 
         if (controlType = "ComboBox" ||
             controlType = "DropDownList") {
-                this.innerText := textString
+            this.innerText := textString
         } else if (controlType = "ListView") {
             this.innerText := textString.titles
             this.titleKeys := textString.keys
+            this.colWidths := textString.HasOwnProp("widths") ? textString.colWidths : "AutoHdr"
         } else {
             this.innerText := RegExMatch(textString, "\{\d+\}")
                 ? this.handleFormatStr(textString, depend, key)
@@ -267,6 +268,9 @@ class AddReactive {
         } else if (this.ctrl is Gui.ListView) {
             ; update list items
             this.handleListViewUpdate()
+            for width in this.colWidths {
+                this.ctrl.ModifyCol(A_Index, width)
+            }
         }
     }
 
