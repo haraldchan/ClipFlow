@@ -165,7 +165,9 @@ class AddReactive {
         } else if (controlType = "ListView") {
             this.innerText := textString.titles
             this.titleKeys := textString.keys
-            this.colWidths := textString.HasOwnProp("widths") ? textString.colWidths : "AutoHdr"
+            this.colWidths := textString.HasOwnProp("widths") 
+                ? textString.widths 
+                : this.titleKeys.map(item => "AutoHdr")
         } else {
             this.innerText := RegExMatch(textString, "\{\d+\}")
                 ? this.handleFormatStr(textString, depend, key)
