@@ -14,7 +14,7 @@ PMN_App(App, popupTitle, db, identifier) {
     handleCaptured(identifier, db) {
         if (!InStr(A_Clipboard, identifier)) {
             return
-        }
+        } 
         ; save to db
         db.add(A_Clipboard)
         Sleep 500
@@ -65,20 +65,20 @@ PMN_App(App, popupTitle, db, identifier) {
                     }
                 } else if (item["guestType"] = "港澳台旅客") {
                     ; from HK/MO/TW
-                    if (InStr(item["name"], searchInput) ||
+                    if (InStr(item["name"], searchInput) || 
                         InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                    }
+                    }          
                 } else {
                     ; from abroad
                     if (InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                    }
-                }
+                    }                       
+                }                
             }
         }
 
@@ -106,7 +106,8 @@ PMN_App(App, popupTitle, db, identifier) {
             nameRoom: queryFilter.value["nameRoom"],
             period: queryFilter.value["period"]
         })
-            handleListContentUpdate()),
+            handleListContentUpdate()
+        ),
         ; name or room number
         App.AddText("x+10 yp+5 h20", "姓名/房号"),
         App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"]).OnEvent("Change", (e*) => queryFilter.set({
@@ -126,7 +127,7 @@ PMN_App(App, popupTitle, db, identifier) {
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
         App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile()),
         ; profile list
-        GuestProfileList(App, db, listContent),
+        GuestProfileList(App, listContent),
         ; setting window
         PMN_Window(PMN_Setting),
         App.AddText("y+5 xp+480", "设置").OnEvent("Click", (*) => PMN_Setting.Show()),
