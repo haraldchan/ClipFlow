@@ -137,6 +137,22 @@ class effect {
     }
 }
 
+class IndexList {
+    __New(guiObj, depend, listItem) {
+        loop depend.value.Length {
+            guiObj.AddReactive(listItem[1], listItem[2], listItem[3], depend, A_Index)
+        }
+    }
+}
+
+class ForList {
+    __New(guiObj, depend, listItem, key) {
+        loop depend.value.Length {
+            guiObj.AddReactive(listItem[1], listItem[2], listItem[3], depend, key)
+        }
+    }
+}
+
 class AddReactive {
     __New(GuiObject, controlType, options := "", textString := "", depend := 0, key := 0, event := 0) {
         ; params type checking
