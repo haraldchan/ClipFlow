@@ -44,6 +44,7 @@ History(CF) {
 	return (
 		clipHistory.value.map(item =>
 			CF.AddReactiveEdit("x30 h38 w250 y+10 ReadOnly", "{1}", clipHistory, A_Index)
-		)
+		),
+		; IndexList(CF, clipHistory, ["Edit", "x30 h38 w250 y+10 ReadOnly", "{1}"])
 	)
 }
