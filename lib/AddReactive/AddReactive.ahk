@@ -137,22 +137,6 @@ class effect {
     }
 }
 
-class IndexList {
-    __New(guiObj, depend, listItem) {
-        loop depend.value.Length {
-            guiObj.AddReactive(listItem[1], listItem[2], listItem[3], depend, A_Index)
-        }
-    }
-}
-
-class ForList {
-    __New(guiObj, depend, listItem, key) {
-        loop depend.value.Length {
-            guiObj.AddReactive(listItem[1], listItem[2], listItem[3], depend, key)
-        }
-    }
-}
-
 class AddReactive {
     __New(GuiObject, controlType, options := "", textString := "", depend := 0, key := 0, event := 0) {
         ; params type checking
@@ -331,7 +315,25 @@ class AddReactive {
     }
 }
 
+class IndexList {
+    __New(guiObj, controlType, options, innerText, depend := 0, key := 0, event := 0){
+        loop depend.value.length {
+            guiObj.AddReactive(controlType, options, innerText, depend, A_Index, event)
+        }
+    }   
+}
+
+class ForList {
+    __New(guiObj, controlType, options, innerText, depend := 0, key := 0, event := 0){
+        loop depend.value.length {
+            guiObj.AddReactive(controlType, options, innerText, depend, [[A_Index], key*], event)
+        }
+    }   
+}
+
 Gui.Prototype.AddReactive := AddReactive
+Gui.Prototype.IndexList := IndexList
+Gui.Prototype.ForList := ForList
 
 ; for lsp {
 ; revue.ahk
