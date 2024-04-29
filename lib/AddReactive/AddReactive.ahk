@@ -323,7 +323,7 @@ class IndexList {
     }   
 }
 
-class ForList {
+class KeyList {
     __New(guiObj, controlType, options, innerText, depend := 0, key := 0, event := 0){
         loop depend.value.length {
             guiObj.AddReactive(controlType, options, innerText, depend, [[A_Index], key*], event)
@@ -333,7 +333,7 @@ class ForList {
 
 Gui.Prototype.AddReactive := AddReactive
 Gui.Prototype.IndexList := IndexList
-Gui.Prototype.ForList := ForList
+Gui.Prototype.KeyList := KeyList
 
 ; for lsp {
 ; revue.ahk
