@@ -1,6 +1,7 @@
 History(CF) {
-	clipHistory := signal(fillBlank(config.read("clipHistory")))
-	; fillBlank(clipHistory.value)
+	clipHistory := signal(config.read("clipHistory"))
+	fillBlank(clipHistory.value)
+
 	OnClipboardChange (*) => (
 		saveHistory(),
 		sleep(100),
@@ -42,9 +43,6 @@ History(CF) {
 	}
 
 	return (
-		clipHistory.value.map(item =>
-			CF.AddReactiveEdit("x30 h38 w250 y+10 ReadOnly", "{1}", clipHistory, A_Index)
-		),
-		; IndexList(CF, clipHistory, ["Edit", "x30 h38 w250 y+10 ReadOnly", "{1}"])
+		CF.IndexList("Edit", "x30 h40 w250 y+10 ReadOnly", "{1}", clipHistory)
 	)
 }
