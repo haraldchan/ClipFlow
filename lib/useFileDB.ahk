@@ -35,7 +35,7 @@ class useFileDB {
 		matchFilePaths := []
 		loop files, (db . "\" . queryDate . "\*.json") {
 			if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= queryPeriodInput) {
-				matchFilePaths.unshift(A_LoopFileFullPath)
+				matchFilePaths.InsertAt(1, A_LoopFileFullPath)
 			}
 		}
 		return matchFilePaths
