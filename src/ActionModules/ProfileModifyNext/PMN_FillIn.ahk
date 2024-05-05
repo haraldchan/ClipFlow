@@ -58,6 +58,20 @@ class PMN_FillIn {
         return parsedInfo
     }
 
+    static waitAltWin(anchorX, anchorY){
+        CoordMode "Pixel", "Screen"
+        WIN_HEADER_BLUE := "0x99B4D1"
+        loop {
+            Sleep 250
+            if (PixelGetColor(anchorX, anchorY + 24) != WIN_HEADER_BLUE) {
+                continue
+            } else {
+                Sleep 500 
+                break
+            }
+        }
+    }
+
     static fillAction(guestProfileMap) {
         CoordMode "Pixel", "Screen"
         AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
@@ -137,7 +151,8 @@ class PMN_FillIn {
             MouseMove anchorX + 10, anchorY + 10 ; open alt name win
             Sleep 50
             Click 1
-            Sleep 3500
+
+            this.waitAltWin(anchorX, anchorY)
 
             Send Format("{Text}{1}", guestProfileMap["nameAlt"])
             Sleep 100
