@@ -246,6 +246,30 @@ class PM_CopyPaste {
         return guestProfile
     }
 
+    static waitAltWin(anchorX, anchorY){
+        CoordMode "Pixel", "Screen"
+        WIN_HEADER_BLUE := "0x99B4D1"
+        loop {
+            Sleep 250
+            if (PixelGetColor(anchorX, anchorY + 24) != WIN_HEADER_BLUE) {
+                continue
+            } else {
+                Sleep 500 
+                break
+            }
+        }
+    }
+
+    static waitProfileClose(anchorX, anchorY, AnchorImage) {
+        CoordMode "Pixel", "Screen"
+        loop {
+            Sleep 250
+            if(!ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, AnchorImage)) {
+                break
+            }
+        }
+    }
+
     static paste(guestProfileMap) {
         CoordMode "Pixel", "Screen"
         AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
@@ -325,7 +349,8 @@ class PM_CopyPaste {
             MouseMove anchorX + 10, anchorY + 10 ; open alt name win
             Sleep 50
             Click 1
-            Sleep 3500
+
+            this.waitAltWin(anchorX, anchorY)
 
             Send Format("{Text}{1}", guestProfileMap["nameAlt"])
             Sleep 100
@@ -356,8 +381,11 @@ class PM_CopyPaste {
                 取消(Esc)：      留在 Opera
             )", "Profile Modify", "OKCancel T2 4096")
         if (backToPsb = "OK") {
+            WinActivate "ahk_class SunAwtFrame"
             Send "!o"
-            Sleep 1500
+
+            this.waitProfileClose(anchorX, anchorY, AnchorImage)
+
             if (WinExist("旅客信息")) {
                 WinActivate "旅客信息"
             } else {
