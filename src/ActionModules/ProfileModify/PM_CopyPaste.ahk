@@ -248,10 +248,10 @@ class PM_CopyPaste {
 
     static waitAltWin(anchorX, anchorY){
         CoordMode "Pixel", "Screen"
-        WIN_HEADER_BLUE := "0x99B4D1"
-        loop {
+        WIN_HEADER_BLUE := "0xBFCDDB"
+        loop 16 {
             Sleep 250
-            if (PixelGetColor(anchorX, anchorY + 24) != WIN_HEADER_BLUE) {
+            if (PixelGetColor(anchorX, anchorY - 98) != WIN_HEADER_BLUE) {
                 continue
             } else {
                 Sleep 500 
@@ -262,7 +262,7 @@ class PM_CopyPaste {
 
     static waitProfileClose(anchorX, anchorY, AnchorImage) {
         CoordMode "Pixel", "Screen"
-        loop {
+        loop 16 {
             Sleep 250
             if(!ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, AnchorImage)) {
                 break
