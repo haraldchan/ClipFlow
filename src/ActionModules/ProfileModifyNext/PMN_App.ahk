@@ -118,8 +118,10 @@ PMN_App(App, popupTitle, db, identifier) {
         App.AddGroupBox("R17 w550 y+20", popupTitle),
         ; date
         App.AddDateTime("vdate xp+10 yp+25 w100 h25 Choose" . queryFilter.value["date"])
-            .OnEvent("Change", (ctrl, info) => handleQuery(ctrl.Name, ctrl.Value)),
-        handleListContentUpdate(),
+            .OnEvent("Change", (ctrl, info) => 
+                handleQuery(ctrl.Name, ctrl.Value)
+                handleListContentUpdate()
+            ),
         ; name or room number
         App.AddText("x+10 yp+5 h20", "姓名/房号"),
         App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"])
