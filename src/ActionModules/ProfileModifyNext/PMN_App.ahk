@@ -96,11 +96,6 @@ PMN_App(App, popupTitle, db, identifier) {
         }
         if (ctrlName = "period") {
             updatedQuery["period"] := newVal = "" ? 7200 : newVal
-            queryFilter.set({
-                date: queryFilter.value["date"],
-                nameRoom: queryFilter.value["nameRoom"],
-                period: newVal = "" ? 7200 : newVal
-            })
         }
 
         queryFilter.set(updatedQuery)
