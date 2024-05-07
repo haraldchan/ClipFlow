@@ -118,16 +118,16 @@ PMN_App(App, popupTitle, db, identifier) {
         App.AddGroupBox("R17 w550 y+20", popupTitle),
         ; date
         App.AddDateTime("vdate xp+10 yp+25 w100 h25 Choose" . queryFilter.value["date"])
-            .OnEvent("Change", (ctrl, val) => handleQueryFilterUpdate(ctrl.Name, val)),
+            .OnEvent("Change", (ctrl, info) => handleQueryFilterUpdate(ctrl.Name, ctrl.Value)),
         handleListContentUpdate(),
         ; name or room number
         App.AddText("x+10 yp+5 h20", "姓名/房号"),
         App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"])
-            .OnEvent("Change", (ctrl, val) => handleQueryFilterUpdate(ctrl.Name, val)),
+            .OnEvent("Change", (ctrl, info) => handleQueryFilterUpdate(ctrl.Name, ctrl.Value)),
         ; period
         App.AddText("x+10 yp+5 h20", "最近"),
         App.AddEdit("vperiod Number x+1 yp-5 w30 h25", queryFilter.value["period"])
-            .OnEvent("Change", (ctrl, val) => handleQueryFilterUpdate(ctrl.Name, val)),
+            .OnEvent("Change", (ctrl, info) => handleQueryFilterUpdate(ctrl.Name, ctrl.Value)),
         App.AddText("x+1 yp+5 h25", "分钟"),
         ; manual updating
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
