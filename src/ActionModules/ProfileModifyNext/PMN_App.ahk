@@ -14,7 +14,7 @@ PMN_App(App, popupTitle, db, identifier) {
     handleCaptured(identifier, db) {
         if (!InStr(A_Clipboard, identifier)) {
             return
-        } 
+        }
         ; save to db
         db.add(A_Clipboard)
         Sleep 500
@@ -65,24 +65,45 @@ PMN_App(App, popupTitle, db, identifier) {
                     }
                 } else if (item["guestType"] = "港澳台旅客") {
                     ; from HK/MO/TW
-                    if (InStr(item["name"], searchInput) || 
+                    if (InStr(item["name"], searchInput) ||
                         InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                    }          
+                    }
                 } else {
                     ; from abroad
                     if (InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
                         filteredItems.unshift(item)
-                    }                       
-                }                
+                    }
+                }
             }
         }
 
         listContent.set(filteredItems)
+    }
+
+    handleQueryFilterUpdate(ctrlName, newVal) {
+        updatedQuery := queryFilter.value
+
+        if (ctrlName = "date") {
+            updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
+        }
+        if (ctrlName = "nameRoom") {
+            updatedQuery["nameRoom"] := newVal
+        }
+        if (ctrlName = "period") {
+            updatedQuery["period"] := newVal = "" ? 7200 : newVal
+            queryFilter.set({
+                date: queryFilter.value["date"],
+                nameRoom: queryFilter.value["nameRoom"],
+                period: newVal = "" ? 7200 : newVal
+            })
+        }
+
+        queryFilter.set(updatedQuery)
     }
 
     fillPmsProfile() {
@@ -101,36 +122,22 @@ PMN_App(App, popupTitle, db, identifier) {
     return (
         App.AddGroupBox("R17 w550 y+20", popupTitle),
         ; date
-        App.AddDateTime("vdate xp+10 yp+25 w100 h25 Choose" . queryFilter.value["date"]).OnEvent("Change", (d*) => queryFilter.set({
-            date: FormatTime(d[1].value, "yyyyMMdd"),
-            nameRoom: queryFilter.value["nameRoom"],
-            period: queryFilter.value["period"]
-        })
-            handleListContentUpdate()
-        ),
+        App.AddDateTime("vdate xp+10 yp+25 w100 h25 Choose" . queryFilter.value["date"])
+            .OnEvent("Change", (ctrl, val) => handleQueryFilterUpdate(ctrl.Name, val)),
+        handleListContentUpdate(),
         ; name or room number
         App.AddText("x+10 yp+5 h20", "姓名/房号"),
-        App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"]).OnEvent("Change", (e*) => queryFilter.set({
-            date: queryFilter.value["date"],
-            nameRoom: e[1].value,
-            period: queryFilter.value["period"]
-        })),
+        App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"])
+            .OnEvent("Change", (ctrl, val) => handleQueryFilterUpdate(ctrl.Name, val)),
         ; period
         App.AddText("x+10 yp+5 h20", "最近"),
-        App.AddEdit("vperiod Number x+1 yp-5 w30 h25", queryFilter.value["period"]).OnEvent("Change", (e*) => queryFilter.set({
-            date: queryFilter.value["date"],
-            nameRoom: queryFilter.value["nameRoom"],
-            period: e[1].value = "" ? 7200 : e[1].value
-        })),
+        App.AddEdit("vperiod Number x+1 yp-5 w30 h25", queryFilter.value["period"])
+            .OnEvent("Change", (ctrl, val) => handleQueryFilterUpdate(ctrl.Name, val)),
         App.AddText("x+1 yp+5 h25", "分钟"),
         ; manual updating
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
         App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile()),
         ; profile list
-        GuestProfileList(App, listContent),
-        ; setting window
-        PMN_Window(PMN_Setting),
-        App.AddText("y+5 xp+480", "设置").OnEvent("Click", (*) => PMN_Setting.Show()),
-        App.AddPicture("w15 h15 x+5", A_ScriptDir . "\src\Assets\setting_icon.png").OnEvent("Click", (*) => PMN_Setting.Show())
+        GuestProfileList(App, listContent)
     )
 }
