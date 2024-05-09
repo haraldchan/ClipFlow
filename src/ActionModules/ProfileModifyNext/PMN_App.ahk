@@ -1,6 +1,5 @@
 #Include "./GuestProfileList.ahk"
 #Include "./PMN_FillIn.ahk"
-#Include "./PMN_Setting.ahk"
 
 PMN_App(App, popupTitle, db, identifier) {
     listContent := signal(db.load())
@@ -19,6 +18,8 @@ PMN_App(App, popupTitle, db, identifier) {
         db.add(A_Clipboard)
         Sleep 500
         handleListContentUpdate()
+        ; show notifier msgbox
+        MsgBox(Format("已保存信息：{1}", JSON.parse(A_Clipboard)["name"]), popupTitle, "T1.5")
     }
 
     handleListContentUpdate() {
@@ -121,7 +122,7 @@ PMN_App(App, popupTitle, db, identifier) {
             .OnEvent("Change", (ctrl, info) => 
                 handleQuery(ctrl.Name, ctrl.Value)
                 handleListContentUpdate()
-            ),
+        ),
         ; name or room number
         App.AddText("x+10 yp+5 h20", "姓名/房号"),
         App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"])
