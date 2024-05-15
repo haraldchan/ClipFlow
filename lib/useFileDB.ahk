@@ -18,7 +18,7 @@ class useFileDB {
 
 	add(jsonString) {
 		dateFolder := "\" . FormatTime(A_Now, "yyyyMMdd")
-		fileName := "\" . A_Now . A_MSec . ".json"
+		fileName := "\" . JSON.parse(jsonString)["fileName"] . ".json"
 		; create dateFolder if not exist yet
 		if (!DirExist(this.using . dateFolder)) {
 			DirCreate(this.using . dateFolder)
@@ -54,5 +54,14 @@ class useFileDB {
 			.map(file => JSON.parse(FileRead(file, "UTF-8")))
 
 		return loadedData
+	}
+
+	update(fileName, queryDate, newJsonString){
+		loop files, (this.using . "\" . queryDate . "\*.json") {
+			if (fileName . ".json" = A_LoopFileName) {
+				FileDelete(A_LoopFileFullPath)
+				FileAppend(newJsonString, this.using . "\" . queryDate . "\" . filename . ".json" , "UTF-8")
+			}
+		}
 	}
 }
