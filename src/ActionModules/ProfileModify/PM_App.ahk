@@ -86,6 +86,7 @@ PM_App(App, popupTitle) {
     pmsFill(*) {
         App.Hide()
         useSingleScript()
+        Sleep 500
         PM_CopyPaste.paste(currentGuest.value)
         useSingleScript()
 
