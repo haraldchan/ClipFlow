@@ -14,11 +14,15 @@ class PMN_FillIn {
         ; last name
         parsedInfo["nameLast"] := currentGuest["guestType"] = "内地旅客"
             ? getFullnamePinyin(currentGuest["name"])[1]
-            : currentGuest["nameLast"]
+            : currentGuest["nameLast"] = " "
+                ? getFullnamePinyin(currentGuest["name"])[1]
+                : currentGuest["nameLast"]
         ; first name
         parsedInfo["nameFirst"] := currentGuest["guestType"] = "内地旅客"
             ? getFullnamePinyin(currentGuest["name"])[2]
-            : currentGuest["nameFirst"]
+            : currentGuest["nameFirst"] = " "
+                ? getFullnamePinyin(currentGuest["name"])[2]
+                : currentGuest["nameFirst"] 
         ; address
         parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客" 
             ? currentGuest["addr"]
