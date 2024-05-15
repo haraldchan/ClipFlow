@@ -1,4 +1,5 @@
 #Include "./GuestProfileList.ahk"
+#Include "./GuestProfileDetails.ahk"
 #Include "./PMN_FillIn.ahk"
 
 PMN_App(App, popupTitle, db, identifier) {
@@ -120,15 +121,21 @@ PMN_App(App, popupTitle, db, identifier) {
         PMN_Fillin.fill(listContent.value[LV.GetNext()])
     }
 
-    addUpdateItemHandler(){
+    addAddtionalEvents(){
         LV := App.getCtrlByType("ListView")
         LV.OnEvent("ItemEdit", (guiObj, itemIndex) => handleUpdateItem(itemIndex, LV))
+        LV.OnEvent("ContextMenu", (params*) => showProfileDetails(params[2], LV))
     }
 
     handleUpdateItem(itemIndex, LV){
         selectedItem := listContent.value[itemIndex]
         selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
         db.update(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
+    }
+
+    showProfileDetails(itemIndex, LV){
+        selectedItem := listContent.value[itemIndex]
+        GuestProfileDetails(selectedItem)
     }
 
 
@@ -154,6 +161,6 @@ PMN_App(App, popupTitle, db, identifier) {
         App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile(App)),
         ; profile list
         GuestProfileList(App, listContent),
-        addUpdateItemHandler()
+        addAddtionalEvents()
     )
 }
