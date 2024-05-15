@@ -276,10 +276,7 @@ class PM_CopyPaste {
         anchorX := 0
         anchorY := 0
 
-        if (WinGetMinMax("ahk_class SunAwtFrame") = 1) {
-            anchorX := 451 - 10
-            anchorY := 278
-        } else if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, AnchorImage)) {
+        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, AnchorImage)) {
             anchorX := FoundX - 10
             anchorY := FoundY
         } else {
