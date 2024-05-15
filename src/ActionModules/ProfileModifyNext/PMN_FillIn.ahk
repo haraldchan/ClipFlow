@@ -78,10 +78,7 @@ class PMN_FillIn {
         anchorX := 0
         anchorY := 0
 
-        if (WinGetMinMax("ahk_class SunAwtFrame") = 1) {
-            anchorX := 451 - 10
-            anchorY := 278
-        } else if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, AnchorImage)) {
+        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, AnchorImage)) {
             anchorX := FoundX - 10
             anchorY := FoundY
         } else {
@@ -175,7 +172,7 @@ class PMN_FillIn {
         BlockInput false
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
 
-        MsgBox("已完成 Profile Modify！", "Profile Modify Next", "OKCancel T2 4096")
+        MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
     }
     
 }
