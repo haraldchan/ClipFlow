@@ -14,12 +14,14 @@ PMN_App(App, popupTitle, db, identifier) {
         if (!InStr(A_Clipboard, identifier)) {
             return
         }
+        updatedGuestInfo := JSON.parse(A_Clipboard)
+        updatedGuestInfo["fileName"] := A_Now . A_MSec
         ; save to db
-        db.add(A_Clipboard)
+        db.add(JSON.stringify(updatedGuestInfo))
         Sleep 500
         handleListContentUpdate()
         ; show notifier msgbox
-        MsgBox(Format("已保存信息：{1}", JSON.parse(A_Clipboard)["name"]), popupTitle, "T1.5")
+        MsgBox(Format("已保存信息：{1}", updatedGuestInfo["name"]), popupTitle, "T1.5")
     }
 
     handleListContentUpdate() {
@@ -102,11 +104,14 @@ PMN_App(App, popupTitle, db, identifier) {
         queryFilter.set(updatedQuery)
     }
 
-    fillPmsProfile() {
+    fillPmsProfile(App) {
         if (!WinExist("ahk_class SunAwtFrame")) {
             MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
             return
         }
+
+        App.Hide()
+        sleep 500
 
         LV := App.getCtrlByType("ListView")
         if (LV.GetNext() = 0) {
@@ -114,6 +119,18 @@ PMN_App(App, popupTitle, db, identifier) {
         }
         PMN_Fillin.fill(listContent.value[LV.GetNext()])
     }
+
+    addUpdateItemHandler(){
+        LV := App.getCtrlByType("ListView")
+        LV.OnEvent("ItemEdit", (guiObj, itemIndex) => handleUpdateItem(itemIndex, LV))
+    }
+
+    handleUpdateItem(itemIndex, LV){
+        selectedItem := listContent.value[itemIndex]
+        selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
+        db.update(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
+    }
+
 
     return (
         App.AddGroupBox("R17 w550 y+20", popupTitle),
@@ -134,8 +151,9 @@ PMN_App(App, popupTitle, db, identifier) {
         App.AddText("x+1 yp+5 h25", "分钟"),
         ; manual updating
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
-        App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile()),
+        App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile(App)),
         ; profile list
-        GuestProfileList(App, listContent)
+        GuestProfileList(App, listContent),
+        addUpdateItemHandler()
     )
 }
