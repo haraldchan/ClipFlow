@@ -10,7 +10,8 @@ GuestProfileDetails(selectedGuest) {
         "idType", "证件类型",
         "name", "全名",
         "guestType", "旅客类型",
-        "roomNum", "房号"
+        "roomNum", "房号",
+        "tel", "联系电话"
     )
 
     listInitialize(selectedGuest, fieldIndex) {
@@ -37,7 +38,7 @@ GuestProfileDetails(selectedGuest) {
     }
 
     return (
-        profile.AddListView("vguestProfile Grid w230 r8", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
+        profile.AddListView("vguestProfile LV0x4000 Grid w230 r9", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
         listInitialize(selectedGuest, fieldIndex),
         profile.AddButton("h30 w230", "关   闭").OnEvent("Click", (*) => profile.Hide()),
         profile.Show()
