@@ -1,5 +1,5 @@
 GuestProfileDetails(selectedGuest) {
-    profile := Gui()
+    profile := Gui(,"Profile Details")
     profile.SetFont(, "微软雅黑")
 
     fieldIndex := Map(
@@ -39,6 +39,7 @@ GuestProfileDetails(selectedGuest) {
     return (
         profile.AddListView("vguestProfile Grid w230 r8", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
         listInitialize(selectedGuest, fieldIndex),
+        profile.AddButton("h30 w230", "关   闭").OnEvent("Click", (*) => profile.Hide()),
         profile.Show()
     )
 }
