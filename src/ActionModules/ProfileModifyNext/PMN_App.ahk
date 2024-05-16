@@ -15,8 +15,10 @@ PMN_App(App, popupTitle, db, identifier) {
         if (!InStr(A_Clipboard, identifier)) {
             return
         }
+
         updatedGuestInfo := JSON.parse(A_Clipboard)
         updatedGuestInfo["fileName"] := A_Now . A_MSec
+
         ; save to db
         db.add(JSON.stringify(updatedGuestInfo))
         Sleep 500
@@ -65,7 +67,7 @@ PMN_App(App, popupTitle, db, identifier) {
                 if (item["guestType"] = "内地旅客") {
                     ; from mainland
                     if (InStr(item["name"], searchInput)) {
-                        filteredItems.unshift(item)
+                        filteredItems.InsertAt(1, item)
                     }
                 } else if (item["guestType"] = "港澳台旅客") {
                     ; from HK/MO/TW
@@ -73,14 +75,14 @@ PMN_App(App, popupTitle, db, identifier) {
                         InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
-                        filteredItems.unshift(item)
+                        filteredItems.InsertAt(1, item)
                     }
                 } else {
                     ; from abroad
                     if (InStr(item["nameLast"], searchInput, "Off") ||
                         InStr(item["nameFirst"], searchInput, "Off")
                     ) {
-                        filteredItems.unshift(item)
+                        filteredItems.InsertAt(1, item)
                     }
                 }
             }
