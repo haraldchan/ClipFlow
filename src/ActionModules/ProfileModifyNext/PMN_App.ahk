@@ -58,7 +58,7 @@ PMN_App(App, popupTitle, db, identifier) {
             ; searching by room number
             for item in loadedItems {
                 if (InStr(item["roomNum"], searchInput)) {
-                    filteredItems.unshift(item)
+                    filteredItems.InsertAt(1, item)
                 }
             }
         } else {
@@ -67,6 +67,8 @@ PMN_App(App, popupTitle, db, identifier) {
                 if (item["guestType"] = "内地旅客") {
                     ; from mainland
                     if (InStr(item["name"], searchInput)) {
+                        filteredItems.InsertAt(1, item)
+                    } else if (InStr(item["addr"], searchInput)) {
                         filteredItems.InsertAt(1, item)
                     }
                 } else if (item["guestType"] = "港澳台旅客") {
