@@ -6,9 +6,32 @@ PMN_App(App, popupTitle, db, identifier) {
     listContent := signal(db.load())
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
-        nameRoom: "",
+        search: "",
         period: 60
     })
+
+    searchBy := signal("nameRoom")
+    searchByMap := Map(
+        "姓名/房号", "nameRoom"
+        "地址", "addr"
+        "电话", "tel"
+    )
+
+    handleQuery(ctrlName, newVal) {
+        updatedQuery := queryFilter.value
+
+        if (ctrlName = "date") {
+            updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
+        }
+        if (ctrlName = "search") {
+            updatedQuery["search"] := newVal
+        }
+        if (ctrlName = "period") {
+            updatedQuery["period"] := newVal = "" ? 7200 : newVal
+        }
+
+        queryFilter.set(updatedQuery)
+    }
 
     OnClipboardChange (*) => handleCaptured(identifier, db)
     handleCaptured(identifier, db) {
@@ -37,76 +60,70 @@ PMN_App(App, popupTitle, db, identifier) {
         }
 
         loadedItems := db.load(, queryFilter.value["date"], adjustedPeriod)
+        listContent.set(handleSearchByConditions(loadedItems))
+    }
+
+    handleSearchByConditions(loadedItems) {
         filteredItems := []
-
-        typeConvert(content) {
-            converted := ""
-            try {
-                converted := Number(content)
-            } catch {
-                converted := content
-            }
-            return converted
-        }
-
-        searchInput := typeConvert(queryFilter.value["nameRoom"])
+        searchInput := queryFilter.value["search"]
 
         if (searchInput = "") {
-            ; no search value
-            filteredItems := loadedItems
-        } else if (searchInput is Number) {
-            ; searching by room number
+            return loadedItems
+        }
+
+        if (searchBy.value = "nameRoom") {
+            typeConvert(content) {
+                converted := ""
+                try {
+                    converted := Number(content)
+                } catch {
+                    converted := content
+                }
+                return converted
+            }
+
+            if (typeConvert(searchInput) is Number) {
+                ; searching by room number
+                for item in loadedItems {
+                    if (InStr(item["roomNum"], searchInput)) {
+                        filteredItems.InsertAt(1, item)
+                    }
+                }
+            } else {
+                ; searching by name fragment
+                for item in loadedItems {
+                    if (item["guestType"] = "内地旅客") {
+                        ; from mainland
+                        if (InStr(item["name"], searchInput)) {
+                            filteredItems.InsertAt(1, item)
+                        }
+                    } else if (item["guestType"] = "港澳台旅客") {
+                        ; from HK/MO/TW
+                        if (InStr(item["name"], searchInput) ||
+                            InStr(item["nameLast"], searchInput, "Off") ||
+                            InStr(item["nameFirst"], searchInput, "Off")
+                        ) {
+                            filteredItems.InsertAt(1, item)
+                        }
+                    } else {
+                        ; from abroad
+                        if (InStr(item["nameLast"], searchInput, "Off") ||
+                            InStr(item["nameFirst"], searchInput, "Off")
+                        ) {
+                            filteredItems.InsertAt(1, item)
+                        }
+                    }
+                }
+            }
+        } else  {
             for item in loadedItems {
-                if (InStr(item["roomNum"], searchInput)) {
+                if (InStr(item[searchBy.value], searchInput)) {
                     filteredItems.InsertAt(1, item)
                 }
             }
-        } else {
-            ; searching by name fragment
-            for item in loadedItems {
-                if (item["guestType"] = "内地旅客") {
-                    ; from mainland
-                    if (InStr(item["name"], searchInput)) {
-                        filteredItems.InsertAt(1, item)
-                    } else if (InStr(item["addr"], searchInput)) {
-                        filteredItems.InsertAt(1, item)
-                    }
-                } else if (item["guestType"] = "港澳台旅客") {
-                    ; from HK/MO/TW
-                    if (InStr(item["name"], searchInput) ||
-                        InStr(item["nameLast"], searchInput, "Off") ||
-                        InStr(item["nameFirst"], searchInput, "Off")
-                    ) {
-                        filteredItems.InsertAt(1, item)
-                    }
-                } else {
-                    ; from abroad
-                    if (InStr(item["nameLast"], searchInput, "Off") ||
-                        InStr(item["nameFirst"], searchInput, "Off")
-                    ) {
-                        filteredItems.InsertAt(1, item)
-                    }
-                }
-            }
-        }
+        } 
 
-        listContent.set(filteredItems)
-    }
-
-    handleQuery(ctrlName, newVal) {
-        updatedQuery := queryFilter.value
-
-        if (ctrlName = "date") {
-            updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
-        }
-        if (ctrlName = "nameRoom") {
-            updatedQuery["nameRoom"] := newVal
-        }
-        if (ctrlName = "period") {
-            updatedQuery["period"] := newVal = "" ? 7200 : newVal
-        }
-
-        queryFilter.set(updatedQuery)
+        return filteredItems
     }
 
     fillPmsProfile(App) {
@@ -125,21 +142,22 @@ PMN_App(App, popupTitle, db, identifier) {
         PMN_Fillin.fill(listContent.value[LV.GetNext()])
     }
 
-    addAddtionalEvents(){
+    addAddtionalEvents() {
+        ; ListView Events
         LV := App.getCtrlByType("ListView")
         LV.OnEvent("ItemEdit", (guiObj, itemIndex) => handleUpdateItem(itemIndex, LV))
         LV.OnEvent("ContextMenu", (params*) => showProfileDetails(params[2], LV))
-    }
 
-    handleUpdateItem(itemIndex, LV){
-        selectedItem := listContent.value[itemIndex]
-        selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
-        db.update(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
-    }
+        handleUpdateItem(itemIndex, LV) {
+            selectedItem := listContent.value[itemIndex]
+            selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
+            db.update(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
+        }
 
-    showProfileDetails(itemIndex, LV){
-        selectedItem := listContent.value[itemIndex]
-        GuestProfileDetails(selectedItem)
+        showProfileDetails(itemIndex, LV) {
+            selectedItem := listContent.value[itemIndex]
+            GuestProfileDetails(selectedItem)
+        }
     }
 
     helpInfo := "
@@ -152,20 +170,22 @@ PMN_App(App, popupTitle, db, identifier) {
         `t`t`t`t- (详情信息) 复制单条信息
     )"
 
+
     return (
         App.AddGroupBox("R17 w550 y+20", popupTitle),
-        ;TODO: Add clickable groupbox title, which enable a how-to msgbox that shows quick-keys
-        ; App.AddText("xp10 yp10", popupTitle . " ⓘ")
-            ; .OnEvent("Click", (*) => MsgBox(helpInfo, "Help", "4096"))
+        ; TODO: Add clickable groupbox title, which enable a how-to msgbox that shows quick-keys
+        App.AddText("xp10 yp10", popupTitle . " ⓘ")
+            .OnEvent("Click", (*) => MsgBox(helpInfo, "Help", "4096"))
         ; date
         App.AddDateTime("vdate xp+10 yp+25 w100 h25 Choose" . queryFilter.value["date"])
-            .OnEvent("Change", (ctrl, info) => 
+            .OnEvent("Change", (ctrl, info) =>
                 handleQuery(ctrl.Name, ctrl.Value)
-                handleListContentUpdate()
-        ),
-        ; name or room number
-        App.AddText("x+10 yp+5 h20", "姓名/房号"),
-        App.AddEdit("vnameRoom x+5 yp-5 w100 h25", queryFilter.value["nameRoom"])
+                handleListContentUpdate()),
+        ; search conditions
+        ; App.AddText("x+10 yp+5 h20", "搜索条件"),
+        App.AddDropDownList("x+10 h20", ["姓名/房号", "地址", "电话"])
+            .OnEvent("Change", (ctrl, info) => searchBy.set(searchByMap[ctrl.Text])),
+        App.AddEdit("vsearchBox x+5 yp-5 w100 h25", queryFilter.value["search"])
             .OnEvent("Change", (ctrl, info) => handleQuery(ctrl.Name, ctrl.Value)),
         ; period
         App.AddText("x+10 yp+5 h20", "最近"),
