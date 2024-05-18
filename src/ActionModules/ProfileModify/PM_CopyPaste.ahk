@@ -1,5 +1,5 @@
-#Include "./Dict.ahk"
-#Include "./DictIndex.ahk"
+; #Include "./Dict.ahk"
+; #Include "./DictIndex.ahk"
 
 class PM_CopyPaste {
     static copy() {
@@ -203,8 +203,8 @@ class PM_CopyPaste {
             guestProfile["language"] := "C"
             guestProfile["country"] := "CN"
             guestProfile["nameAlt"] := infoArr[4]
-            guestProfile["nameLast"] := getFullnamePinyin(infoArr[4])[1]
-            guestProfile["nameFirst"] := getFullnamePinyin(infoArr[4])[2]
+            guestProfile["nameLast"] := useDict.getFullnamePinyin(infoArr[4])[1]
+            guestProfile["nameFirst"] := useDict.getFullnamePinyin(infoArr[4])[2]
             if (StrLen(infoArr[3]) = 18) {
                 guestProfile["idType"] := "IDC"
             } else if (StrLen(infoArr[3]) = 9) {
@@ -213,7 +213,7 @@ class PM_CopyPaste {
                 guestProfile["idType"] := " "
             }
             guestProfile["address"] := infoArr[5]
-            guestProfile["province"] := getProvince(infoArr[6])
+            guestProfile["province"] := useDict.getProvince(infoArr[6])
         } else if (gType = 2) {
             guestProfile["language"] := "E"
             guestProfile["country"] := "CN"
@@ -239,7 +239,7 @@ class PM_CopyPaste {
             guestProfile["address"] := ""
             guestProfile["nameLast"] := infoArr[4]
             guestProfile["nameFirst"] := infoArr[5]
-            guestProfile["country"] := getCountryCode(infoArr[6])
+            guestProfile["country"] := useDict.getCountryCode(infoArr[6])
             guestProfile["province"] := " "
         }
 

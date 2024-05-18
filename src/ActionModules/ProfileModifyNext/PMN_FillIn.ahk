@@ -13,15 +13,15 @@ class PMN_FillIn {
             : currentGuest["name"]
         ; last name
         parsedInfo["nameLast"] := currentGuest["guestType"] = "内地旅客"
-            ? getFullnamePinyin(currentGuest["name"])[1]
+            ? useDict.getFullnamePinyin(currentGuest["name"])[1]
             : currentGuest["nameLast"] = " "
-                ? getFullnamePinyin(currentGuest["name"])[1]
+                ? useDict.getFullnamePinyin(currentGuest["name"])[1]
                 : currentGuest["nameLast"]
         ; first name
         parsedInfo["nameFirst"] := currentGuest["guestType"] = "内地旅客"
-            ? getFullnamePinyin(currentGuest["name"])[2]
+            ? useDict.getFullnamePinyin(currentGuest["name"])[2]
             : currentGuest["nameFirst"] = " "
-                ? getFullnamePinyin(currentGuest["name"])[2]
+                ? useDict.getFullnamePinyin(currentGuest["name"])[2]
                 : currentGuest["nameFirst"] 
         ; address
         parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客" 
@@ -33,7 +33,7 @@ class PMN_FillIn {
             : "E"
         ; country
         parsedInfo["country"] := currentGuest["guestType"] = "国外旅客"
-            ? getCountryCode(currentGuest["country"])
+            ? useDict.getCountryCode(currentGuest["country"])
             : "CN"
         ; address
         parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客"
@@ -41,16 +41,16 @@ class PMN_FillIn {
             : " "
         ; province(mainland & hk/mo/tw)
         if (currentGuest["guestType"] = "内地旅客") {
-            parsedInfo["province"] := getProvince(currentGuest["addr"])
+            parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])
         } else if (currentGuest["guestType"] = "港澳台旅客") {
-            parsedInfo["province"] := getProvince(currentGuest["region"])
+            parsedInfo["province"] := useDict.getProvince(currentGuest["region"])
         } else {
             parsedInfo["province"] := " "
         }
         ; id number
         parsedInfo["idNum"] := currentGuest["idNum"]
         ; id Type
-        parsedInfo["idType"] := getIdTypeCode(currentGuest["idType"])
+        parsedInfo["idType"] := useDict.getIdTypeCode(currentGuest["idType"])
         ; gender
         parsedInfo["gender"] := currentGuest["gender"] = "男" ? "Mr" : "Ms"
         ; birthday
