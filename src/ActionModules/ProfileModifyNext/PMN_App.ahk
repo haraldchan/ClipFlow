@@ -12,9 +12,10 @@ PMN_App(App, popupTitle, db, identifier) {
 
     searchBy := signal("nameRoom")
     searchByMap := Map(
-        "姓名/房号", "nameRoom"
-        "地址", "addr"
-        "电话", "tel"
+        "姓名/房号", "nameRoom",
+        "地址", "addr",
+        "电话", "tel",
+        "生日", "birthday",
     )
 
     handleQuery(ctrlName, newVal) {
@@ -183,7 +184,7 @@ PMN_App(App, popupTitle, db, identifier) {
                 handleListContentUpdate()),
         ; search conditions
         ; App.AddText("x+10 yp+5 h20", "搜索条件"),
-        App.AddDropDownList("x+10 h20", ["姓名/房号", "地址", "电话"])
+        App.AddDropDownList("x+10 h20", ["姓名/房号", "地址", "电话", "生日"])
             .OnEvent("Change", (ctrl, info) => searchBy.set(searchByMap[ctrl.Text])),
         App.AddEdit("vsearchBox x+5 yp-5 w100 h25", queryFilter.value["search"])
             .OnEvent("Change", (ctrl, info) => handleQuery(ctrl.Name, ctrl.Value)),
