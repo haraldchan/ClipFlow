@@ -142,9 +142,21 @@ PMN_App(App, popupTitle, db, identifier) {
         GuestProfileDetails(selectedItem)
     }
 
+    helpInfo := "
+    (
+        操作指引：
+
+        点击房号`t`t- 修改房号
+        鼠标右键`t`t- 显示详细信息
+        双击信息`t`t- (主界面中) 复制身份证号
+        `t`t`t`t- (详情信息) 复制单条信息
+    )"
 
     return (
         App.AddGroupBox("R17 w550 y+20", popupTitle),
+        ;TODO: Add clickable groupbox title, which enable a how-to msgbox that shows quick-keys
+        ; App.AddText("xp10 yp10", popupTitle . " ⓘ")
+            ; .OnEvent("Click", (*) => MsgBox(helpInfo, "Help", "4096"))
         ; date
         App.AddDateTime("vdate xp+10 yp+25 w100 h25 Choose" . queryFilter.value["date"])
             .OnEvent("Change", (ctrl, info) => 
