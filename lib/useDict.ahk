@@ -745,7 +745,7 @@ class useDict {
 
     static getFullnamePinyin(fullname) {
         if (Dict.doubleLastName.Has(SubStr(fullname, 1, 2))) {
-            lastname := Dictionary.doubleLastName[SubStr(fullname, 1, 2)]
+            lastname := Dict.doubleLastName[SubStr(fullname, 1, 2)]
             lastnameLength := 2
         } else {
             lastname := this.getPinyin(SubStr(fullname, 1, 1))
@@ -761,7 +761,7 @@ class useDict {
     }
 
     static getCountryCode(country) {
-        for region, code in Dictionary.regionISO {
+        for region, code in Dict.regionISO {
             if (country = region) {
                 return code
             }
