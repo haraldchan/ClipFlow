@@ -4,6 +4,7 @@
 #Include "./useConfigJSON.ahk"
 #Include "./useSingleScript.ahk"
 #Include "./useFileDB.ahk"
+#Include "./useDict.ahk"
 
 #Include "./AddReactive/AddReactive.ahk"
 /************************************************************************
