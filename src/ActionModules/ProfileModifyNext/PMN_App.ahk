@@ -24,7 +24,7 @@ PMN_App(App, popupTitle, db, identifier) {
         if (ctrlName = "date") {
             updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
         }
-        if (ctrlName = "search") {
+        if (ctrlName = "searchBox") {
             updatedQuery["search"] := newVal
         }
         if (ctrlName = "period") {
@@ -165,28 +165,27 @@ PMN_App(App, popupTitle, db, identifier) {
     (
         操作指引：
 
-        点击房号`t`t- 修改房号
-        鼠标右键`t`t- 显示详细信息
-        双击信息`t`t- (主界面中) 复制身份证号
-        `t`t`t`t- (详情信息) 复制单条信息
+        点击房号`t- 修改房号
+        鼠标右键`t- 显示详细信息
+        双击信息`t- (主界面中) 复制身份证号
+        `t- (详情信息) 复制单条信息
     )"
 
 
     return (
-        App.AddGroupBox("R17 w550 y+20", popupTitle),
+        App.AddGroupBox("R17 w580 y+20"," "),
         ; TODO: Add clickable groupbox title, which enable a how-to msgbox that shows quick-keys
-        App.AddText("xp10 yp10", popupTitle . " ⓘ")
+        App.AddText("xp15 ", popupTitle . " ⓘ ")
             .OnEvent("Click", (*) => MsgBox(helpInfo, "Help", "4096"))
         ; date
-        App.AddDateTime("vdate xp+10 yp+25 w100 h25 Choose" . queryFilter.value["date"])
+        App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
             .OnEvent("Change", (ctrl, info) =>
                 handleQuery(ctrl.Name, ctrl.Value)
                 handleListContentUpdate()),
         ; search conditions
-        ; App.AddText("x+10 yp+5 h20", "搜索条件"),
-        App.AddDropDownList("x+10 h20", ["姓名/房号", "地址", "电话", "生日"])
+        App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "地址", "电话", "生日"])
             .OnEvent("Change", (ctrl, info) => searchBy.set(searchByMap[ctrl.Text])),
-        App.AddEdit("vsearchBox x+5 yp-5 w100 h25", queryFilter.value["search"])
+        App.AddEdit("vsearchBox x+5 w100 h25")
             .OnEvent("Change", (ctrl, info) => handleQuery(ctrl.Name, ctrl.Value)),
         ; period
         App.AddText("x+10 yp+5 h20", "最近"),
