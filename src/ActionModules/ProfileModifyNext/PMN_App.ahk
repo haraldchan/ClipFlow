@@ -10,9 +10,12 @@ PMN_App(App, popupTitle, db, identifier) {
         period: 60
     })
 
+    currentGuest := signal(Map("idNum", 0))
+
     searchBy := signal("nameRoom")
     searchByMap := Map(
         "姓名/房号", "nameRoom",
+        "证件号码", "idNum",
         "地址", "addr",
         "电话", "tel",
         "生日", "birthday",
@@ -41,14 +44,32 @@ PMN_App(App, popupTitle, db, identifier) {
         }
 
         updatedGuestInfo := JSON.parse(A_Clipboard)
-        updatedGuestInfo["fileName"] := A_Now . A_MSec
+        
+        if (currentGuest.value["idNum"] = updatedGuestInfo["idNum"]) {
+            handleGuestInfoUpdate(updatedGuestInfo)
+            MsgBox(Format("已更新信息：{1}", updatedGuestInfo["name"]), popupTitle, "T1.5")
+        } else {
+            updatedGuestInfo["fileName"] := A_Now . A_MSec
+            ; save to db
+            db.add(JSON.stringify(updatedGuestInfo))
+            MsgBox(Format("已保存信息：{1}", updatedGuestInfo["name"]), popupTitle, "T1.5")
+        }
 
-        ; save to db
-        db.add(JSON.stringify(updatedGuestInfo))
+        currentGuest.set(JSON.parse(A_Clipboard))
+        
         Sleep 500
         handleListContentUpdate()
-        ; show notifier msgbox
-        MsgBox(Format("已保存信息：{1}", updatedGuestInfo["name"]), popupTitle, "T1.5")
+    }
+
+    handleGuestInfoUpdate(captured) {
+        recentGuests := db.load()
+        for guest in recentGuests {
+            if (guest["idNum"] = captured["idNum"]) {
+                captured["fileName"] := guest["fileName"]
+                db.update(guest["fileName"], queryFilter.value["date"], JSON.stringify(captured))
+                return
+            }
+        }
     }
 
     handleListContentUpdate() {
@@ -144,7 +165,6 @@ PMN_App(App, popupTitle, db, identifier) {
     }
 
     addAddtionalEvents() {
-        ; ListView Events
         LV := App.getCtrlByType("ListView")
         LV.OnEvent("ItemEdit", (guiObj, itemIndex) => handleUpdateItem(itemIndex, LV))
         LV.OnEvent("ContextMenu", (params*) => showProfileDetails(params[2], LV))
@@ -157,14 +177,12 @@ PMN_App(App, popupTitle, db, identifier) {
 
         showProfileDetails(itemIndex, LV) {
             selectedItem := listContent.value[itemIndex]
-            GuestProfileDetails(selectedItem)
+            GuestProfileDetails(selectedItem, fillPmsProfile, App)
         }
     }
 
     helpInfo := "
     (
-        操作指引：
-
         点击房号`t- 修改房号
         鼠标右键`t- 显示详细信息
         双击信息`t- (主界面中) 复制身份证号
@@ -176,15 +194,17 @@ PMN_App(App, popupTitle, db, identifier) {
         App.AddGroupBox("R17 w580 y+20"," "),
         ; TODO: Add clickable groupbox title, which enable a how-to msgbox that shows quick-keys
         App.AddText("xp15 ", popupTitle . " ⓘ ")
-            .OnEvent("Click", (*) => MsgBox(helpInfo, "Help", "4096"))
+            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
         ; date
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
             .OnEvent("Change", (ctrl, info) =>
                 handleQuery(ctrl.Name, ctrl.Value)
-                handleListContentUpdate()),
+                handleListContentUpdate()
+        ),
         ; search conditions
-        App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "地址", "电话", "生日"])
+        App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "证件号码", "地址", "电话", "生日"])
             .OnEvent("Change", (ctrl, info) => searchBy.set(searchByMap[ctrl.Text])),
+        ; search box
         App.AddEdit("vsearchBox x+5 w100 h25")
             .OnEvent("Change", (ctrl, info) => handleQuery(ctrl.Name, ctrl.Value)),
         ; period
