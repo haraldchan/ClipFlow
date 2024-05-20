@@ -1,6 +1,6 @@
-GuestProfileDetails(selectedGuest) {
-    profile := Gui(,"Profile Details")
-    profile.SetFont(, "微软雅黑")
+GuestProfileDetails(selectedGuest, fillIn, App) {
+    Profile := Gui("+AlwaysOnTop", "Profile Details")
+    Profile.SetFont(, "微软雅黑")
 
     fieldIndex := Map(
         "addr", "地址",
@@ -37,10 +37,16 @@ GuestProfileDetails(selectedGuest) {
         MsgBox(Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard), popupTitle, "4096 T1")
     }
 
+    fillInPms(){
+        profile.Destroy()
+        fillIn(App)
+    }
+
     return (
-        profile.AddListView("vguestProfile LV0x4000 Grid w230 r9", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
+        Profile.AddListView("vguestProfile LV0x4000 Grid w230 r9", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
         listInitialize(selectedGuest, fieldIndex),
-        profile.AddButton("h30 w230", "关   闭").OnEvent("Click", (*) => profile.Hide()),
-        profile.Show()
+        Profile.AddButton("h30 w110", "关 闭 (&C)").OnEvent("Click", (*) => profile.Destroy()),
+        Profile.AddButton("x+10 h30 w110 Default", "填   入").OnEvent("Click", (*) => fillInPms()),
+        Profile.Show()
     )
 }
