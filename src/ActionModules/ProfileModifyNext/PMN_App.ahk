@@ -43,16 +43,16 @@ PMN_App(App, popupTitle, db, identifier) {
             return
         }
 
-        updatedGuestInfo := JSON.parse(A_Clipboard)
+        incomingGuest := JSON.parse(A_Clipboard)
         
-        if (currentGuest.value["idNum"] = updatedGuestInfo["idNum"]) {
-            handleGuestInfoUpdate(updatedGuestInfo)
-            MsgBox(Format("已更新信息：{1}", updatedGuestInfo["name"]), popupTitle, "T1.5")
+        if (currentGuest.value["idNum"] = incomingGuest["idNum"]) {
+            handleGuestInfoUpdate(incomingGuest)
+            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         } else {
-            updatedGuestInfo["fileName"] := A_Now . A_MSec
+            incomingGuest["fileName"] := A_Now . A_MSec
             ; save to db
-            db.add(JSON.stringify(updatedGuestInfo))
-            MsgBox(Format("已保存信息：{1}", updatedGuestInfo["name"]), popupTitle, "T1.5")
+            db.add(JSON.stringify(incomingGuest))
+            MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
 
         currentGuest.set(JSON.parse(A_Clipboard))
