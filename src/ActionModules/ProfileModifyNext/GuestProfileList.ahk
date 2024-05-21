@@ -6,7 +6,7 @@ GuestProfileList(App, listContent) {
     }
 
     options := {
-        lvOptions: "LV0x4000 Grid -ReadOnly w550 r15 xp-470 y+10",
+        lvOptions: "Grid NoSortHdr -ReadOnly -Multi w550 r15 xp-470 y+10",
         itemOptions: ""
     }
 
