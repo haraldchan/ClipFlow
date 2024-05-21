@@ -37,8 +37,8 @@ PMN_App(App, popupTitle, db, identifier) {
         queryFilter.set(updatedQuery)
     }
 
-    OnClipboardChange (*) => handleCaptured(identifier, db)
-    handleCaptured(identifier, db) {
+    OnClipboardChange (*) => handleCaptured(identifier)
+    handleCaptured(identifier) {
         if (!InStr(A_Clipboard, identifier)) {
             return
         }
