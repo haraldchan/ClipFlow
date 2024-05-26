@@ -192,7 +192,6 @@ PMN_App(App, popupTitle, db, identifier) {
 
     return (
         App.AddGroupBox("R17 w580 y+20"," "),
-        ; TODO: Add clickable groupbox title, which enable a how-to msgbox that shows quick-keys
         App.AddText("xp15 ", popupTitle . " ⓘ ")
             .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
         ; date
