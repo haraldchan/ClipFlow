@@ -1,0 +1,17 @@
+1. save <FO03-DEP.xml>, read data from it
+ - 1.1 read: roomNumber, name, checkin date
+ - 1.2 render these data to a ListView of module
+ - 1.3 user can un-check extended rooms
+
+2. read guest id from file db
+ - 2.1 use checkin date to find in db
+ - 2.2 checkin -> date folder 
+       (check checkin date & the day before, covering pre night audit "twilight zone")
+       name -> id
+       
+ - 2.3 push ids to an array
+
+3. injecting script
+ - 3.1 use hotkey, inject scripts in browser console
+ - 3.2 hotkey < -- > script
+ - 3.3 need a modal notify user
