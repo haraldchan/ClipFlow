@@ -3,12 +3,14 @@
 #Include "../ActionModules/InvoiceWechat.ahk"
 #Include "../ActionModules/ShareClip/ShareClip.ahk"
 #Include "../ActionModules/ReservationHandler/ReservationHandler.ahk"
+#Include "../ActionModules/BatchCheckout/BatchCheckout.ahk"
 
 FlowModes(CF) {
 	modules := [
 		ProfileModifyNew,
 		ProfileModifyNext,
-		InvoiceWechat,
+		BatchCheckout,
+		; InvoiceWechat,
 		ShareClip,
 		ResvHandler,
 	]
