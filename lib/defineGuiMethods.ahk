@@ -2,6 +2,7 @@ defineGuiMethods(guiProto) {
     guiProto.Prototype.getCtrlByName := getCtrlByName
     guiProto.Prototype.getCtrlByType := getCtrlByType
     guiProto.Prototype.getCtrlByTypeAll := getCtrlByTypeAll
+    guiProto.ListView.Prototype.getCheckedRowNumbers := getCheckedRowNumbers
 
     getCtrlByName(guiProto, vName) {
         for ctrl in guiProto {
@@ -33,6 +34,20 @@ defineGuiMethods(guiProto) {
         return ctrlArray
     }
 
+    static getCheckedRowNumbers(guiListView, LV) {
+        checkedRowNumbers := []
+        loop LV.GetCount() {
+            curRow := LV.GetNext(A_Index - 1, "Checked")
+            try {
+                if (curRow = prevRow || curRow = 0) {
+                    Continue
+                }
+            }
+            checkedRowNumbers.Push(curRow)
+            prevRow := curRow
+        }
+        return checkedRowNumbers
+    }
 }
 
 defineGuiMethods(Gui)
