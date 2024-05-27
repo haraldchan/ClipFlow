@@ -46,16 +46,22 @@ BC_App(App, popupTitle, db) {
         BC_Execute.checkoutBatch(filteredIds)
     }
 
+    helpInfo := "
+    (
+        1. 请先获取已退房客人信息
+        2. 开始退房前，务必先到蓝豆查看“续住”工单，剔除列表中的续住房号
+    )"
+
     return (
         handleInitialize(),
         App.AddGroupBox("R17 y+20"," "),
         App.AddText("xp15 ", popupTitle . " ⓘ "),
-            ; .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
+           .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
         ; time selectors
         App.AddText("h20 0x200", "退房时间段"),
         
         App.AddComboBox("x+10 h20 Choose1", ["07:00", "15:00", "00:00"])
-        .OnEvent("Change", (ctrl, _) => startTime.set(ctrl.Text)),
+           .OnEvent("Change", (ctrl, _) => startTime.set(ctrl.Text)),
         
         App.AddText("h20 0x200", "-"),
         
@@ -63,7 +69,7 @@ BC_App(App, popupTitle, db) {
            .OnEvent("Change", (ctrl, _) => endTime.set(ctrl.Text)),
         ; departed guests list
         App.AddReactiveListView(options, columnDetails, deps),
-        App.AddButton("w110 h30", "重新获取").OnEvent("Click", (*) => handleInitialize()),
+        App.AddButton("w110 h30", "获取信息").OnEvent("Click", (*) => handleInitialize()),
         App.AddButton("x+10 w110 h30", "开始退房").OnEvent("Click", (*) => performCheckout()),
     )
 }
