@@ -4,7 +4,8 @@ class useFileDB {
 	__New(dbSetting) {
 		this.main := dbSetting.main
 		this.backup := dbSetting.HasOwnProp("backup") ? dbSetting.backup : ""
-		this.cleanPeriod := dbSetting.HasOwnProp("cleanPeriod") ? dbSetting.cleanPeriod : 0
+		this.cleanPeriod := dbSetting.HasOwnProp("cleanPeriod") ? dbSetting.cleanPeriod : 0,
+			this.archive := dbSetting.archive
 		this.using := dbSetting.main
 	}
 
@@ -56,12 +57,24 @@ class useFileDB {
 		return loadedData
 	}
 
-	update(fileName, queryDate, newJsonString){
+	update(fileName, queryDate, newJsonString) {
 		loop files, (this.using . "\" . queryDate . "\*.json") {
 			if (fileName . ".json" = A_LoopFileName) {
 				FileDelete(A_LoopFileFullPath)
-				FileAppend(newJsonString, this.using . "\" . queryDate . "\" . filename . ".json" , "UTF-8")
+				FileAppend(newJsonString, this.using . "\" . queryDate . "\" . filename . ".json", "UTF-8")
 			}
 		}
+	}
+
+	createArchive(archiveDate) {
+		archiveData := JSON.stringify(this.load(, archiveDate, 60 * 24 * this.cleanPeriod))
+		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
+		FileAppend(archiveData, archiveFullPath, "UTF-8")
+	}
+
+	loadArchive(archiveDate) {
+		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
+		archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
+		return archivedData
 	}
 }
