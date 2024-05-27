@@ -8,7 +8,8 @@ class BatchCheckout {
     static dbSetting := {
         main: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow" . "\src\ActionModules\ProfileModifyNext\GuestProfiles",
         ; backup: A_MyDocuments . "\GuestProfiles",
-        cleanPeriod: 182
+        cleanPeriod: 182,
+        archive: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow" . "\src\ActionModules\ProfileModifyNext\GuestProfilesArchive"
     }
     static db := useFileDB(this.dbSetting)
 
