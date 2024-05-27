@@ -59,6 +59,9 @@ PMN_App(App, popupTitle, db, identifier) {
         
         Sleep 500
         handleListContentUpdate()
+
+        clipHistory := JSON.parse(config.read("clipHistory"))
+        A_Clipboard := clipHistory.Length > 1 ? clipHistory[2] : ""
     }
 
     handleGuestInfoUpdate(captured) {
