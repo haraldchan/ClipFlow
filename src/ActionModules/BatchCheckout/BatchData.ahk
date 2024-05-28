@@ -159,7 +159,7 @@ class BatchData {
                 ; TODO: or using name to match?
                 target := singleDay.find(guest => this.matchGuest(guest, dGuest.value))
                 if (target != "") { ; what will return if not found???
-                    guestIds.Push(target["idNum"])
+                    guestIds.Push(target)
                     break
                 } 
             }
@@ -173,13 +173,18 @@ class BatchData {
             if (useDict.getFullnamePinyin(guest["name"])[1] = depGuest["nameLast"] &&
                 useDict.getFullnamePinyin(guest["name"])[2] = depGuest["nameFirst"]
                 ) {
-                return Map(guest["name"], guest["idNum"])
+                return true
+            } else {
+                return false 
             }
+            
         } else {
             if (guest["nameLast"] = depGuest["nameLast"] &&
                 guest["nameFirst"] = depGuest["nameFirst"]
                 ) {
-                return Map(guest["name"], guest["idNum"])
+                return true
+            } else {
+                return false 
             }
         }
     }
