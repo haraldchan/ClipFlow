@@ -158,7 +158,7 @@ class BatchData {
             for singleDay in guestInfosByDay {
                 ; TODO: or using name to match?
                 target := singleDay.find(guest => this.matchGuest(guest, dGuest.value))
-                if (target != "") { ; what will return if not found???
+                if (target != "") { 
                     guestIds.Push(target)
                     break
                 } 
