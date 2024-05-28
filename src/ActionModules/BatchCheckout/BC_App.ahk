@@ -2,7 +2,6 @@
 #Include "./BC_Execute.ahk"
 
 BC_App(App, popupTitle, db) {
-    ids := signal([])
     deps := signal([])
     startTime := signal("00:00")
     endTime := signal("15:00")
@@ -22,8 +21,7 @@ BC_App(App, popupTitle, db) {
 
         if (FileExist(saveFileName)) {
             departedGuests := BatchData.getDepartures(saveFileName)
-            deps.set(departedGuests)
-            ids.set(BatchData.getDepartedIdsAll(db, departedGuests))
+            deps.set(BatchData.getDepartedIdsAll(db, departedGuests))
         }
     }
 
@@ -42,16 +40,16 @@ BC_App(App, popupTitle, db) {
         checkedRows := App.getCtrlByType("ListView").getCheckedRowNumbers()
         filteredIds := []
         for row in checkedRows {
-            filteredIds.Push(ids.value[row])
+            filteredIds.Push(deps.value[row]["idNum"])
         }
 
         BC_Execute.checkoutBatch(filteredIds)
     }
 
     copyIdNumber(LV, row) {
-        A_Clipboard := ids.value[row]
-        guest := LV.GetText(row, 1) . ": " LV.GetText(row, 2)  
-        MsgBox(Format("已复制证件号码: `n`n{1} : {2}", guest, A_Clipboard), popupTitle, "4096 T1")
+        A_Clipboard := deps.value[row]["idNum"]
+        guest := deps.value[row]["roomNum"] . " " deps.value[row]["name"]
+        MsgBox(Format("已复制证件号码: `n`n{1} : {2}", guest, A_Clipboard), popupTitle, "4096 T2")
     }
 
     helpInfo := "
