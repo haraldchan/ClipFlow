@@ -75,7 +75,6 @@ class BatchData {
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
     }
 
-    ; TODO: rewrite with new ui
     static saveDeps(frTime, toTime) {
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
         BlockInput false
@@ -116,7 +115,7 @@ class BatchData {
         nameElements := xmlDoc.getElementsByTagName("GUEST_NAME") 
 
         loop roomElements.Length {
-            try { ;TODO: parsing will be error somehow, yet it is readable
+            try { ; parsing will be error somehow, yet it is readable
                 roomNum := roomElements[A_Index - 1].ChildNodes[0].nodeValue
                 fullname := nameElements[A_Index - 1].ChildNodes[0].nodeValue
                 nameLast := StrReplace(StrSplit(fullname, ",")[1], "*", "")
@@ -156,7 +155,6 @@ class BatchData {
             dGuest.set(depGuest)
 
             for singleDay in guestInfosByDay {
-                ; TODO: or using name to match?
                 target := singleDay.find(guest => this.matchGuest(guest, dGuest.value))
                 if (target != "") { 
                     guestIds.Push(target)
