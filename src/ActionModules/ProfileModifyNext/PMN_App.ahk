@@ -60,8 +60,8 @@ PMN_App(App, popupTitle, db, identifier) {
         Sleep 500
         handleListContentUpdate()
 
-        clipHistory := JSON.parse(config.read("clipHistory"))
-        A_Clipboard := clipHistory.Length > 1 ? clipHistory[2] : ""
+        clipHistory := config.read("clipHistory")
+        A_Clipboard := clipHistory.Length > 1 ? clipHistory[1] : ""
     }
 
     handleGuestInfoUpdate(captured) {
@@ -76,6 +76,16 @@ PMN_App(App, popupTitle, db, identifier) {
     }
 
     handleListContentUpdate() {
+        listContent.set([
+            Map(
+                "roomNum", "Loading...",
+                "name", "Loading...",
+                "idType", "Loading...",
+                "idNum", "Loading...",
+                "addr", "Loading..."
+            )
+        ])
+
         if (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")) {
             adjustedPeriod := queryFilter.value["period"]
             App.getCtrlByName("period").Enabled := true
