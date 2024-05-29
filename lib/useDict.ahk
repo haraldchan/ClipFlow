@@ -757,7 +757,7 @@ class useDict {
         loop firstnameSplit.Length {
             firstname .= this.getPinyin(firstnameSplit[A_Index]) . " "
         }
-        return [lastname, firstname]
+        return [lastname, Trim(firstname)]
     }
 
     static getCountryCode(country) {
