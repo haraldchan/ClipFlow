@@ -150,7 +150,6 @@ class BatchData {
         }
 
         guestIds := []
-
         for depGuest in departedGuests {
             dGuest.set(depGuest)
 
@@ -165,8 +164,8 @@ class BatchData {
         return guestIds
     }
 
-    ;TODO can't return correct ids
     static matchGuest(guest, depGuest){
+
         if (guest["guestType"] = "内地旅客") {
             if (useDict.getFullnamePinyin(guest["name"])[1] = depGuest["nameLast"] &&
                 useDict.getFullnamePinyin(guest["name"])[2] = depGuest["nameFirst"]
