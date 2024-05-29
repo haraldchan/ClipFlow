@@ -25,7 +25,6 @@ BC_App(App, popupTitle, db) {
         saveFileName := Format(A_MyDocuments . "\{1} - Departures.XML", today)
 
         if (FileExist(saveFileName)) {
-            TrayTip "保存中......"
             departedGuests := BatchData.getDepartures(saveFileName)
             deps.set(BatchData.getDepartedIdsAll(db, departedGuests))
         } 
@@ -45,7 +44,7 @@ BC_App(App, popupTitle, db) {
     columnDetails := {
         keys: ["roomNum", "name"],
         titles: ["房号", "姓名"],
-        widths: [60, 180]
+        widths: [60, 170]
     }
 
     options := {
@@ -77,12 +76,18 @@ BC_App(App, popupTitle, db) {
 
     helpInfo := "
     (
+        使用步骤
+
         1. 请先获取已退房客人信息
+         - 如未下载过当天的 Departure XML 文件，请先下载
+         - 已有 XML 文件时，点击“获取信息”按键后取消即可读取
+
         2. 开始退房前，务必先到蓝豆查看“续住”工单，剔除列表中的续住房号
+
+        3. 开始退房前，请先登录旅业二期，并选择“入住管理”
     )"
 
     return (
-        ; handleInitialize(),
         App.AddGroupBox("R19 y+20 w280"," "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
