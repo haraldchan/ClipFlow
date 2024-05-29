@@ -32,7 +32,7 @@ class BC_Execute {
 	static checkoutBatch(ids) {
 		WinActivate "ahk_class 360se6_Frame"
 		WinSetAlwaysOnTop true, "ahk_class 360se6_Frame"
-		BlockInput true
+		; BlockInput true
 
 		Send "^+j"
 		Sleep 1000
@@ -43,7 +43,7 @@ class BC_Execute {
 			this.checkoutOne(id)
 		}
 
-		BlockInput false
+		; BlockInput false
 		WinSetAlwaysOnTop false, "ahk_class 360se6_Frame"
 		MsgBox("已完成批量退房。", "Batch Checkout", "4096 T3")
 	}
