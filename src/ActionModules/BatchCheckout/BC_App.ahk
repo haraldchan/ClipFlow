@@ -28,9 +28,15 @@ BC_App(App, popupTitle, db) {
             TrayTip "保存中......"
             departedGuests := BatchData.getDepartures(saveFileName)
             deps.set(BatchData.getDepartedIdsAll(db, departedGuests))
+        } 
+
+        if (deps.value.Length = 1) {
+            MsgBox("似乎未有 Departure 数据，请先点击获取信息并下载！", "Batch Checkout", "4096")
+            deps.set([])
+        } else {
+            Msgbox("Info Loaded.", popupTitle, "T1 4096")
         }
 
-        Msgbox("Info Loaded.", popupTitle, "T1 4096")
         App.getCtrlByName("info").Enabled := true
         App.getCtrlByName("batch").Enabled := true
         App.Show()
@@ -48,6 +54,12 @@ BC_App(App, popupTitle, db) {
     }
 
     performCheckout() {
+        if (deps.value.Length = 0) {
+            MsgBox("似乎未有 Departure 数据，请先点击获取信息并下载！", "Batch Checkout", "4096")
+            deps.set([])
+            return
+        } 
+
         checkedRows := App.getCtrlByType("ListView").getCheckedRowNumbers()
         filteredIds := []
         for row in checkedRows {
@@ -70,6 +82,7 @@ BC_App(App, popupTitle, db) {
     )"
 
     return (
+        ; handleInitialize(),
         App.AddGroupBox("R19 y+20 w280"," "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
