@@ -112,11 +112,15 @@ class BatchData {
         xmlDoc.async := false
         xmlDoc.load(xmlPath)
         roomElements := xmlDoc.getElementsByTagName("ROOM")
+        arrivalElements := xmlDoc.getElementsByTagName("ARRIVAL")
         nameElements := xmlDoc.getElementsByTagName("GUEST_NAME") 
+
 
         loop roomElements.Length {
             try { ; parsing will be error somehow, yet it is readable
                 roomNum := roomElements[A_Index - 1].ChildNodes[0].nodeValue
+                arrival := StrSplit(arrivalElements[A_Index - 1].ChildNodes[0].nodeValue, "-")
+                ciDate := "20" . arrival[3] . arrival[1] . arrival[2]
                 fullname := nameElements[A_Index - 1].ChildNodes[0].nodeValue
                 nameLast := StrReplace(StrSplit(fullname, ",")[1], "*", "")
                 nameFirst := StrSplit(fullname, ",")[2]
@@ -124,6 +128,7 @@ class BatchData {
 
             departedGuests.Push(Map(
                 "roomNum", roomNum,
+                "ciDate", ciDate,
                 "name", StrReplace(fullname, "`n", " "),
                 "nameLast", nameLast,
                 "nameFirst", nameFirst
@@ -143,8 +148,11 @@ class BatchData {
         today := FormatTime(A_Now, "yyyyMMdd")
         loop SEARCH_DAYS {
             try{
+                archiveDate := FormatTime(DateAdd(today, 0 - A_Index, "Days"), "yyyyMMdd")
                 guestInfosByDay.Push(
-                    db.loadArchive(FormatTime(DateAdd(today, 0 - A_Index, "Days"), "yyyyMMdd"))
+                    Map("date", archiveDate, 
+                        "infoList", db.loadArchive(archiveDate)
+                    )
                 )       
             }
         }
@@ -153,14 +161,19 @@ class BatchData {
         for depGuest in departedGuests {
             dGuest.set(depGuest)
 
-            for singleDay in guestInfosByDay {
-                target := singleDay.find(guest => this.matchGuest(guest, dGuest.value))
-                if (target != "") { 
-                    guestIds.Push(target)
-                    break
-                } 
+            for day in guestInfosByDay {
+                if (day["date"] = depGuest["ciDate"]) {
+                    target := day["infoList"].find(guest => this.matchGuest(guest, dGuest.value))
+                    if (target != "") { 
+                        ; debug.mb(target)
+
+                        guestIds.Push(target)
+                        break
+                    }                     
+                }
             }
         }
+
         return guestIds
     }
 
