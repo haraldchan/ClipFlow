@@ -87,14 +87,16 @@ PMN_App(App, popupTitle, db, identifier) {
         ])
 
         if (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")) {
-            adjustedPeriod := queryFilter.value["period"]
+            ; adjustedPeriod := queryFilter.value["period"]
             App.getCtrlByName("period").Enabled := true
         } else {
-            adjustedPeriod := 60 * 24 * db.cleanPeriod
+            ; adjustedPeriod := 60 * 24 * db.cleanPeriod
             App.getCtrlByName("period").Enabled := false
         }
 
-        loadedItems := db.load(, queryFilter.value["date"], adjustedPeriod)
+        loadedItems := queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")
+            ? db.load(, queryFilter.value["date"], queryFilter.value["period"])
+            : db.loadArchive(queryFilter.value["date"])
         listContent.set(handleSearchByConditions(loadedItems))
     }
 
