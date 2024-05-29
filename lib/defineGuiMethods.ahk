@@ -34,7 +34,7 @@ defineGuiMethods(guiProto) {
         return ctrlArray
     }
 
-    static getCheckedRowNumbers(guiListView, LV) {
+    static getCheckedRowNumbers(LV) {
         checkedRowNumbers := []
         loop LV.GetCount() {
             curRow := LV.GetNext(A_Index - 1, "Checked")
