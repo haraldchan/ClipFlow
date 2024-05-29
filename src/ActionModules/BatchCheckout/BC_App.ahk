@@ -5,6 +5,7 @@ BC_App(App, popupTitle, db) {
     deps := signal([])
     startTime := signal("00:00")
     endTime := signal("15:00")
+    isLoading := signal(false)
 
     handleInitialize() {
         getData := MsgBox(
@@ -16,13 +17,23 @@ BC_App(App, popupTitle, db) {
             BatchData.reportFiling(startTime.value, endTime.value)
         }
 
+        deps.set([Map("roomNum", " ", "name", "Loading...")])
+        App.getCtrlByName("info").Enabled := false
+        App.getCtrlByName("batch").Enabled := false
+
         today := FormatTime(A_Now, "yyyyMMdd")
         saveFileName := Format(A_MyDocuments . "\{1} - Departures.XML", today)
 
         if (FileExist(saveFileName)) {
+            TrayTip "保存中......"
             departedGuests := BatchData.getDepartures(saveFileName)
             deps.set(BatchData.getDepartedIdsAll(db, departedGuests))
         }
+
+        Msgbox("Info Loaded.", popupTitle, "T1 4096")
+        App.getCtrlByName("info").Enabled := true
+        App.getCtrlByName("batch").Enabled := true
+        App.Show()
     }
 
     columnDetails := {
@@ -59,7 +70,6 @@ BC_App(App, popupTitle, db) {
     )"
 
     return (
-        handleInitialize(),
         App.AddGroupBox("R19 y+20 w280"," "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
@@ -75,7 +85,7 @@ BC_App(App, popupTitle, db) {
            .OnEvent("Change", (ctrl, _) => endTime.set(ctrl.Text)),
         ; departed guests list
         App.AddReactiveListView(options, columnDetails, deps,,["DoubleClick", copyIdNumber]),
-        App.AddButton("w120 h30", "获取信息").OnEvent("Click", (*) => handleInitialize()),
-        App.AddButton("x+10 w120 h30", "开始退房").OnEvent("Click", (*) => performCheckout())
+        App.AddButton("vinfo w120 h30", "获取信息").OnEvent("Click", (*) => handleInitialize()),
+        App.AddButton("vbatch x+10 w120 h30", "开始退房").OnEvent("Click", (*) => performCheckout())
     )
 }
