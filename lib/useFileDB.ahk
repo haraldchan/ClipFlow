@@ -51,18 +51,33 @@ class useFileDB {
 	}
 
 	load(db := this.using, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
+		 if (queryDate = FormatTime(A_Now, "yyyyMMdd")) {
+            return this.loadOneDay(db, queryDate, queryPeriodInput)
+        } else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
+            return this.loadArchiveOneDay(queryDate)
+        } else {
+            return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriod)
+        }
+	}
+
+	loadOneDay(db := this.using, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
 		loadedData := this.findByPeriod(db, queryDate, queryPeriodInput)
 			.map(file => JSON.parse(FileRead(file, "UTF-8")))
 
 		return loadedData
 	}
 
-	update(fileName, queryDate, newJsonString) {
+	updateOne(fileName, queryDate, newJsonString) {
 		loop files, (this.using . "\" . queryDate . "\*.json") {
 			if (fileName . ".json" = A_LoopFileName) {
 				FileDelete(A_LoopFileFullPath)
 				FileAppend(newJsonString, this.using . "\" . queryDate . "\" . filename . ".json", "UTF-8")
 			}
+		}
+
+		if (queryDate != FormatTime(A_Now, "yyyyMMdd")) {
+			FileDelete(this.archive . "\" . queryDate . " - archive.json")
+			this.createArchive(queryDate)		
 		}
 	}
 
@@ -72,7 +87,7 @@ class useFileDB {
 		FileAppend(archiveData, archiveFullPath, "UTF-8")
 	}
 
-	loadArchive(archiveDate) {
+	loadArchiveOneDay(archiveDate) {
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
 		archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
 		return archivedData
