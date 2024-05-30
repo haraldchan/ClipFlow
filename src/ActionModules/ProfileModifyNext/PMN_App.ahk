@@ -20,6 +20,7 @@ PMN_App(App, popupTitle, db, identifier) {
         "电话", "tel",
         "生日", "birthday",
     )
+    effect(searchBy, () => App.getCtrlByName("searchBox").Value := "")
 
     handleQuery(ctrlName, newVal) {
         updatedQuery := queryFilter.value
