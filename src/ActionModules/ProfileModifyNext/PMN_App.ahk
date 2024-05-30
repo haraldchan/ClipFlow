@@ -87,16 +87,26 @@ PMN_App(App, popupTitle, db, identifier) {
         ])
 
         if (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")) {
-            ; adjustedPeriod := queryFilter.value["period"]
             App.getCtrlByName("period").Enabled := true
         } else {
-            ; adjustedPeriod := 60 * 24 * db.cleanPeriod
             App.getCtrlByName("period").Enabled := false
         }
 
-        loadedItems := queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")
-            ? db.load(, queryFilter.value["date"], queryFilter.value["period"])
-            : db.loadArchive(queryFilter.value["date"])
+        loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
+
+        if (loadedItems.Length = 0) {
+            listContent.set([
+                Map(
+                    "roomNum", "NO DATA",
+                    "name", "NO DATA",
+                    "idType", "NO DATA",
+                    "idNum", "NO DATA",
+                    "addr", "NO DATA"
+                )
+            ])
+            return 
+        }
+
         listContent.set(handleSearchByConditions(loadedItems))
     }
 
@@ -187,7 +197,7 @@ PMN_App(App, popupTitle, db, identifier) {
         handleUpdateItem(itemIndex, LV) {
             selectedItem := listContent.value[itemIndex]
             selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
-            db.update(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
+            db.updateOne(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
         }
 
         showProfileDetails(itemIndex, LV) {
