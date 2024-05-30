@@ -151,7 +151,7 @@ class BatchData {
                 archiveDate := FormatTime(DateAdd(today, 0 - A_Index, "Days"), "yyyyMMdd")
                 guestInfosByDay.Push(
                     Map("date", archiveDate, 
-                        "infoList", db.loadArchive(archiveDate)
+                        "infoList", db.loadArchiveOneDay(archiveDate)
                     )
                 )       
             }
@@ -165,8 +165,6 @@ class BatchData {
                 if (day["date"] = depGuest["ciDate"]) {
                     target := day["infoList"].find(guest => this.matchGuest(guest, dGuest.value))
                     if (target != "") { 
-                        ; debug.mb(target)
-
                         guestIds.Push(target)
                         break
                     }                     
