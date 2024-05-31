@@ -70,7 +70,7 @@ PMN_App(App, popupTitle, db, identifier) {
         for guest in recentGuests {
             if (guest["idNum"] = captured["idNum"]) {
                 captured["fileName"] := guest["fileName"]
-                db.update(guest["fileName"], queryFilter.value["date"], JSON.stringify(captured))
+                db.updateOne(guest["fileName"], queryFilter.value["date"], JSON.stringify(captured))
                 return
             }
         }
@@ -81,6 +81,7 @@ PMN_App(App, popupTitle, db, identifier) {
             Map(
                 "roomNum", "Loading...",
                 "name", "Loading...",
+                "gender", "Loading...",
                 "idType", "Loading...",
                 "idNum", "Loading...",
                 "addr", "Loading..."
@@ -100,6 +101,7 @@ PMN_App(App, popupTitle, db, identifier) {
                 Map(
                     "roomNum", "NO DATA",
                     "name", "NO DATA",
+                    "gender", "NO DATA",
                     "idType", "NO DATA",
                     "idNum", "NO DATA",
                     "addr", "NO DATA"
