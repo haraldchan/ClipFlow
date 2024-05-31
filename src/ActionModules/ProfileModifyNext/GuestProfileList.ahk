@@ -1,12 +1,12 @@
 GuestProfileList(App, listContent) {
     columnDetails := {
-        keys: ["roomNum","name", "idType", "idNum", "addr"],
-        titles: ["房号", "姓名", "类型", "证件号码", "地址"],
-        widths: [50, 90, 80, 160, 145]
+        keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
+        titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
+        widths: [50, 90, 40, 80, 145, 120]
     }
 
     options := {
-        lvOptions: "Grid NoSortHdr -ReadOnly -Multi w550 r15 xp-470 y+10",
+        lvOptions: "Grid NoSortHdr -ReadOnly -Multi LV0x4000 w550 r15 xp-470 y+10",
         itemOptions: ""
     }
 
