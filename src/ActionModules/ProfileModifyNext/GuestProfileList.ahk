@@ -11,7 +11,7 @@ GuestProfileList(App, listContent) {
     }
 
     copyIdNumber(LV, row) {
-        A_Clipboard := LV.GetText(row, 4)
+        A_Clipboard := LV.GetText(row, 5)
         key := LV.GetText(row, 2)
         MsgBox(Format("已复制证件号码: `n`n{1} : {2}", key, A_Clipboard), popupTitle, "4096 T1")
     }
