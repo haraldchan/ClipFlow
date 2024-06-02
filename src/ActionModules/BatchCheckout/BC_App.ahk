@@ -74,6 +74,25 @@ BC_App(App, popupTitle, db) {
         MsgBox(Format("已复制证件号码: `n`n{1} : {2}", guest, A_Clipboard), popupTitle, "4096 T2")
     }
 
+    multiCheck(LV, row){
+        itemState := SendMessage(0x102C, row - 1, 0xF000, LV)  
+        isChecked := (ItemState >> 12) - 1 
+
+        checkedRows := []
+        rowNumber := 0
+        loop {
+            rowNumber := LV.GetNext(rowNumber, "Focused") 
+            if (rowNumber = 0) {
+                break
+            }
+            checkedRows.Push(rowNumber)
+        }
+
+        for checkedRow in checkedRows {
+            LV.Modify(checkedRow, isChecked ? "Check" : "-Check")
+        }
+    }
+
     helpInfo := "
     (
         使用步骤
@@ -102,7 +121,7 @@ BC_App(App, popupTitle, db) {
         App.AddComboBox("x+5 w70 Choose1", ["15:00", "00:00", "07:00"])
            .OnEvent("Change", (ctrl, _) => endTime.set(ctrl.Text)),
         ; departed guests list
-        App.AddReactiveListView(options, columnDetails, deps,,["DoubleClick", copyIdNumber]),
+        App.AddReactiveListView(options, columnDetails, deps,,[["DoubleClick", copyIdNumber], ["ItemCheck", multiCheck]]),
         App.AddButton("vinfo w120 h30", "获取信息").OnEvent("Click", (*) => handleInitialize()),
         App.AddButton("vbatch x+10 w120 h30", "开始退房").OnEvent("Click", (*) => performCheckout())
     )
