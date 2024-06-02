@@ -3,7 +3,7 @@ class PMNG_Execute {
         ; pending
     }
 
-    static startModify(inhRooms, groupGuests) {
+    static startModify(dummyName ,inhRooms, groupGuests) {
         curGuest := signal({})
 
         for guest in groupGuests {
