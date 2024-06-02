@@ -360,8 +360,8 @@ RH_Kingsley(infoObj, addFromConf := 0) {
             pmsGuestNames.Push(StrSplit(curGuestName, "/"))
         } else {
             pmsGuestNames.Push([
-                getFullnamePinyin(curGuestName)[1], ; lastName pinyin
-                getFullnamePinyin(curGuestName)[2], ; firstName pinyin
+                useDict.getFullnamePinyin(curGuestName)[1], ; lastName pinyin
+                useDict.getFullnamePinyin(curGuestName)[2], ; firstName pinyin
                 curGuestName, ; hanzi-name
             ])
         }
@@ -415,8 +415,8 @@ RH_Fliggy(infoObj, addFromConf := 0) {
             pmsGuestNames.Push(StrSplit(curGuestName, " "))
         } else {
             pmsGuestNames.Push([
-                getFullnamePinyin(curGuestName)[1], ; lastName pinyin
-                getFullnamePinyin(curGuestName)[2], ; firstName pinyin
+                useDict.getFullnamePinyin(curGuestName)[1], ; lastName pinyin
+                useDict.getFullnamePinyin(curGuestName)[2], ; firstName pinyin
                 curGuestName, ; hanzi-name
             ])
         }
