@@ -3,13 +3,14 @@
 
 PMNG_App(App, popupTitle, db) {
     currentGroupName := signal("")
+    currentDummyName := signal("")
     currentGroupRooms := signal([])
     loadedGuests := signal([])
 
     handleListInitialize(){
         blockcode := InputBox("请输入 BlockCode",popupTitle, 4096)
         if (blockcode.Result = "Cancel") {
-            utils.cleanReload(winGroup)
+            return
         }
 
         if (!FileExist(A_MyDocuments . "\" . blockcode . ".XML")) {
@@ -20,6 +21,7 @@ PMNG_App(App, popupTitle, db) {
         
         currentGroupName.set(groupInfo["groupName"])
         currentGroupRooms.set(groupInfo["inhRooms"])
+        currentDummyName.set(groupInfo["dummyName"])
         loadedGuests.set(guestInfo)
     }
 
@@ -60,7 +62,7 @@ PMNG_App(App, popupTitle, db) {
             selectedGuests.Push(loadedGuests.value[row])
         }
 
-        PMNG_Execute.startModify(currentGroupRooms.value, selectedGuests)
+        PMNG_Execute.startModify(currentDummyName.value, currentGroupRooms.value, selectedGuests)
     }
 
     helpInfo := ""
