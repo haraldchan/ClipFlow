@@ -74,22 +74,11 @@ BC_App(App, popupTitle, db) {
         MsgBox(Format("已复制证件号码: `n`n{1} : {2}", guest, A_Clipboard), popupTitle, "4096 T2")
     }
 
-    multiCheck(LV, row){
-        itemState := SendMessage(0x102C, row - 1, 0xF000, LV)  
-        isChecked := (ItemState >> 12) - 1 
-
-        checkedRows := []
-        rowNumber := 0
-        loop {
-            rowNumber := LV.GetNext(rowNumber, "Focused") 
-            if (rowNumber = 0) {
-                break
-            }
-            checkedRows.Push(rowNumber)
-        }
-
-        for checkedRow in checkedRows {
-            LV.Modify(checkedRow, isChecked ? "Check" : "-Check")
+    multiCheck(LV, item, isChecked){
+        focusedRows := LV.getFocusedRowNumbers()
+        
+        for focusedRow in focusedRows {
+            LV.Modify(focusedRow, isChecked ? "Check" : "-Check")
         }
     }
 
