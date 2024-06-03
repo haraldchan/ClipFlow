@@ -10,8 +10,6 @@ PMN_App(App, popupTitle, db, identifier) {
         period: 60
     })
 
-    currentGuest := signal(Map("idNum", 0))
-
     searchBy := signal("nameRoom")
     searchByMap := Map(
         "姓名/房号", "nameRoom",
@@ -21,23 +19,31 @@ PMN_App(App, popupTitle, db, identifier) {
         "生日", "birthday",
     )
     effect(searchBy, () => App.getCtrlByName("searchBox").Value := "")
-
+    
     handleQuery(ctrlName, newVal) {
-        updatedQuery := queryFilter.value
-
+        updatedQuery := Map()
+        
         if (ctrlName = "date") {
             updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
+            updatedQuery["search"] := queryFilter.value["search"]
+            updatedQuery["period"] := queryFilter["period"]
         }
         if (ctrlName = "searchBox") {
+            updatedQuery["date"] := queryFilter.value["date"]
             updatedQuery["search"] := newVal
+            updatedQuery["period"] := queryFilter["period"]
         }
         if (ctrlName = "period") {
-            updatedQuery["period"] := newVal = "" ? 7200 : newVal
+            updatedQuery["date"] := queryFilter.value["date"]
+            updatedQuery["search"] := queryFilter.value["search"]
+            updatedQuery["period"] := newVal = "" ? 1440 : newVal
         }
-
+        
         queryFilter.set(updatedQuery)
     }
-
+    effect(queryFilter, () => handleListContentUpdate())
+    
+    currentGuest := signal(Map("idNum", 0))
     OnClipboardChange (*) => handleCaptured(identifier)
     handleCaptured(identifier) {
         if (!InStr(A_Clipboard, identifier)) {
