@@ -204,6 +204,9 @@ PMN_App(App, popupTitle, db, identifier) {
         }
 
         showProfileDetails(itemIndex, LV) {
+            if (itemIndex = 0) {
+                return
+            }
             selectedItem := listContent.value[itemIndex]
             GuestProfileDetails(selectedItem, fillPmsProfile, App)
         }
