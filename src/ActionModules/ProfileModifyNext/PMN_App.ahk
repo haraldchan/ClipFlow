@@ -21,21 +21,15 @@ PMN_App(App, popupTitle, db, identifier) {
     effect(searchBy, () => App.getCtrlByName("searchBox").Value := "")
     
     handleQuery(ctrlName, newVal) {
-        updatedQuery := Map()
+        updatedQuery := queryFilter.value.deepClone()
         
         if (ctrlName = "date") {
             updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
-            updatedQuery["search"] := queryFilter.value["search"]
-            updatedQuery["period"] := queryFilter["period"]
         }
         if (ctrlName = "searchBox") {
-            updatedQuery["date"] := queryFilter.value["date"]
             updatedQuery["search"] := newVal
-            updatedQuery["period"] := queryFilter["period"]
         }
         if (ctrlName = "period") {
-            updatedQuery["date"] := queryFilter.value["date"]
-            updatedQuery["search"] := queryFilter.value["search"]
             updatedQuery["period"] := newVal = "" ? 1440 : newVal
         }
         
