@@ -28,26 +28,3 @@ queryBtn.click()
 coBtn = Array.from(document.querySelectorAll('span')).find((span) => span.innerText === '退房')
 coBtn.click()
 okBtn.click()
-
-
-
-// batch check in 
-// perhaps I should embbed this to ProfileClipper extension?
-function findSpan(label){
-	return Array.from(document.querySelectorAll('span')).find((span) => span.innerText === label)
-}
-
-// TODO: use setTimeout might not be a good idea, maybe use check display classes of something
-const batchCheckin = setInterval(() => {
-	findSpan('修改').click()
-	findSpan('上报(R)').click()
-	
-	if (findSpan('一同入住')) {
-		findSpan('一同入住').click()
-	}
-
-	if (findSpan('暂无数据')) {
-		console.log('done.')
-		clearInterval(batchCheckin)
-	}
-}, 2000);
