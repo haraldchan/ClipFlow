@@ -44,7 +44,7 @@ class utils {
 ;debug: save output log / show msgbox
 class debug {
     static mb(obj) {
-        str := JSON.stringify(obj)
+        str := obj is String ? obj : JSON.stringify(obj)
         MsgBox(str, "Debug")
     }
 
