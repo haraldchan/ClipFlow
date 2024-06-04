@@ -110,6 +110,9 @@ class PMNG_Data {
         groupGuests := []
         for roomNum in roomNums {
             for guest in loadedGuests {
+                if (StrLen(guest["roomNum"]) = 3) {
+                    guest["roomNum"] := "0" . guest["roomNum"]
+                }
                 if (guest["roomNum"] = roomNum) {
                     groupGuests.Push(guest)
                 }
