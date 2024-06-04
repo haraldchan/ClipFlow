@@ -35,7 +35,6 @@ PMN_App(App, popupTitle, db, identifier) {
         
         queryFilter.set(updatedQuery)
     }
-    effect(queryFilter, () => handleListContentUpdate())
     
     currentGuest := signal(Map("idNum", 0))
     OnClipboardChange (*) => handleCaptured(identifier)
