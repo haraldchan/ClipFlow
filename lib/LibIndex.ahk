@@ -6,6 +6,7 @@
 #Include "./useSingleScript.ahk"
 #Include "./useFileDB.ahk"
 #Include "./useDict.ahk"
+#Include "./useDebug.ahk"
 
 #Include "./AddReactive/AddReactive.ahk"
 /************************************************************************
