@@ -3,7 +3,6 @@
 
 PMNG_App(App, popupTitle, db) {
     currentGroupName := signal("")
-    currentDummyName := signal("")
     currentGroupRooms := signal([])
     loadedGuests := signal([])
 
@@ -21,7 +20,6 @@ PMNG_App(App, popupTitle, db) {
         
         currentGroupName.set(groupInfo["groupName"])
         currentGroupRooms.set(groupInfo["inhRooms"])
-        currentDummyName.set(groupInfo["dummyName"])
         loadedGuests.set(guestInfo)
     }
 
@@ -36,22 +34,11 @@ PMNG_App(App, popupTitle, db) {
         itemOptions: "Check"
     }
 
-    multiCheck(LV, row){
-        itemState := SendMessage(0x102C, row - 1, 0xF000, LV)  
-        isChecked := (ItemState >> 12) - 1 
-
-        checkedRows := []
-        rowNumber := 0
-        loop {
-            rowNumber := LV.GetNext(rowNumber, "Focused") 
-            if (rowNumber = 0) {
-                break
-            }
-            checkedRows.Push(rowNumber)
-        }
-
-        for checkedRow in checkedRows {
-            LV.Modify(checkedRow, isChecked ? "Check" : "-Check")
+    multiCheck(LV, item, isChecked){
+        focusedRows := LV.getFocusedRowNumbers()
+        
+        for focusedRow in focusedRows {
+            LV.Modify(focusedRow, isChecked ? "Check" : "-Check")
         }
     }
 
@@ -62,7 +49,7 @@ PMNG_App(App, popupTitle, db) {
             selectedGuests.Push(loadedGuests.value[row])
         }
 
-        PMNG_Execute.startModify(currentDummyName.value, currentGroupRooms.value, selectedGuests)
+        PMNG_Execute.startModify(currentGroupName.value, currentGroupRooms.value, selectedGuests)
     }
 
     helpInfo := ""

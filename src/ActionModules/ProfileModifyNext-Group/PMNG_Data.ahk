@@ -84,11 +84,9 @@ class PMNG_Data {
         xmlDoc.async := false
         xmlDoc.load(xmlPath)
         roomElements := xmlDoc.getElementsByTagName("ROOM")
-        dummyNameElements := xmlDoc.getElementsByTagName("")
-        groupNameElements := xmlDoc.getElementsByTagName("")
+        groupNameElements := xmlDoc.getElementsByTagName("GROUP_NAME")
         
-        groupName := groupNameElements[0].ChildNodes[0].nodeValue
-        dummyName := StrSplit(dummyNameElements[0].ChildNodes[0].nodeValue, " ")[0]
+        groupName := Trim(groupNameElements[0].ChildNodes[0].nodeValue)
         
         inhRooms := []
         loop roomElements.Length {
@@ -97,18 +95,18 @@ class PMNG_Data {
                 ? SubStr(roomNumString, 1)
                 : roomNumString
 
-            inhRooms.Push(Map("roomNum", roomNum))
+            inhRooms.Push(roomNum)
         }
 
-        return Map("groupName", groupName, "dummyName", dummyName, "inhRooms", inhRooms)
+        return Map("groupName", groupName, "inhRooms", inhRooms)
     }
 
     static getGroupGuests(db, inhRooms) {
-        roomNums := inhRooms.map(room => room.roomNum).unique()
+        ; roomNums := inhRooms.map(room => room.roomNum).unique()
         loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 1440)
 
         groupGuests := []
-        for roomNum in roomNums {
+        for roomNum in inhRooms {
             for guest in loadedGuests {
                 if (StrLen(guest["roomNum"]) = 3) {
                     guest["roomNum"] := "0" . guest["roomNum"]
