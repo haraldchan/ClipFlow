@@ -19,8 +19,9 @@ class useDebug {
     }
 
     static log(input) {
+        hr := "--------------------------------------"
         logHistory := this.logContent.value
-        this.logContent.set(this.logLine(input) . "`r`n`r`n" . logHistory)
+        this.logContent.set(logHistory . hr . this.logLine(input) . "`n")
     }
 
     ; timer1 := useDebug.time(timer1)
