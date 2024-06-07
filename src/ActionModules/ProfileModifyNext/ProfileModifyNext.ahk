@@ -16,7 +16,7 @@ class ProfileModifyNext {
     static USE(App) {
         today := Format(A_Now, "yyyyMMdd")
         yesterday := FormatTime(DateAdd(today, -1, "Days"), "yyyyMMdd")
-        if (!FileExist(this.archive . "\" . yesterday . " - archive.json")) {
+        if (!FileExist(this.db.archive . "\" . yesterday . " - archive.json")) {
             this.db.createArchive(yesterday)
         }
         
