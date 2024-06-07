@@ -44,11 +44,16 @@ class useDebug {
     }
 
     static Console() {
-        Console := Gui("+AlwaysOnTop", "Debug")
+        Console := Gui("+AlwaysOnTop", "Console")
         Console.SetFont(, "微软雅黑")
 
         onTop := signal(true)
         effect(onTop, isOnTop => Console.Opt(isOnTop ? "+AlwaysOnTop" : "-AlwaysOnTop"))
+        effect(this.logContent, cur => 
+            Console.getCtrlByName("save").Enabled := (cur = "")
+                ? false
+                : true
+        )
 
         saveLog() {
             savePath := FileSelect("S 16")
@@ -60,7 +65,7 @@ class useDebug {
         return (
             Console.AddCheckbox("h25 w170 Checked", "keep on-top").OnEvent("Click", (edit, _) => onTop.set(edit.value)),
             Console.AddButton("h25 x+10", "clear").OnEvent("Click", (*) => this.logContent.set(""))
-            Console.AddButton("h25 x+10", "save log").OnEvent("Click", (*) => saveLog()),
+            Console.AddButton("vsave h25 x+10 Disabled", "save log").OnEvent("Click", (*) => saveLog()),
             ; log window
             Console.AddReactiveEdit("x10 w300 h500 ReadOnly", "{1}", this.logContent),
             Console.Show()
