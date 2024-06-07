@@ -37,7 +37,7 @@ class useDebug {
         __New(timer) {
             this.timer := timer
             this.time := DateDiff(A_Now, timer.startTime, "Seconds") . "s"
-            this.logMsg := Format("{1} ends within {2}", timer.label ? "timer: " . timer.label : "", this.time)
+            this.logMsg := Format("{1} ends within {2}`r`n", timer.label ? "timer: " . timer.label : "", this.time)
 
             useDebug.log(this.logMsg)
         }
@@ -53,8 +53,6 @@ class useDebug {
         saveLog() {
             savePath := FileSelect("S 16")
             fileName := savePath . ".txt"
-
-            useDebug.log(fileName)
 
             FileAppend(this.logContent.value, fileName, "UTF-8")
         }
