@@ -26,7 +26,7 @@ class useDebug {
 
     ; timer1 := useDebug.time(timer1)
     class time {
-        __New(label) {
+        __New(label := 0) {
             this.label := label
             this.startTime := A_Now
         }
@@ -37,7 +37,7 @@ class useDebug {
         __New(timer) {
             this.timer := timer
             this.time := DateDiff(A_Now, timer.startTime, "Seconds") . "s"
-            this.logMsg := Format("timer: {1} ends within {2}", timer.label, this.time)
+            this.logMsg := Format("{1}ends within {2}", timer.label ? timer.label : "", this.time)
 
             useDebug.log(this.logMsg)
         }
