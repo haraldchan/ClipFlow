@@ -1,4 +1,4 @@
-// inject
+const guestIds = []
 const queryInput = document.querySelector('input[placeholder="请输入查询条件"]')
 const querySelect = document.querySelector('input[placeholder="请选择字段"]')
 
@@ -7,24 +7,40 @@ const change = new Event('input', {
 	cancelable: true,
 })
 
+function findSpan(label) {
+	return Array.from(document.querySelectorAll('span')).find((span) => span.innerText === label)
+}
+
 document.querySelectorAll('.el-select-dropdown__item')[3].click()
-const queryBtn = Array.from(document.querySelectorAll('span')).find((span) => span.innerText === '查 询').parentElement
-let coBtn = Array.from(document.querySelectorAll('span')).find((span) => span.innerText === '退房')
+const queryBtn = findSpan('查 询')
 let okBtn, cxlBtn
 
+let coBtn = findSpan('退房')
 coBtn.click()
+
 setTimeout(() => {
 	okBtn = Array.from(document.querySelector('.el-message-box__btns').querySelectorAll('span')).find((span) => span.innerText === '确定')
 	cxlBtn = Array.from(document.querySelector('.el-message-box__btns').querySelectorAll('span')).find((span) => span.innerText === '取消')
 	cxlBtn.click()
 }, 500)
 
-// search
-queryInput.value = '{idNumber}'
-queryInput.dispatchEvent(change)
-queryBtn.click()
+guestIds.forEach(id => {
+	coBtn = findSpan('退房')
 
-// confirm checkout
-coBtn = Array.from(document.querySelectorAll('span')).find((span) => span.innerText === '退房')
-coBtn.click()
-okBtn.click()
+	setTimeout(() => {
+		setTimeout(() => {
+			queryInput.value = id
+			queryInput.dispatchEvent(change)
+			queryBtn.click()
+		}, 1000);
+
+		setTimeout(() => {
+			coBtn.click()
+			}, 2000);
+			
+		setTimeout(() => {
+			okBtn.click()	
+		}, 4000);
+
+	}, 2000);
+})
