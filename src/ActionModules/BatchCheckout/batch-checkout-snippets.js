@@ -44,3 +44,5 @@ guestIds.forEach(id => {
 
 	}, 2000);
 })
+
+alert('已完成退房。')

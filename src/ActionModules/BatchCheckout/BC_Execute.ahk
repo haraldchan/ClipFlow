@@ -1,33 +1,57 @@
 ﻿#Include "./JSnippets.ahk"
 
 class BC_Execute {
-	static inject() {
-		A_Clipboard := JSnippets.getElements
-		Send "^v"
-		Sleep 100
-		Send "{Enter}"
-		Sleep 1000
-	}
+	static JSnippet := "
+	(
+		const guestIds = {1}
+		const queryInput = document.querySelector('input[placeholder="请输入查询条件"]')
+		const querySelect = document.querySelector('input[placeholder="请选择字段"]')
 
-	static checkoutOne(id) {
-		A_Clipboard := Format(JSnippets.clickSearchBtn, id)
-		Send "^v"
-		Sleep 100
-		Send "{Enter}"
-		Sleep 100
+		const change = new Event('input', {
+			bubbles: true,
+			cancelable: true,
+		})
 
-		Sleep 1000
+		function findSpan(label) {
+			return Array.from(document.querySelectorAll('span')).find((span) => span.innerText === label)
+		}
 
-		A_Clipboard := JSnippets.clickCheckoutSpan
-		Send "^v"
-		Sleep 100
-		Send "{Enter}"
-		Sleep 100
-		Send "{Text}okBtn.click()"
-		Sleep 100
-		Send "{Enter}"
-		Sleep 2000
-	}
+		document.querySelectorAll('.el-select-dropdown__item')[3].click()
+		const queryBtn = findSpan('查 询')
+		let okBtn, cxlBtn
+
+		let coBtn = findSpan('退房')
+		coBtn.click()
+
+		setTimeout(() => {
+			okBtn = Array.from(document.querySelector('.el-message-box__btns').querySelectorAll('span')).find((span) => span.innerText === '确定')
+			cxlBtn = Array.from(document.querySelector('.el-message-box__btns').querySelectorAll('span')).find((span) => span.innerText === '取消')
+			cxlBtn.click()
+		}, 500)
+
+		guestIds.forEach(id => {
+			coBtn = findSpan('退房')
+
+			setTimeout(() => {
+				setTimeout(() => {
+					queryInput.value = id
+					queryInput.dispatchEvent(change)
+					queryBtn.click()
+				}, 1000);
+
+				setTimeout(() => {
+					coBtn.click()
+					}, 2000);
+					
+				setTimeout(() => {
+					okBtn.click()	
+				}, 4000);
+
+			}, 2000);
+		})
+
+		alert('已完成退房。')
+	)"
 
 	static checkoutBatch(ids) {
 		WinActivate "ahk_class 360se6_Frame"
@@ -37,14 +61,12 @@ class BC_Execute {
 		Send "^+j"
 		Sleep 1000
 
-		this.inject()
-
-		for id in ids {
-			this.checkoutOne(id)
-		}
+		A_Clipboard := Format(this.JSnippet, JSON.stringify(ids))
+		Send "^v"
+		Sleep 1000
+		Send "{Enter}"
 
 		; BlockInput false
 		WinSetAlwaysOnTop false, "ahk_class 360se6_Frame"
-		MsgBox("已完成批量退房。", "Batch Checkout", "4096 T3")
 	}
 }
