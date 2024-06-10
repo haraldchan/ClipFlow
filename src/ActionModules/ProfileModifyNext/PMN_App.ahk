@@ -94,7 +94,6 @@ PMN_App(App, popupTitle, db, identifier) {
         }
 
         loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
-
         if (loadedItems.Length = 0) {
             listContent.set([
                 Map(
@@ -209,16 +208,34 @@ PMN_App(App, popupTitle, db, identifier) {
             selectedItem := listContent.value[itemIndex]
             GuestProfileDetails(selectedItem, fillPmsProfile, App)
         }
+
+        searchBox := App.getCtrlByName("searchBox")
+        searchBox.OnEvent("LoseFocus", (*) => handleListContentUpdate())
+
+        period := App.getCtrlByName("period")
+        period.OnEvent("LoseFocus", (*) => handleListContentUpdate())
+    }
+
+    hotkeys() {
+        Hotkey "^f", (*) => App.getCtrlByName("searchBox").Focus()
     }
 
     helpInfo := "
     (
+        ============ 基本功能 ============
+
         点击房号`t- 修改房号
         鼠标右键`t- 显示详细信息
         双击信息`t- (主界面中) 复制身份证号
         `t- (详情信息) 复制单条信息
-    )"
 
+        ============= 快捷键 =============
+
+        Ctrl+F`t- 搜索框
+        Alt+R`t- 根据条件搜索
+        Enter`t- 填入信息到Profile
+
+    )"
 
     return (
         App.AddGroupBox("R17 w580 y+20"," "),
@@ -232,20 +249,21 @@ PMN_App(App, popupTitle, db, identifier) {
         ),
         ; search conditions
         App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "证件号码", "地址", "电话", "生日"])
-            .OnEvent("Change", (ctrl, info) => searchBy.set(searchByMap[ctrl.Text])),
+            .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
         ; search box
         App.AddEdit("vsearchBox x+5 w100 h25")
-            .OnEvent("Change", (ctrl, info) => handleQuery(ctrl.Name, ctrl.Value)),
+            .OnEvent("Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value)),
         ; period
         App.AddText("x+10 yp+5 h20", "最近"),
         App.AddEdit("vperiod Number x+1 yp-5 w30 h25", queryFilter.value["period"])
-            .OnEvent("Change", (ctrl, info) => handleQuery(ctrl.Name, ctrl.Value)),
+            .OnEvent("Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value)),
         App.AddText("x+1 yp+5 h25", "分钟"),
         ; manual updating
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
         App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile(App)),
         ; profile list
         GuestProfileList(App, listContent),
-        addAddtionalEvents()
+        addAddtionalEvents(),
+        hotkeys()
     )
 }
