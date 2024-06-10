@@ -7,7 +7,7 @@ PMNG_App(App, popupTitle, db) {
     loadedGuests := signal([])
 
     handleListInitialize(){
-        blockcode := InputBox("请输入 BlockCode",popupTitle, 4096)
+        blockcode := InputBox("请输入 BlockCode", popupTitle)
         if (blockcode.Result = "Cancel") {
             return
         }
@@ -30,7 +30,7 @@ PMNG_App(App, popupTitle, db) {
     }
 
     options := {
-        lvOptions: "Checked Grid NoSortHdr LV0x4000 -ReadOnly w250 r16 xp-160 y+10",
+        lvOptions: "Checked Grid NoSortHdr LV0x4000 -ReadOnly w245 r16 y+10",
         itemOptions: "Check"
     }
 
@@ -55,17 +55,18 @@ PMNG_App(App, popupTitle, db) {
     helpInfo := ""
 
     return (
-        App.AddGroupBox("R19 y+20 w280"," "),
+        App.AddGroupBox("R19 y+20 w270"," "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
-
         App.AddReactiveText("h20 y+10 0x200", "当前团队：{1}" , currentGroupName),
-        App.AddButton("h20 w100", "保存团单")
-           .OnEvent("Click", (*) => handleListInitialize())
 
         ; inhouse guests list
         App.AddReactiveListView(options, columnDetails, loadedGuests,, ["ItemCheck", multiCheck]),
-        App.AddButton("vinfo w120 h30", "获取信息").OnEvent("Click", (*) => handleListInitialize()),
-        App.AddButton("vbatch x+10 w120 h30", "开始退房").OnEvent("Click", (*) => performModify())
+
+        ; btns
+        App.AddButton("h30 w75", "保存团单")
+           .OnEvent("Click", (*) => handleListInitialize()),
+        App.AddButton("vinfo x+10 w75 h30", "获取信息").OnEvent("Click", (*) => handleListInitialize()),
+        App.AddButton("vbatch x+10 w75 h30", "开始退房").OnEvent("Click", (*) => performModify())
     )
 }
