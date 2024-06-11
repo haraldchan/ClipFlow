@@ -3,7 +3,7 @@
 
 class useDebug {
     static logContent := signal("")
-
+    
     static logLine(input) {
         if (input is String || input is Number) {
             return input
@@ -24,16 +24,24 @@ class useDebug {
         this.logContent.set(logHistory . hr . this.logLine(input) . "`r`n")
     }
 
-    ; timer1 := useDebug.time(timer1)
+    
     class time {
+        /**
+         * Start a timer.
+         * @param {string|number} [label] Name of the timer.
+         * @return {Timer}
+         */
         __New(label := 0) {
             this.label := label
             this.startTime := A_Now
         }
     }
 
-    ; useDebug.timeEnd(timer1) => 1000ms
     class timeEnd {
+        /**
+         * Stops a timer.
+         * @param {Timer} timer Timer that needs to log.
+         */
         __New(timer) {
             this.timer := timer
             this.time := DateDiff(A_Now, timer.startTime, "Seconds") . "s"

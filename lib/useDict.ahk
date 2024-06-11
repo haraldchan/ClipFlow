@@ -772,6 +772,11 @@ class Dict {
 }
 
 class useDict {
+    /**
+     * Convert the pinyin of a character.
+     * @param {string} hanzi A chinese character to convert.
+     * @returns {string} 
+     */
     static getPinyin(hanzi) {
         for pinyin, hanCharacters in Dict.pinyin {
             if (InStr(hanCharacters, hanzi)) {
@@ -780,6 +785,11 @@ class useDict {
         }
     }
 
+    /**
+     * Convert the pinyin of last name and first name.
+     * @param {string} fullname The name to convert.
+     * @returns {array} [last name, first name]
+     */
     static getFullnamePinyin(fullname) {
         if (Dict.doubleLastName.Has(SubStr(fullname, 1, 2))) {
             lastname := Dict.doubleLastName[SubStr(fullname, 1, 2)]
@@ -797,6 +807,11 @@ class useDict {
         return [lastname, Trim(firstname)]
     }
 
+    /**
+     * Get the ISO 3166-1 alpha-2 regional code.
+     * @param {string} country The chinese country name to convert.
+     * @returns {any} 
+     */
     static getCountryCode(country) {
         for region, code in Dict.regionISO {
             if (country = region) {
@@ -805,6 +820,11 @@ class useDict {
         }
     }
 
+    /**
+     * Get the province name by address
+     * @param {string} address 
+     * @returns {any} 
+     */
     static getProvince(address) {
         for province, code in Dict.provinces {
             if (InStr(address, province)) {

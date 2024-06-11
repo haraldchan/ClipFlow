@@ -4,12 +4,17 @@
 #Include "./AddReactive-Ctrls.ahk"
 
 class signal {
-    __New(val) {
-        this.value := ((val is Class) or (val is Func))
-            ? val
-            : val is Object
-                ? this.mapify(val)
-                : val
+    /**
+     * Creates a reactive signal variable.
+     * @param {any} initialValue The initial value of the signal.This argument is ignored after the initial render.
+     * @return {Signal}
+     */
+    __New(initialValue) {
+        this.value := ((initialValue is Class) or (initialValue is Func))
+            ? initialValue
+            : initialValue is Object
+                ? this.mapify(initialValue)
+                : initialValue
         this.subs := []
         this.comps := []
         this.effects := []
@@ -23,6 +28,11 @@ class signal {
         }
     }
 
+    /**
+     * Set the new value of the signal.
+     * @param {any} newSignalValue New state of the signal. Also accept function object.
+     * @returns {void} 
+     */
     set(newSignalValue) {
         prevValue := this.value
 
@@ -82,12 +92,18 @@ class signal {
 }
 
 class computed {
-    __New(_signal, mutation) {
-        checkType(_signal, signal, "First parameter is not a ReactiveSignal.")
-        checkType(mutation, Func, "Second parameter is not a Function.")
+    /**
+     * Create a computed signal which derives a reactive value.
+     * @param {signal} depend The signal derives from.
+     * @param {Func} computation computation function expression.
+     * @return {Signal}
+     */
+    __New(depend, computation) {
+        checkType(depend, signal, "First parameter is not a ReactiveSignal.")
+        checkType(computation, Func, "Second parameter is not a Function.")
 
-        this.signal := _signal
-        this.mutation := mutation
+        this.signal := depend
+        this.mutation := computation
         this.value := this.mutation.Call(this.signal.value)
         this.subs := []
         this.comps := []
@@ -132,13 +148,31 @@ class computed {
 }
 
 class effect {
+    /**
+     * Create a effect that runs when the value of depend signal changes.
+     * @param {signal} depend The signal associated with.
+     * @param {(new?, prev?) => void} effectFn Callback function object. 
+     * First param retrieves the new value of the signal, second param retrives previous value.
+     * @example effect(signal, (new, prev) => MsgBox(Format("New: {1}, prev: {2}", new, prev)))
+     */
     __New(depend, effectFn) {
         depend.addEffect(effectFn)
     }
 }
 
 class AddReactive {
-    __New(GuiObject, controlType, options := "", textString := "", depend := 0, key := 0, event := 0) {
+    /**
+     * Creates a new reactive control and add it to the window.
+     * @param {Gui} GuiObject The target Gui Object.
+     * @param {string} controlType Control type to create. Available: Text, Edit, CheckBox, Radio, DropDownList, ComboBox, ListView.
+     * @param {string} options Options apply to the control, same as Gui.Add.
+     * @param {string|Array|Object} content Text or formatted text for text, options for DDL/ComboBox, column option object for ListView.
+     * @param {signal|Array|Object} depend Subscribed signal, or an array of signals. 
+     * @param {string|number} key A key or index as render indicator.
+     * @param {[ event: Event, callback: ()=>void ]} event Events and callback function objects.
+     * @returns {AddReactive} 
+     */
+    __New(GuiObject, controlType, options := "", content := "", depend := 0, key := 0, event := 0) {
         ; params type checking
         checkType(GuiObject, Gui, "Second(GuiObject) param is not a Gui Object.")
         if (controlType != "ListView") {
@@ -151,7 +185,6 @@ class AddReactive {
         this.GuiObject := GuiObject
         this.depend := depend
         this.key := key
-        this.formattedString := textString
         this.options := options
 
         if (controlType = "ListView") {
@@ -161,17 +194,17 @@ class AddReactive {
 
         if (controlType = "ComboBox" ||
             controlType = "DropDownList") {
-                this.innerText := textString
+                this.innerText := content
         } else if (controlType = "ListView") {
-            this.innerText := textString.titles
-            this.titleKeys := textString.keys
-            this.colWidths := textString.HasOwnProp("widths")
-                ? textString.widths
+            this.innerText := content.titles
+            this.titleKeys := content.keys
+            this.colWidths := content.HasOwnProp("widths")
+                ? content.widths
                 : this.titleKeys.map(item => "AutoHdr")
         } else {
-            this.innerText := RegExMatch(textString, "\{\d+\}")
-                ? this.handleFormatStr(textString, depend, key)
-                : textString
+            this.innerText := RegExMatch(content, "\{\d+\}")
+                ? this.handleFormatStr(content, depend, key)
+                : content
         }
 
 
@@ -322,17 +355,43 @@ class AddReactive {
 }
 
 class IndexList {
-    __New(guiObj, controlType, options, innerText, depend := 0, key := 0, event := 0) {
+    /**
+     * Creates a list of multiple reactive controls, ordered by index.
+     * @param {Gui} GuiObject The target Gui Object.
+     * @param {string} controlType Control type to create. Available: Text, Edit, CheckBox, Radio.
+     * @param {string} options Options apply to the control, same as Gui.Add.
+     * @param {string} innerText Text or formatted text to hold signal values.
+     * @param {signal} depend Subscribed signal
+     * @param {[ event: Event, callback: ()=>void ]} event Events and callback function objects.
+     * @return {Gui.Control[]}
+     */
+    __New(GuiObject, controlType, options, innerText, depend := 0, event := 0) {
+        indexList := []
         loop depend.value.length {
-            guiObj.AddReactive(controlType, options, innerText, depend, A_Index, event)
+            indexList.Push(
+                GuiObject.AddReactive(controlType, options, innerText, depend, A_Index, event)
+            )
         }
     }
 }
-
 class KeyList {
-    __New(guiObj, controlType, options, innerText, depend := 0, key := 0, event := 0) {
+    /**
+     * Creates a list of multiple reactive controls, render each item by keys.
+     * @param {Gui} GuiObject The target Gui Object.
+     * @param {string} controlType Control type to create. Available: Text, Edit, CheckBox, Radio.
+     * @param {string} options Options apply to the control, same as Gui.Add.
+     * @param {string} innerText Text or formatted text to hold signal values.
+     * @param {signal} depend Subscribed signal
+     * @param {array} key the keys of the signal's value
+     * @param {[ event: Event, callback: ()=>void ]} event Events and callback function objects.
+     * @return {Gui.Control[]}
+     */
+    __New(GuiObject, controlType, options, innerText, depend := 0, key := 0, event := 0) {
+        keyList := []
         loop depend.value.length {
-            guiObj.AddReactive(controlType, options, innerText, depend, [[A_Index], key*], event)
+            keyList.Push(
+                GuiObject.AddReactive(controlType, options, innerText, depend, [[A_Index], key*], event)
+            )
         }
     }
 }
