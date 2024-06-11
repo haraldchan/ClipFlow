@@ -7,8 +7,13 @@ const change = new Event('input', {
 	cancelable: true,
 })
 
-function findSpan(label) {
-	return Array.from(document.querySelectorAll('span')).find((span) => span.innerText === label)
+/**
+ * Find the span element by innerText.
+ * @param {string} innerText The innerText of the target span.
+ * @returns {HTMLSpanElement}
+ */
+function findSpan(innerText) {
+	return Array.from(document.querySelectorAll('span')).find((span) => span.innerText === innerText)
 }
 
 document.querySelectorAll('.el-select-dropdown__item')[3].click()
