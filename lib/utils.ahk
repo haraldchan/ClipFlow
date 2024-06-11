@@ -39,6 +39,33 @@ class utils {
             throw TypeError(Format("{1}; `n`nCurrent Type: {2}", errMsg, Type(val)))
         }
     }
+
+    imgSearchAll(imgPath, method := "TD") {
+        ; method: "LeftRight" or "LR", "TopDown" or "TD"
+        target := imgPath
+        coords := []
+        fromWidth := 0
+        fromHeight := 0
+
+        loop {
+            if (!ImageSearch(&FoundX, &FoundY, fromWidth, fromHeight, A_ScreenWidth, A_ScreenWidth, target)) {
+                if (A_Index = 1) {
+                    MsgBox("Image Not Found.")
+                }
+                break
+            } else {
+                x := FoundX
+                y := FoundY
+                coords.Push([x, y])
+
+                if (method = "LeftRight" || method = "LR") {
+                    fromWidth := x
+                } else if (method = "TopDown" || method = "TD") {
+                    fromHeight := y
+                }
+            }
+        }
+    }
 }
 
 ;debug: save output log / show msgbox
@@ -49,7 +76,7 @@ class debug {
     }
 
     static log(res) {
-        log := A_MyDocuments . "\" . FormatTime(A_Now, "yyyyMMdd") . "-log.txt" 
+        log := A_MyDocuments . "\" . FormatTime(A_Now, "yyyyMMdd") . "-log.txt"
         if (!FileExist(log)) {
             FileAppend("", log)
         }
