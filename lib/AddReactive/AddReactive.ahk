@@ -183,9 +183,10 @@ class AddReactive {
 
         this.ctrlType := controlType
         this.GuiObject := GuiObject
+        this.options := options
+        this.content := content
         this.depend := depend
         this.key := key
-        this.options := options
 
         if (controlType = "ListView") {
             this.lvOptions := options.lvOptions
@@ -305,10 +306,10 @@ class AddReactive {
     update() {
         if (this.ctrl is Gui.Text || this.ctrl is Gui.Button) {
             ; update text label
-            this.ctrl.Text := this.handleFormatStr(this.formattedString, this.depend, this.key)
+            this.ctrl.Text := this.handleFormatStr(this.content, this.depend, this.key)
         } else if (this.ctrl is Gui.Edit) {
             ; update text value
-            this.ctrl.Value := this.handleFormatStr(this.formattedString, this.depend, this.key)
+            this.ctrl.Value := this.handleFormatStr(this.content, this.depend, this.key)
         } else if (this.ctrl is Gui.ListView) {
             ; update list items
             this.handleListViewUpdate()
