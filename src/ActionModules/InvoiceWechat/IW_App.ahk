@@ -40,7 +40,7 @@ IW_App(App, popupTitle) {
     }
 
     handleInfoListUpdate() {
-        if (invoice.value = "") {
+        if (invoice.value.Capacity = 0) {
             return 
         }
 
@@ -56,6 +56,12 @@ IW_App(App, popupTitle) {
     }
     effect(invoice, () => handleInfoListUpdate())
 
+    openShareClipboard() {
+        shareClipFolder := A_ScriptDir . "\src\ActionModules\ShareClip\SharedClips"
+        shareTxt := Format("{1}\{2}.txt", shareClipFolder, FormatTime(A_Now, "yyyyMMdd"))
+        Run(shareTxt)
+    }
+
     fillInfo() {
         xMarkImg := A_ScriptDir . "\src\Assets\invoiceXmark.PNG"
         try {
@@ -67,19 +73,23 @@ IW_App(App, popupTitle) {
         Sleep 500
 
         CoordMode "Pixel", "Screen"
-        ImageSearch(&foundX, &foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, xMarkImg)
-        anchorX := foundX - 30
-        anchorY := foundY + 10  
+        try {
+            ImageSearch(&foundX, &foundY, 0, 0, A_ScreenWidth, A_ScreenHeight, xMarkImg)
+            anchorX := foundX - 30
+            anchorY := foundY + 10
+        } catch {
+            MsgBox("请先打开 “账单查询” 界面", popupTitle, "T3")
+            return
+        }
 
         infoStr := (invoice.value.Capacity > 2)
-            ? invoice.value["company"] . "`t" . invoice.value["taxNum"] . "`t" . invoice.value["address"] . invoice.value["tel"] . "`t" . invoice.value["bank"] . invoice.value["account"]
+            ? invoice.value["company"] . "`t" . invoice.value["taxNum"] . "`t" . invoice.value["address"] . " " . invoice.value["tel"] . "`t" . invoice.value["bank"] . " " . invoice.value["account"]
             : invoice.value["company"] . "`t" . invoice.value["taxNum"]
 
         MouseMove anchorX, anchorY
+        Click
         Sleep 200
         Send infoStr
-
-        A_Clipboard := ""
     }
 
     copyListField(LV, row) {
@@ -106,9 +116,11 @@ IW_App(App, popupTitle) {
     return (
         App.AddGroupBox("R10 w450 y+20", popupTitle),
         App.AddText("xp+10 yp+20 w200", "发票信息").SetFont("bold s11 q4", ""),
-        App.AddListView("vinfoList Grid y+5 r6 w430", ["项目", "内容"])
+        App.AddListView("vinfoList Grid y+5 r6 w420", ["项目", "内容"])
            .OnEvent("DoubleClick", copyListField),
-        App.AddButton("Default h35 w230 y+15", "开始填入")
+        App.AddButton("h35 w200 y+15", "打开共享剪贴板")
+           .OnEvent("Click", (*) => openShareClipboard()),
+        App.AddButton("x+20 h35 w200", "开始填入")
            .OnEvent("Click", (*) => fillInfo()),
         listInit()
     )
