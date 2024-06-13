@@ -11,5 +11,6 @@
   },
   "resvHandler":{
     "JSON":{}
-  }
+  },
+  "invoiceWechat": ""
 }
