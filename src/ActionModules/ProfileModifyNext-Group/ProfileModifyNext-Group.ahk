@@ -2,7 +2,7 @@
 #Include "PMNG_App.ahk"
 
 class ProfileModifyNext_Group {
-    static name := "rofileModifyNext Group"
+    static name := "ProfileModifyNext Group"
     static title := "Flow Mode - " . this.name
     static popupTitle := "ClipFlow - " . this.name
     static dbSetting := {
