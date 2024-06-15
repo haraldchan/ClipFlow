@@ -40,7 +40,7 @@ class utils {
         }
     }
 
-    imgSearchAll(imgPath, method := "TD") {
+    static imgSearchAll(imgPath, method := "TD") {
         ; method: "LeftRight" or "LR", "TopDown" or "TD"
         target := imgPath
         coords := []
@@ -65,6 +65,17 @@ class utils {
                 }
             }
         }
+    }
+
+    static waitLoading() {
+        checkCursor() {
+            if (A_Cursor != "Wait") {
+                SetTimer(, 0)
+                return
+            }
+        }
+
+        SetTimer(checkCursor)
     }
 }
 
