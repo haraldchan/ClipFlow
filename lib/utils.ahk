@@ -67,9 +67,9 @@ class utils {
         }
     }
 
-    static waitLoading() {
+    static waitLoading(interval := 150) {
         loop {
-            sleep 150
+            sleep interval
             if (A_Cursor != "Wait") {
                 break
             }
