@@ -94,82 +94,83 @@ class PMN_FillIn {
         ; { fillin common info: nameLast, nameFirst, language, gender, country, birthday, idType, idNum
         MouseMove anchorX, anchorY
         Click 3
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["nameLast"])
 
         Send "{Tab}"
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["nameFirst"])
 
         loop 2 {
             Send "{Tab}"
         }
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["language"])
 
         Send "{Tab}"
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["gender"])
 
         Send "{Tab}"
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["addr"])
 
         loop 6 {
             Send "{Tab}"
         }
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["country"])
 
         Send "{Tab}"
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["province"])
 
         loop 9 {
             Send "{Tab}"
         }
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["birthday"])
 
         Send "{Tab}"
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["idNum"])
-        Sleep 100
+        utils.waitLoading()
 
         MouseMove anchorX + 393, anchorY + 28
-        Sleep 100
+        utils.waitLoading()
         Click 3
         Send Format("{Text}{1}", guestProfileMap["idType"])
-        Sleep 100
+        utils.waitLoading()
         Send "{Tab}"
-        Sleep 100
+        utils.waitLoading()
         ; }
         if (guestProfileMap["nameAlt"] != " ") {
             ; { with hanzi name
             ; fillin: nameAlt, gender(in nameAlt window)
             MouseMove anchorX + 10, anchorY + 10 ; open alt name win
-            Sleep 50
+            utils.waitLoading()
             Click 1
 
-            this.waitAltWin(anchorX, anchorY)
+            ; this.waitAltWin(anchorX, anchorY)
+            utils.waitLoading()
 
             Send Format("{Text}{1}", guestProfileMap["nameAlt"])
-            Sleep 100
+            utils.waitLoading()
 
             loop 3 {
                 Send "{Tab}"
             }
-            Sleep 100
+            utils.waitLoading()
             Send Format("{Text}{1}", "C")
 
             Send "{Tab}"
-            Sleep 100
+            utils.waitLoading()
             Send Format("{Text}{1}", guestProfileMap["gender"])
-            Sleep 100
+            utils.waitLoading()
             Send "{Tab}"
-            Sleep 100
+            utils.waitLoading()
             Send "!o"
-            Sleep 100
+            utils.waitLoading()
         }
         BlockInput false
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"

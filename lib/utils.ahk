@@ -68,14 +68,12 @@ class utils {
     }
 
     static waitLoading() {
-        checkCursor() {
+        loop {
+            sleep 150
             if (A_Cursor != "Wait") {
-                SetTimer(, 0)
-                return
+                break
             }
         }
-
-        SetTimer(checkCursor)
     }
 }
 
