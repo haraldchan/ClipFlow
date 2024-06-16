@@ -322,6 +322,8 @@ class AddReactive {
         } else if (this.ctrl is Gui.ListView) {
             ; update list items
             this.handleListViewUpdate()
+        } else {
+            this.ctrl.Value := this.depend.value
         }
     }
 
