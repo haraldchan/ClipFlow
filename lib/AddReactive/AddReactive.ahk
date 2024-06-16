@@ -219,7 +219,7 @@ class AddReactive {
             }
         } else if (controlType = "DateTime" || controlType = "MonthCal") {
             this.ctrl := this.GuiObject.Add(this.ctrlType, this.options)
-            this.ctrl.Value := this.depend.value
+            this.ctrl.Value := this.depend.value ? this.depend.value : A_Now
         } else {
             this.ctrl := this.GuiObject.Add(this.ctrlType, this.options, this.innerText)
         }
