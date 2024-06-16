@@ -184,6 +184,7 @@ class AddReactive {
         this.ctrlType := controlType
         this.GuiObject := GuiObject
         this.options := options
+        this.bind := InStr(options, "Bind")
         this.content := content
         this.depend := depend
         this.key := key
@@ -216,8 +217,16 @@ class AddReactive {
             for width in this.colWidths {
                 this.ctrl.ModifyCol(A_Index, width)
             }
+        } else if (controlType = "DateTime" || controlType = "MonthCal") {
+            this.ctrl := this.GuiObject.Add(this.ctrlType, this.options)
+            this.ctrl.Value := this.depend.value
         } else {
             this.ctrl := this.GuiObject.Add(this.ctrlType, this.options, this.innerText)
+        }
+
+        ; if options include "Bind", set binding event
+        if (this.depend != 0 && this.bing = true) {
+            this.ctrl.OnEvent("Change", (ctrl, info) => this.depend.set(ctrl.value))
         }
 
         ; add subscribe
