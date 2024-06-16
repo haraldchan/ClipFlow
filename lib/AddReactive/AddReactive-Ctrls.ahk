@@ -142,6 +142,34 @@ class AddReactiveListView extends AddReactive {
     }
 }
 
+class AddReactiveDateTime extends AddReactive {
+    /**
+     * Add a reactive ListView control to Gui
+     * @param {Gui} GuiObject The target Gui Object.
+     * @param {string} options Options apply to the control, same as Gui.Add.
+     * @param {signal} depend Subscribed signal
+     * @param {[ event: Event, callback: ()=>void ]} [event] Events and callback function objects.
+     * @returns {AddReactiveDateTime}     
+     */
+    __New(GuiObject, options, depend := 0, event := 0) {
+        super.__New(GuiObject, "DateTime", options,, depend,, event)
+    }
+}
+
+class AddReactiveMonthCal extends AddReactive {
+    /**
+     * Add a reactive ListView control to Gui
+     * @param {Gui} GuiObject The target Gui Object.
+     * @param {string} options Options apply to the control, same as Gui.Add.
+     * @param {signal} depend Subscribed signal
+     * @param {[ event: Event, callback: ()=>void ]} [event] Events and callback function objects.
+     * @returns {AddReactiveMonthCal}     
+     */
+    __New(GuiObject, options, depend := 0, event := 0) {
+        super.__New(GuiObject, "MonthCal", options,, depend,, event)
+    }
+}
+
 ; mount to Gui.Prototype
 Gui.Prototype.AddReactiveText := AddReactiveText
 Gui.Prototype.AddReactiveEdit := AddReactiveEdit
@@ -151,3 +179,5 @@ Gui.Prototype.AddReactiveRadio := AddReactiveRadio
 Gui.Prototype.AddReactiveComboBox := AddReactiveComboBox
 Gui.Prototype.AddReactiveDropDownList := AddReactiveDropDownList
 Gui.Prototype.AddReactiveListView := AddReactiveListView
+Gui.Prototype.AddReactiveDateTime := AddReactiveDateTime
+Gui.Prototype.AddReactiveMonthCal := AddReactiveMonthCal
