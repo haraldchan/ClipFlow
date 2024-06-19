@@ -19,10 +19,10 @@ PMN_App(App, popupTitle, db, identifier) {
         "生日", "birthday",
     )
     effect(searchBy, () => App.getCtrlByName("searchBox").Value := "")
-    
+
     handleQuery(ctrlName, newVal) {
         updatedQuery := queryFilter.value.deepClone()
-        
+
         if (ctrlName = "date") {
             updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
         }
@@ -32,10 +32,10 @@ PMN_App(App, popupTitle, db, identifier) {
         if (ctrlName = "period") {
             updatedQuery["period"] := newVal = "" ? 1440 : newVal
         }
-        
+
         queryFilter.set(updatedQuery)
     }
-    
+
     currentGuest := signal(Map("idNum", 0))
     OnClipboardChange (*) => handleCaptured(identifier)
     handleCaptured(identifier) {
@@ -44,7 +44,7 @@ PMN_App(App, popupTitle, db, identifier) {
         }
 
         incomingGuest := JSON.parse(A_Clipboard)
-        
+
         if (currentGuest.value["idNum"] = incomingGuest["idNum"]) {
             handleGuestInfoUpdate(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
@@ -56,7 +56,7 @@ PMN_App(App, popupTitle, db, identifier) {
         }
 
         currentGuest.set(JSON.parse(A_Clipboard))
-        
+
         Sleep 500
         handleListContentUpdate()
 
@@ -105,7 +105,7 @@ PMN_App(App, popupTitle, db, identifier) {
                     "addr", "NO DATA"
                 )
             ])
-            return 
+            return
         }
 
         listContent.set(handleSearchByConditions(loadedItems))
@@ -163,13 +163,22 @@ PMN_App(App, popupTitle, db, identifier) {
                     }
                 }
             }
-        } else  {
+        } else if (searchBy.value = "birthday") {
+            bd := StrLen(searchInput) = 8
+                ? SubStr(searchInput, 1, 4) . "-" . SubStr(searchInput, 5, 2) . "-" . SubStr(searchInput, 7, 2)
+                : searchInput
+            for item in loadedItems {
+                if (InStr(item[searchBy.value], bd)) {
+                    filteredItems.InsertAt(1, item)
+                }
+            }
+        } else {
             for item in loadedItems {
                 if (InStr(item[searchBy.value], searchInput)) {
                     filteredItems.InsertAt(1, item)
                 }
             }
-        } 
+        }
 
         return filteredItems
     }
@@ -238,25 +247,24 @@ PMN_App(App, popupTitle, db, identifier) {
     )"
 
     return (
-        App.AddGroupBox("R17 w580 y+20"," "),
+        App.AddGroupBox("R17 w580 y+20", " "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
-            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
+        .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
         ; date
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
-            .OnEvent("Change", (ctrl, info) =>
-                handleQuery(ctrl.Name, ctrl.Value)
-                handleListContentUpdate()
-        ),
+        .OnEvent("Change", (ctrl, info) =>
+            handleQuery(ctrl.Name, ctrl.Value)
+            handleListContentUpdate()),
         ; search conditions
         App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "证件号码", "地址", "电话", "生日"])
-            .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
+        .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
         ; search box
         App.AddEdit("vsearchBox x+5 w100 h25")
-            .OnEvent("Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value)),
+        .OnEvent("Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value)),
         ; period
         App.AddText("x+10 yp+5 h20", "最近"),
         App.AddEdit("vperiod Number x+1 yp-5 w30 h25", queryFilter.value["period"])
-            .OnEvent("Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value)),
+        .OnEvent("Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value)),
         App.AddText("x+1 yp+5 h25", "分钟"),
         ; manual updating
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
