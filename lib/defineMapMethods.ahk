@@ -1,6 +1,7 @@
 defineMapMethods(_map) {
     _map.Prototype.keys := keys
     _map.Prototype.values := values
+    _map.Prototype.getKey := getKey
     _map.Prototype.deepClone := deepClone
 
     keys(_map) {
@@ -21,6 +22,14 @@ defineMapMethods(_map) {
         }
 
         return newArray
+    }
+
+    getKey(_map, value) {
+        for k, v in _map {
+            if (v = value) {
+                return k
+            }
+        }
     }
 
     deepClone(_map) {
