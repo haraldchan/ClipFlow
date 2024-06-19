@@ -184,7 +184,6 @@ class AddReactive {
         this.ctrlType := controlType
         this.GuiObject := GuiObject
         this.options := options
-        this.bind := InStr(options, "Bind")
         this.content := content
         this.depend := depend
         this.key := key
@@ -222,11 +221,6 @@ class AddReactive {
             this.ctrl.Value := this.depend.value ? this.depend.value : A_Now
         } else {
             this.ctrl := this.GuiObject.Add(this.ctrlType, this.options, this.innerText)
-        }
-
-        ; if options include "Bind", set binding event
-        if (this.depend != 0 && this.bing = true) {
-            this.ctrl.OnEvent("Change", (ctrl, info) => this.depend.set(ctrl.value))
         }
 
         ; add subscribe
@@ -359,6 +353,10 @@ class AddReactive {
 
     setEvent(event, callback) {
         this.ctrl.OnEvent(event, callback)
+    }
+
+    setFont(options := "", fontName := "Verdana") {
+        this.ctrl.setFont(options, fontName)
     }
 
     disable(state) {
