@@ -57,7 +57,7 @@ class useFileDB {
             return this.loadArchiveOneDay(queryDate)
         } else {
 			if (!FileExist(this.archive . "\" . queryDate . " - archive.json")) {
-				SetTimer(this.createArchive(queryDate), -100)
+				SetTimer(() => this.createArchive(queryDate), -100)
 				return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriod)
 			}
         }
@@ -85,7 +85,7 @@ class useFileDB {
 	}
 
 	createArchive(archiveDate) {
-		archiveData := JSON.stringify(this.load(, archiveDate, 60 * 24 * this.cleanPeriod))
+		archiveData := JSON.stringify(this.loadOneDay(, archiveDate, 60 * 24 * this.cleanPeriod))
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
 		FileAppend(archiveData, archiveFullPath, "UTF-8")
 	}
