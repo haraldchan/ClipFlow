@@ -57,7 +57,9 @@ class useFileDB {
             return this.loadArchiveOneDay(queryDate)
         } else {
 			if (!FileExist(this.archive . "\" . queryDate . " - archive.json")) {
-				SetTimer(() => this.createArchive(queryDate), -100)
+				if (DateDiff(A_Now, queryDate, "Days") > 0) {
+					SetTimer(() => this.createArchive(queryDate), -100)
+				}
 				return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriod)
 			}
         }
