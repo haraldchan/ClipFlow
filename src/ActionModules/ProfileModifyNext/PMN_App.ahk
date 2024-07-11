@@ -292,8 +292,8 @@ PMN_App(App, popupTitle, db, identifier) {
         period.OnEvent("LoseFocus", (*) => handleListContentUpdate())
     }
 
-    hotkeys() {
-        Hotkey "^f", (*) => App.getCtrlByName("searchBox").Focus()
+    setHotkeys() {
+        Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
     }
 
     helpInfo := "
@@ -339,6 +339,6 @@ PMN_App(App, popupTitle, db, identifier) {
         ; profile list
         GuestProfileList(App, listContent),
         addAddtionalEvents(),
-        hotkeys()
+        setHotkeys()
     )
 }
