@@ -45,12 +45,19 @@ PMN_App(App, popupTitle, db, identifier) {
 
         incomingGuest := JSON.parse(A_Clipboard)
 
+        ; updating from add guest modal
         if (currentGuest.value["idNum"] = incomingGuest["idNum"]) {
-            handleGuestInfoUpdate(incomingGuest)
+            handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
+
+        ; updating from saved guest modal
+        } else if (incomingGuest.Has('regTime')) {
+            handleGuestInfoUpdateFromMod(incomingGuest)
+            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
+
+        ; adding guest
         } else {
             incomingGuest["fileName"] := A_Now . A_MSec
-            ; save to db
             db.add(JSON.stringify(incomingGuest))
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
@@ -64,7 +71,7 @@ PMN_App(App, popupTitle, db, identifier) {
         A_Clipboard := clipHistory.Length > 1 ? clipHistory[1] : ""
     }
 
-    handleGuestInfoUpdate(captured) {
+    handleGuestInfoUpdateFromAdd(captured) {
         recentGuests := db.load()
         for guest in recentGuests {
             if (guest["idNum"] = captured["idNum"]) {
@@ -73,6 +80,66 @@ PMN_App(App, popupTitle, db, identifier) {
                 return
             }
         }
+    }
+
+    handleGuestInfoUpdateFromMod(updater) {
+        recentGuests := db.load()
+        matchedGuest := Map()
+        regTime := updater["regTime"]
+
+        if (updater["guestType"] = "内地旅客") {
+            nameFrag := StrReplace(updater["name"], "*", "")
+            birthday := updater["birthday"]
+            address := updater["addr"]
+
+            for guest in recentGuests {
+                if (
+                    SubStr(guest["name"], 1, 1) = nameFrag &&
+                    guest["birthday"] = birthday &&
+                    guest["addr"] = address &&
+                    SubStr(guest["fileName"], 0, 14) = regTime
+                ) {
+                    matchedGuest := guest
+                }
+            }
+        } else if (updater["guestType"] = "港澳台旅客") {
+            nameFrag := StrReplace(updater["name"], "*", "")
+            birthday := updater["birthday"]
+            region := updater["region"]
+
+            for guest in recentGuests {
+                if (
+                    SubStr(guest["name"], 1, 1) = nameFrag &&
+                    guest["birthday"] = birthday &&
+                    guest["region"] = region &&
+                    SubStr(guest["fileName"], 0, 14) = regTime
+                ) {
+                    matchedGuest := guest
+                }
+            }
+        } else {
+            nameLastFrag := StrReplace(updater["nameLast"], "*", "")
+            nameFirstFrag := StrReplace(updater["nameFirst"], "*", "")
+            idNumFrag := StrReplace(updater["idNum"], "*", "")
+            birthday := updater["birthday"]
+            country := updater["country"]
+
+            for guest in recentGuests {
+                if (
+                    SubStr(guest["nameLast"], 1, 1) = nameLastFrag &&
+                    SubStr(guest["nameFirst"], 1, 1) = nameFirstFrag &&
+                    SubStr(guest["idNum"], 1, 2) = idNumFrag
+                    guest["birthday"] = birthday &&
+                    guest["country"] = country &&
+                    SubStr(guest["fileName"], 0, 14) = regTime
+                ) {
+                    matchedGuest := guest
+                }
+            }
+        }
+
+        matchedGuest["roomNum"] := updater["roomNum"]
+        db.updateOne(guest["fileName"], queryFilter.value["date"], JSON.stringify(matchedGuest))
     }
 
     handleListContentUpdate() {
