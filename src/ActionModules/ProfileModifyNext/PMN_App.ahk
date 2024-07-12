@@ -46,18 +46,20 @@ PMN_App(App, popupTitle, db, identifier) {
         incomingGuest := JSON.parse(A_Clipboard)
 
         ; updating from add guest modal
-        if (currentGuest.value["idNum"] = incomingGuest["idNum"]) {
+        if (currentGuest.value["idNum"] = incomingGuest["idNum"] 
+            && !InStr(incomingGuest["idNum"], "*")
+        ) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
         ; updating from saved guest modal
-        } else if (incomingGuest.Has('regTime')) {
+        } else if (InStr(incomingGuest["name"], "*")) {
             handleGuestInfoUpdateFromMod(incomingGuest)
-            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
+            ; MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
         ; adding guest
         } else {
-            incomingGuest["fileName"] := A_Now . A_MSec
+            incomingGuest["fileName"] := incomingGuest["regTime"] . A_MSec
             db.add(JSON.stringify(incomingGuest))
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
@@ -84,7 +86,7 @@ PMN_App(App, popupTitle, db, identifier) {
 
     handleGuestInfoUpdateFromMod(updater) {
         recentGuests := db.load()
-        matchedGuest := Map()
+        matchedGuest := signal(Map())
         regTime := updater["regTime"]
 
         if (updater["guestType"] = "内地旅客") {
@@ -94,12 +96,15 @@ PMN_App(App, popupTitle, db, identifier) {
 
             for guest in recentGuests {
                 if (
-                    SubStr(guest["name"], 1, 1) = nameFrag &&
-                    guest["birthday"] = birthday &&
-                    guest["addr"] = address &&
-                    SubStr(guest["fileName"], 0, 14) = regTime
+                    SubStr(guest["name"], 1, 1) = nameFrag
+                    && guest["birthday"] = birthday 
+                    && guest["addr"] = address 
+                    && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
-                    matchedGuest := guest
+                    guest["roomNum"] := updater["roomNum"]
+                    guest["tel"] := updater["tel"]
+                    matchedGuest.set(guest)
+                    break
                 }
             }
         } else if (updater["guestType"] = "港澳台旅客") {
@@ -109,12 +114,15 @@ PMN_App(App, popupTitle, db, identifier) {
 
             for guest in recentGuests {
                 if (
-                    SubStr(guest["name"], 1, 1) = nameFrag &&
-                    guest["birthday"] = birthday &&
-                    guest["region"] = region &&
-                    SubStr(guest["fileName"], 0, 14) = regTime
+                    SubStr(guest["name"], 1, 1) = nameFrag 
+                    && guest["birthday"] = birthday 
+                    && guest["region"] = region 
+                    && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
-                    matchedGuest := guest
+                    guest["roomNum"] := updater["roomNum"]
+                    guest["tel"] := updater["tel"]
+                    matchedGuest.set(guest)
+                    break
                 }
             }
         } else {
@@ -126,20 +134,22 @@ PMN_App(App, popupTitle, db, identifier) {
 
             for guest in recentGuests {
                 if (
-                    SubStr(guest["nameLast"], 1, 1) = nameLastFrag &&
-                    SubStr(guest["nameFirst"], 1, 1) = nameFirstFrag &&
-                    SubStr(guest["idNum"], 1, 2) = idNumFrag
-                    guest["birthday"] = birthday &&
-                    guest["country"] = country &&
-                    SubStr(guest["fileName"], 0, 14) = regTime
+                    SubStr(guest["nameLast"], 1, 1) = nameLastFrag 
+                    && SubStr(guest["nameFirst"], 1, 1) = nameFirstFrag 
+                    && SubStr(guest["idNum"], 1, 2) = idNumFrag
+                    && guest["birthday"] = birthday 
+                    && guest["country"] = country 
+                    && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
-                    matchedGuest := guest
+                    guest["roomNum"] := updater["roomNum"]
+                    guest["tel"] := updater["tel"]
+                    matchedGuest.set(guest)
+                    break
                 }
             }
         }
 
-        matchedGuest["roomNum"] := updater["roomNum"]
-        db.updateOne(guest["fileName"], queryFilter.value["date"], JSON.stringify(matchedGuest))
+        db.updateOne(matchedGuest.value["fileName"], queryFilter.value["date"], JSON.stringify(matchedGuest.value))
     }
 
     handleListContentUpdate() {
