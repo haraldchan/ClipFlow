@@ -54,8 +54,8 @@ class PMN_FillIn {
         ; birthday
         bd := StrSplit(currentGuest["birthday"], "-")
         parsedInfo["birthday"] := bd[2] . bd[3] . bd[1]
-
-        ; debug.mb(parsedInfo)
+        ; tel number
+        parsedInfo["tel"] := currentGuest["tel"]
 
         return parsedInfo
     }
@@ -143,6 +143,19 @@ class PMN_FillIn {
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
+
+        if (guestProfileMap["tel"] != " ") {
+            MouseMove anchorX + 270, anchorY + 110
+            utils.waitLoading()
+            Click 3
+            Send "{Text}MOBILE"
+            utils.waitLoading()
+            Send "{Tab}"
+            utils.waitLoading()
+            Send Format("{Text}{1}", guestProfileMap["tel"])
+            utils.waitLoading()
+        }
+
         ; }
         if (guestProfileMap["nameAlt"] != " ") {
             ; { with hanzi name
@@ -150,8 +163,6 @@ class PMN_FillIn {
             MouseMove anchorX + 10, anchorY + 10 ; open alt name win
             utils.waitLoading()
             Click 1
-
-            ; this.waitAltWin(anchorX, anchorY)
             utils.waitLoading()
 
             Send Format("{Text}{1}", guestProfileMap["nameAlt"])
