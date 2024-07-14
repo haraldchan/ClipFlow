@@ -21,7 +21,7 @@ PMN_App(App, popupTitle, db, identifier) {
     effect(searchBy, () => App.getCtrlByName("searchBox").Value := "")
 
     handleQuery(ctrlName, newVal) {
-        updatedQuery := queryFilter.value.deepClone()
+        updatedQuery := queryFilter.value
 
         if (ctrlName = "date") {
             updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
@@ -304,6 +304,42 @@ PMN_App(App, popupTitle, db, identifier) {
 
     setHotkeys() {
         Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
+        Hotkey "!Left", (*) => toggleDate("-")
+        Hotkey "!Right", (*) => toggleDate("+")
+        Hotkey "!Up", (*) => togglePeriod("+")
+        Hotkey "!Down", (*) => togglePeriod("-")
+        
+        toggleDate(direction) {
+            diff := direction = "-" ? -1 : 1
+            
+            dt := App.getCtrlByType("DateTime")
+
+            currentDateTime := dt.Value
+            dt.Value := DateAdd(currentDateTime, diff, "Days")
+
+            updatedQuery := queryFilter.value
+            updatedQuery["date"] := FormatTime(dt.Value, "yyyyMMdd")
+
+            queryFilter.set(updatedQuery)
+            handleListContentUpdate()
+        }
+        
+        togglePeriod(direction) {            
+            p := App.getCtrlByName("period")
+            newPeriod := direction = "-" ? p.value - 10 : p.value + 10
+
+            if (newPeriod <= 0) {
+                return
+            }
+
+            p.value := newPeriod
+
+            updatedQuery := queryFilter.value
+            updatedQuery["period"] := p.value
+
+            queryFilter.set(updatedQuery)
+            handleListContentUpdate()
+        }
     }
 
     helpInfo := "
@@ -317,7 +353,9 @@ PMN_App(App, popupTitle, db, identifier) {
 
         ============= 快捷键 =============
 
-        Ctrl+F`t- 搜索框
+        Alt+左/右`t- 日期搜索翻页
+        Alt+上/下`t- 增减搜索时间  
+        Alt+F`t- 搜索框
         Alt+R`t- 根据条件搜索
         Enter`t- 填入信息到Profile
 
