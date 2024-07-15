@@ -46,18 +46,18 @@ PMN_App(App, popupTitle, db, identifier) {
         incomingGuest := JSON.parse(A_Clipboard)
 
         ; updating from add guest modal
-        if (currentGuest.value["idNum"] = incomingGuest["idNum"] 
+        if (currentGuest.value["idNum"] = incomingGuest["idNum"]
             && !InStr(incomingGuest["idNum"], "*")
         ) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
-        ; updating from saved guest modal
+            ; updating from saved guest modal
         } else if (InStr(incomingGuest["name"], "*")) {
             handleGuestInfoUpdateFromMod(incomingGuest)
             ; MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
-        ; adding guest
+            ; adding guest
         } else {
             incomingGuest["fileName"] := incomingGuest["regTime"] . A_MSec
             db.add(JSON.stringify(incomingGuest))
@@ -89,6 +89,20 @@ PMN_App(App, popupTitle, db, identifier) {
         matchedGuest := signal(Map())
         regTime := updater["regTime"]
 
+        handleUpdaterInfo(matchedGuest, guest, updater) {
+            items := updater.keys()
+
+            for item in items {
+                if (InStr(updater[item], "*")) {
+                    continue
+                }
+                
+                guest[item] := updater[item]
+            }
+
+            matchedGuest.set(guest)
+        }
+
         if (updater["guestType"] = "内地旅客") {
             nameFrag := StrReplace(updater["name"], "*", "")
             birthday := updater["birthday"]
@@ -97,13 +111,11 @@ PMN_App(App, popupTitle, db, identifier) {
             for guest in recentGuests {
                 if (
                     SubStr(guest["name"], 1, 1) = nameFrag
-                    && guest["birthday"] = birthday 
-                    && guest["addr"] = address 
+                    && guest["birthday"] = birthday
+                    && guest["addr"] = address
                     && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
-                    guest["roomNum"] := updater["roomNum"]
-                    guest["tel"] := updater["tel"]
-                    matchedGuest.set(guest)
+                    handleUpdaterInfo(matchedGuest, guest, updater)
                     break
                 }
             }
@@ -114,14 +126,12 @@ PMN_App(App, popupTitle, db, identifier) {
 
             for guest in recentGuests {
                 if (
-                    SubStr(guest["name"], 1, 1) = nameFrag 
-                    && guest["birthday"] = birthday 
-                    && guest["region"] = region 
+                    SubStr(guest["name"], 1, 1) = nameFrag
+                    && guest["birthday"] = birthday
+                    && guest["region"] = region
                     && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
-                    guest["roomNum"] := updater["roomNum"]
-                    guest["tel"] := updater["tel"]
-                    matchedGuest.set(guest)
+                    handleUpdaterInfo(matchedGuest, guest, updater)
                     break
                 }
             }
@@ -134,16 +144,14 @@ PMN_App(App, popupTitle, db, identifier) {
 
             for guest in recentGuests {
                 if (
-                    SubStr(guest["nameLast"], 1, 1) = nameLastFrag 
-                    && SubStr(guest["nameFirst"], 1, 1) = nameFirstFrag 
+                    SubStr(guest["nameLast"], 1, 1) = nameLastFrag
+                    && SubStr(guest["nameFirst"], 1, 1) = nameFirstFrag
                     && SubStr(guest["idNum"], 1, 2) = idNumFrag
-                    && guest["birthday"] = birthday 
-                    && guest["country"] = country 
+                    && guest["birthday"] = birthday
+                    && guest["country"] = country
                     && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
-                    guest["roomNum"] := updater["roomNum"]
-                    guest["tel"] := updater["tel"]
-                    matchedGuest.set(guest)
+                    handleUpdaterInfo(matchedGuest, guest, updater)
                     break
                 }
             }
@@ -308,10 +316,10 @@ PMN_App(App, popupTitle, db, identifier) {
         Hotkey "!Right", (*) => toggleDate("+")
         Hotkey "!Up", (*) => togglePeriod("+")
         Hotkey "!Down", (*) => togglePeriod("-")
-        
+
         toggleDate(direction) {
             diff := direction = "-" ? -1 : 1
-            
+
             dt := App.getCtrlByType("DateTime")
 
             currentDateTime := dt.Value
@@ -323,8 +331,8 @@ PMN_App(App, popupTitle, db, identifier) {
             queryFilter.set(updatedQuery)
             handleListContentUpdate()
         }
-        
-        togglePeriod(direction) {            
+
+        togglePeriod(direction) {
             p := App.getCtrlByName("period")
             newPeriod := direction = "-" ? p.value - 10 : p.value + 10
 
