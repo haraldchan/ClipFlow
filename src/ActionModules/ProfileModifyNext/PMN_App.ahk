@@ -85,7 +85,7 @@ PMN_App(App, popupTitle, db, identifier) {
     }
 
     handleGuestInfoUpdateFromMod(updater) {
-        recentGuests := db.load()
+        recentGuests := db.load(,, 480) ; load guests within 8hrs(a shift)
         matchedGuest := signal(Map())
         regTime := updater["regTime"]
 
@@ -93,6 +93,7 @@ PMN_App(App, popupTitle, db, identifier) {
             items := updater.keys()
 
             for item in items {
+                ; if not include "*" (valid info), update guest[item]
                 if (InStr(updater[item], "*")) {
                     continue
                 }
@@ -104,15 +105,11 @@ PMN_App(App, popupTitle, db, identifier) {
         }
 
         if (updater["guestType"] = "内地旅客") {
-            nameFrag := StrReplace(updater["name"], "*", "")
-            birthday := updater["birthday"]
-            address := updater["addr"]
-
             for guest in recentGuests {
                 if (
-                    SubStr(guest["name"], 1, 1) = nameFrag
-                    && guest["birthday"] = birthday
-                    && guest["addr"] = address
+                    SubStr(guest["name"], 1, 1) = StrReplace(updater["name"], "*", "")
+                    && guest["birthday"] = updater["birthday"]
+                    && guest["addr"] = updater["addr"]
                     && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
                     handleUpdaterInfo(matchedGuest, guest, updater)
@@ -120,15 +117,11 @@ PMN_App(App, popupTitle, db, identifier) {
                 }
             }
         } else if (updater["guestType"] = "港澳台旅客") {
-            nameFrag := StrReplace(updater["name"], "*", "")
-            birthday := updater["birthday"]
-            region := updater["region"]
-
             for guest in recentGuests {
                 if (
-                    SubStr(guest["name"], 1, 1) = nameFrag
-                    && guest["birthday"] = birthday
-                    && guest["region"] = region
+                    SubStr(guest["name"], 1, 1) = StrReplace(updater["name"], "*", "")
+                    && guest["birthday"] = updater["birthday"]
+                    && guest["region"] = updater["region"]
                     && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
                     handleUpdaterInfo(matchedGuest, guest, updater)
@@ -136,19 +129,13 @@ PMN_App(App, popupTitle, db, identifier) {
                 }
             }
         } else {
-            nameLastFrag := StrReplace(updater["nameLast"], "*", "")
-            nameFirstFrag := StrReplace(updater["nameFirst"], "*", "")
-            idNumFrag := StrReplace(updater["idNum"], "*", "")
-            birthday := updater["birthday"]
-            country := updater["country"]
-
             for guest in recentGuests {
                 if (
-                    SubStr(guest["nameLast"], 1, 1) = nameLastFrag
-                    && SubStr(guest["nameFirst"], 1, 1) = nameFirstFrag
-                    && SubStr(guest["idNum"], 1, 2) = idNumFrag
-                    && guest["birthday"] = birthday
-                    && guest["country"] = country
+                    SubStr(guest["nameLast"], 1, 1) = StrReplace(updater["nameLast"], "*", "")
+                    && SubStr(guest["nameFirst"], 1, 1) = StrReplace(updater["nameFirst"], "*", "")
+                    && SubStr(guest["idNum"], 1, 2) = StrReplace(updater["idNum"], "*", "")
+                    && guest["birthday"] = updater["birthday"]
+                    && guest["country"] = updater["country"]
                     && SubStr(guest["fileName"], 1, 12) = regTime
                 ) {
                     handleUpdaterInfo(matchedGuest, guest, updater)
