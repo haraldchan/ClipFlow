@@ -53,7 +53,7 @@ PMN_App(App, popupTitle, db, identifier) {
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
             ; updating from saved guest modal
-        } else if (InStr(incomingGuest["name"], "*")) {
+        } else if (InStr(incomingGuest["idNum"], "*")) {
             handleGuestInfoUpdateFromMod(incomingGuest)
             ; MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
@@ -93,11 +93,10 @@ PMN_App(App, popupTitle, db, identifier) {
             items := updater.keys()
 
             for item in items {
-                ; if not include "*" (valid info), update guest[item]
                 if (InStr(updater[item], "*")) {
                     continue
-                }
-                
+                } 
+
                 guest[item] := updater[item]
             }
 
@@ -107,7 +106,7 @@ PMN_App(App, popupTitle, db, identifier) {
         if (updater["guestType"] = "内地旅客") {
             for guest in recentGuests {
                 if (
-                    SubStr(guest["name"], 1, 1) = StrReplace(updater["name"], "*", "")
+                    SubStr(guest["name"], 1, 1) = SubStr(guest["name"], 1, 1)
                     && guest["birthday"] = updater["birthday"]
                     && guest["addr"] = updater["addr"]
                     && SubStr(guest["fileName"], 1, 12) = regTime
@@ -119,7 +118,7 @@ PMN_App(App, popupTitle, db, identifier) {
         } else if (updater["guestType"] = "港澳台旅客") {
             for guest in recentGuests {
                 if (
-                    SubStr(guest["name"], 1, 1) = StrReplace(updater["name"], "*", "")
+                    SubStr(guest["name"], 1, 1) = SubStr(guest["name"], 1, 1)
                     && guest["birthday"] = updater["birthday"]
                     && guest["region"] = updater["region"]
                     && SubStr(guest["fileName"], 1, 12) = regTime
@@ -131,8 +130,8 @@ PMN_App(App, popupTitle, db, identifier) {
         } else {
             for guest in recentGuests {
                 if (
-                    SubStr(guest["nameLast"], 1, 1) = StrReplace(updater["nameLast"], "*", "")
-                    && SubStr(guest["nameFirst"], 1, 1) = StrReplace(updater["nameFirst"], "*", "")
+                    SubStr(guest["nameLast"], 1, 1) = SubStr(guest["nameLast"], 1, 1)
+                    && SubStr(guest["nameFirst"], 1, 1) = SubStr(guest["nameFirst"], 1, 1)
                     && SubStr(guest["idNum"], 1, 2) = StrReplace(updater["idNum"], "*", "")
                     && guest["birthday"] = updater["birthday"]
                     && guest["country"] = updater["country"]
@@ -298,7 +297,7 @@ PMN_App(App, popupTitle, db, identifier) {
     }
 
     setHotkeys() {
-        Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
+        Hotkey "!s", (*) => App.getCtrlByName("searchBox").Focus()
         Hotkey "!Left", (*) => toggleDate("-")
         Hotkey "!Right", (*) => toggleDate("+")
         Hotkey "!Up", (*) => togglePeriod("+")
@@ -350,7 +349,7 @@ PMN_App(App, popupTitle, db, identifier) {
 
         Alt+左/右`t- 日期搜索翻页
         Alt+上/下`t- 增减搜索时间  
-        Alt+F`t- 搜索框
+        Alt+S`t- 搜索框
         Alt+R`t- 根据条件搜索
         Enter`t- 填入信息到Profile
 
