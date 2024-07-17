@@ -2,7 +2,7 @@
 #Include "./GuestProfileDetails.ahk"
 #Include "./PMN_FillIn.ahk"
 
-PMN_App(App, popupTitle, db, identifier) {
+PMN_App(App, moduleTitle, db, identifier) {
     listContent := signal(db.load())
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
@@ -297,7 +297,8 @@ PMN_App(App, popupTitle, db, identifier) {
     }
 
     setHotkeys() {
-        Hotkey "!s", (*) => App.getCtrlByName("searchBox").Focus()
+        HotIfWinActive(popupTitle)
+        Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
         Hotkey "!Left", (*) => toggleDate("-")
         Hotkey "!Right", (*) => toggleDate("+")
         Hotkey "!Up", (*) => togglePeriod("+")
@@ -357,7 +358,7 @@ PMN_App(App, popupTitle, db, identifier) {
 
     return (
         App.AddGroupBox("R17 w580 y+20", " "),
-        App.AddText("xp15 ", popupTitle . " ⓘ ")
+        App.AddText("xp15 ", moduleTitle . " ⓘ ")
         .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
         ; date
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
