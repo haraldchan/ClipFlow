@@ -53,9 +53,9 @@ PMN_App(App, moduleTitle, db, identifier) {
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
             ; updating from saved guest modal
-        } else if (InStr(incomingGuest["idNum"], "*")) {
+        } else if (incomingGuest["isMod"] = true) {
             handleGuestInfoUpdateFromMod(incomingGuest)
-            ; MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
+            MsgBox(Format("已保存修改：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
             ; adding guest
         } else {
