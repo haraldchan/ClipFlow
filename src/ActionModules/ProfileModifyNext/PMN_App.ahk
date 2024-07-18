@@ -87,7 +87,6 @@ PMN_App(App, moduleTitle, db, identifier) {
     handleGuestInfoUpdateFromMod(updater) {
         recentGuests := db.load(,, 480) ; load guests within 8hrs(a shift)
         matchedGuest := signal(Map())
-        regTime := updater["regTime"]
 
         handleUpdaterInfo(matchedGuest, guest, updater) {
             items := updater.keys()
@@ -103,39 +102,40 @@ PMN_App(App, moduleTitle, db, identifier) {
             matchedGuest.set(guest)
         }
 
-        if (updater["guestType"] = "内地旅客") {
-            for guest in recentGuests {
+        for guest in recentGuests {
+
+            if (guest["guestType"] != updater["guestType"]) {
+                continue
+            }
+
+            if (updater["guestType"] = "内地旅客") {
                 if (
-                    SubStr(guest["name"], 1, 1) = SubStr(guest["name"], 1, 1)
+                    SubStr(guest["name"], 1, 1) = SubStr(updater["name"], 1, 1)
                     && guest["birthday"] = updater["birthday"]
                     && guest["addr"] = updater["addr"]
-                    && SubStr(guest["fileName"], 1, 12) = regTime
+                    && guest["regTime"] = updater["regTime"]
                 ) {
                     handleUpdaterInfo(matchedGuest, guest, updater)
                     break
                 }
-            }
-        } else if (updater["guestType"] = "港澳台旅客") {
-            for guest in recentGuests {
+            } else if (updater["guestType"] = "港澳台旅客") {
                 if (
-                    SubStr(guest["name"], 1, 1) = SubStr(guest["name"], 1, 1)
+                    SubStr(guest["name"], 1, 1) = SubStr(updater["name"], 1, 1)
                     && guest["birthday"] = updater["birthday"]
                     && guest["region"] = updater["region"]
-                    && SubStr(guest["fileName"], 1, 12) = regTime
+                    && guest["regTime"] = updater["regTime"]
                 ) {
                     handleUpdaterInfo(matchedGuest, guest, updater)
                     break
                 }
-            }
-        } else {
-            for guest in recentGuests {
+            } else if (updater["guestType"] = "国外旅客"){
                 if (
-                    SubStr(guest["nameLast"], 1, 1) = SubStr(guest["nameLast"], 1, 1)
-                    && SubStr(guest["nameFirst"], 1, 1) = SubStr(guest["nameFirst"], 1, 1)
-                    && SubStr(guest["idNum"], 1, 2) = StrReplace(updater["idNum"], "*", "")
+                    SubStr(guest["nameLast"], 1, 1) = SubStr(updater["nameLast"], 1, 1)
+                    && SubStr(guest["nameFirst"], 1, 1) = SubStr(updater["nameFirst"], 1, 1)
+                    && SubStr(guest["idNum"], 1, 2) = SubStr(updater["idNum"], 1, 2)
                     && guest["birthday"] = updater["birthday"]
                     && guest["country"] = updater["country"]
-                    && SubStr(guest["fileName"], 1, 12) = regTime
+                    && guest["regTime"] = updater["regTime"]
                 ) {
                     handleUpdaterInfo(matchedGuest, guest, updater)
                     break
@@ -350,7 +350,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         Alt+左/右`t- 日期搜索翻页
         Alt+上/下`t- 增减搜索时间  
-        Alt+S`t- 搜索框
+        Alt+F`t- 搜索框
         Alt+R`t- 根据条件搜索
         Enter`t- 填入信息到Profile
 
