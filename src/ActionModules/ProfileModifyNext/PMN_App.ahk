@@ -54,8 +54,8 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             ; updating from saved guest modal
         } else if (incomingGuest["isMod"] = true) {
-            handleGuestInfoUpdateFromMod(incomingGuest)
-            MsgBox(Format("已保存修改：{1}", incomingGuest["name"]), popupTitle, "T1.5")
+            updatedGuest := handleGuestInfoUpdateFromMod(incomingGuest)
+            MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), popupTitle, "T1.5")
 
             ; adding guest
         } else {
@@ -144,6 +144,8 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         db.updateOne(matchedGuest.value["fileName"], queryFilter.value["date"], JSON.stringify(matchedGuest.value))
+
+        return matchedGuest.value
     }
 
     handleListContentUpdate() {
@@ -298,11 +300,11 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     setHotkeys() {
         HotIfWinActive(popupTitle)
-        Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
-        Hotkey "!Left", (*) => toggleDate("-")
-        Hotkey "!Right", (*) => toggleDate("+")
-        Hotkey "!Up", (*) => togglePeriod("+")
-        Hotkey "!Down", (*) => togglePeriod("-")
+            Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
+            Hotkey "!Left", (*) => toggleDate("-")
+            Hotkey "!Right", (*) => toggleDate("+")
+            Hotkey "!Up", (*) => togglePeriod("+")
+            Hotkey "!Down", (*) => togglePeriod("-")
 
         toggleDate(direction) {
             diff := direction = "-" ? -1 : 1
