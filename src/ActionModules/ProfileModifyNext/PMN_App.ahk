@@ -52,12 +52,12 @@ PMN_App(App, moduleTitle, db, identifier) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
-            ; updating from saved guest modal
+        ; updating from saved guest modal
         } else if (incomingGuest["isMod"] = true) {
             updatedGuest := handleGuestInfoUpdateFromMod(incomingGuest)
             MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), popupTitle, "T1.5")
 
-            ; adding guest
+        ; adding guest
         } else {
             incomingGuest["fileName"] := incomingGuest["regTime"] . A_MSec
             db.add(JSON.stringify(incomingGuest))
@@ -143,7 +143,12 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
         }
 
-        db.updateOne(matchedGuest.value["fileName"], queryFilter.value["date"], JSON.stringify(matchedGuest.value))
+        try {
+            db.updateOne(matchedGuest.value["fileName"], queryFilter.value["date"], JSON.stringify(matchedGuest.value))
+        } catch {
+            MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
+            return
+        }
 
         return matchedGuest.value
     }
