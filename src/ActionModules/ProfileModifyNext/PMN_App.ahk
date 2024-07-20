@@ -59,7 +59,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; adding guest
         } else {
-            incomingGuest["fileName"] := incomingGuest["regTime"] . A_MSec
+            incomingGuest["fileName"] := incomingGuest["regTime"] . A_Sec . A_MSec
             db.add(JSON.stringify(incomingGuest))
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
@@ -89,15 +89,17 @@ PMN_App(App, moduleTitle, db, identifier) {
         matchedGuest := signal(Map())
 
         handleUpdaterInfo(matchedGuest, guest, updater) {
-            items := updater.keys()
+            ; items := updater.keys()
 
-            for item in items {
-                if (InStr(updater[item], "*")) {
-                    continue
-                } 
+            ; for item in items {
+            ;     if (InStr(updater[item], "*")) {
+            ;         continue
+            ;     } 
 
-                guest[item] := updater[item]
-            }
+            ;     guest[item] := updater[item]
+            ; }
+            guest["tel"] := updater["tel"]
+            guest["roomNum"] := updater["roomNum"]
 
             matchedGuest.set(guest)
         }
