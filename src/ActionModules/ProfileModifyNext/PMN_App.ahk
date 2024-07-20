@@ -123,6 +123,10 @@ PMN_App(App, moduleTitle, db, identifier) {
             } else if (updater["guestType"] = "港澳台旅客") {
                 if (
                     SubStr(guest["name"], 1, 1) = SubStr(updater["name"], 1, 1)
+                    && guest["nameLast"].Length = updater["nameLast"].Length
+                    && SubStr(guest["nameFirst"], 1, 1) = SubStr(updater["nameFirst"], 1, 1)
+                    && guest["nameFirst"].Length = updater["nameFirst"].Length
+                    && SubStr(guest["idNum"], 1, 2) = SubStr(updater["idNum"], 1, 2)
                     && guest["birthday"] = updater["birthday"]
                     && guest["region"] = updater["region"]
                     && guest["regTime"] = updater["regTime"]
@@ -133,7 +137,9 @@ PMN_App(App, moduleTitle, db, identifier) {
             } else if (updater["guestType"] = "国外旅客"){
                 if (
                     SubStr(guest["nameLast"], 1, 1) = SubStr(updater["nameLast"], 1, 1)
+                    && guest["nameLast"].Length = updater["nameLast"].Length
                     && SubStr(guest["nameFirst"], 1, 1) = SubStr(updater["nameFirst"], 1, 1)
+                    && guest["nameFirst"].Length = updater["nameFirst"].Length
                     && SubStr(guest["idNum"], 1, 2) = SubStr(updater["idNum"], 1, 2)
                     && guest["birthday"] = updater["birthday"]
                     && guest["country"] = updater["country"]
