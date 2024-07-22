@@ -52,12 +52,12 @@ PMN_App(App, moduleTitle, db, identifier) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
-        ; updating from saved guest modal
+            ; updating from saved guest modal
         } else if (incomingGuest["isMod"] = true) {
             updatedGuest := handleGuestInfoUpdateFromMod(incomingGuest)
             MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), popupTitle, "T1.5")
 
-        ; adding guest
+            ; adding guest
         } else {
             incomingGuest["fileName"] := incomingGuest["regTime"] . A_Sec . A_MSec
             db.add(JSON.stringify(incomingGuest))
@@ -85,69 +85,82 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleGuestInfoUpdateFromMod(updater) {
-        recentGuests := db.load(,, 480) ; load guests within 8hrs(a shift)
+        recentGuests := db.load(, , 480) ; load guests within 8hrs(a shift)
         matchedGuest := signal(Map())
+        items := updater.keys()
 
-        handleUpdaterInfo(matchedGuest, guest, updater) {
-            ; items := updater.keys()
+        ; handleUpdaterInfo(matchedGuest, guest, updater) {
+        ;     items := updater.keys()
 
-            ; for item in items {
-            ;     if (InStr(updater[item], "*")) {
-            ;         continue
-            ;     } 
+        ;     for item in items {
+        ;         if (InStr(updater[item], "*")) {
+        ;             continue
+        ;         }
 
-            ;     guest[item] := updater[item]
-            ; }
-            guest["tel"] := updater["tel"]
-            guest["roomNum"] := updater["roomNum"]
+        ;         guest[item] := updater[item]
+        ;     }
+        ;     ; guest["tel"] := updater["tel"]
+        ;     ; guest["roomNum"] := updater["roomNum"]
 
-            matchedGuest.set(guest)
-        }
+        ;     matchedGuest.set(guest)
+        ; }
 
         for guest in recentGuests {
 
-            if (guest["guestType"] != updater["guestType"]) {
-                continue
-            }
+            ; if (guest["guestType"] != updater["guestType"]) {
+            ;     continue
+            ; }
 
-            if (updater["guestType"] = "内地旅客") {
-                if (
-                    SubStr(guest["name"], 1, 1) = SubStr(updater["name"], 1, 1)
-                    && guest["birthday"] = updater["birthday"]
-                    && guest["addr"] = updater["addr"]
-                    && guest["regTime"] = updater["regTime"]
-                ) {
-                    handleUpdaterInfo(matchedGuest, guest, updater)
-                    break
+            ; if (updater["guestType"] = "内地旅客") {
+            ;     if (
+            ;         SubStr(guest["name"], 1, 1) = SubStr(updater["name"], 1, 1)
+            ;         && guest["birthday"] = updater["birthday"]
+            ;         && guest["addr"] = updater["addr"]
+            ;         && guest["regTime"] = updater["regTime"]
+            ;     ) {
+            ;         handleUpdaterInfo(matchedGuest, guest, updater)
+            ;         break
+            ;     }
+            ; } else if (updater["guestType"] = "港澳台旅客") {
+            ;     if (
+            ;         SubStr(guest["name"], 1, 1) = SubStr(updater["name"], 1, 1)
+            ;         && guest["nameLast"].Length = updater["nameLast"].Length
+            ;         && SubStr(guest["nameFirst"], 1, 1) = SubStr(updater["nameFirst"], 1, 1)
+            ;         && guest["nameFirst"].Length = updater["nameFirst"].Length
+            ;         && SubStr(guest["idNum"], 1, 2) = SubStr(updater["idNum"], 1, 2)
+            ;         && guest["birthday"] = updater["birthday"]
+            ;         && guest["region"] = updater["region"]
+            ;         && guest["regTime"] = updater["regTime"]
+            ;     ) {
+            ;         handleUpdaterInfo(matchedGuest, guest, updater)
+            ;         break
+            ;     }
+            ; } else if (updater["guestType"] = "国外旅客") {
+            ;     if (
+            ;         SubStr(guest["nameLast"], 1, 1) = SubStr(updater["nameLast"], 1, 1)
+            ;         && guest["nameLast"].Length = updater["nameLast"].Length
+            ;         && SubStr(guest["nameFirst"], 1, 1) = SubStr(updater["nameFirst"], 1, 1)
+            ;         && guest["nameFirst"].Length = updater["nameFirst"].Length
+            ;         && SubStr(guest["idNum"], 1, 2) = SubStr(updater["idNum"], 1, 2)
+            ;         && guest["birthday"] = updater["birthday"]
+            ;         && guest["country"] = updater["country"]
+            ;         && guest["regTime"] = updater["regTime"]
+            ;     ) {
+            ;         handleUpdaterInfo(matchedGuest, guest, updater)
+            ;         break
+            ;     }
+            ; }
+
+            if (guest["tsId"] = updater["tsId"]) {
+                for item in items {
+                    if (InStr(updater[item], "*")) {
+                        continue
+                    }
+
+                    guest[item] := updater[item]
                 }
-            } else if (updater["guestType"] = "港澳台旅客") {
-                if (
-                    SubStr(guest["name"], 1, 1) = SubStr(updater["name"], 1, 1)
-                    && guest["nameLast"].Length = updater["nameLast"].Length
-                    && SubStr(guest["nameFirst"], 1, 1) = SubStr(updater["nameFirst"], 1, 1)
-                    && guest["nameFirst"].Length = updater["nameFirst"].Length
-                    && SubStr(guest["idNum"], 1, 2) = SubStr(updater["idNum"], 1, 2)
-                    && guest["birthday"] = updater["birthday"]
-                    && guest["region"] = updater["region"]
-                    && guest["regTime"] = updater["regTime"]
-                ) {
-                    handleUpdaterInfo(matchedGuest, guest, updater)
-                    break
-                }
-            } else if (updater["guestType"] = "国外旅客"){
-                if (
-                    SubStr(guest["nameLast"], 1, 1) = SubStr(updater["nameLast"], 1, 1)
-                    && guest["nameLast"].Length = updater["nameLast"].Length
-                    && SubStr(guest["nameFirst"], 1, 1) = SubStr(updater["nameFirst"], 1, 1)
-                    && guest["nameFirst"].Length = updater["nameFirst"].Length
-                    && SubStr(guest["idNum"], 1, 2) = SubStr(updater["idNum"], 1, 2)
-                    && guest["birthday"] = updater["birthday"]
-                    && guest["country"] = updater["country"]
-                    && guest["regTime"] = updater["regTime"]
-                ) {
-                    handleUpdaterInfo(matchedGuest, guest, updater)
-                    break
-                }
+
+                matchedGuest.set(guest)
             }
         }
 
@@ -207,52 +220,52 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         if (searchBy.value = "nameRoom") {
             typeConvert(content) {
-                converted := ""
-                try {
-                    converted := Number(content)
-                } catch {
-                    converted := content
-                }
-                return converted
+            converted := ""
+            try {
+                converted := Number(content)
+            } catch {
+                converted := content
             }
+            return converted
+        }
 
-            if (typeConvert(searchInput) is Number) {
-                ; searching by room number
-                for item in loadedItems {
-                    if (InStr(item["roomNum"], searchInput)) {
+        if (typeConvert(searchInput) is Number) {
+            ; searching by room number
+            for item in loadedItems {
+                if (InStr(item["roomNum"], searchInput)) {
+                    filteredItems.InsertAt(1, item)
+                }
+            }
+        } else {
+            ; searching by name fragment
+            for item in loadedItems {
+                if (item["guestType"] = "内地旅客") {
+                    ; from mainland
+                    if (InStr(item["name"], searchInput)) {
+                        filteredItems.InsertAt(1, item)
+                    }
+                } else if (item["guestType"] = "港澳台旅客") {
+                    ; from HK/MO/TW
+                    if (InStr(item["name"], searchInput) ||
+                        InStr(item["nameLast"], searchInput, "Off") ||
+                        InStr(item["nameFirst"], searchInput, "Off")
+                    ) {
+                        filteredItems.InsertAt(1, item)
+                    }
+                } else {
+                    ; from abroad
+                    if (InStr(item["nameLast"], searchInput, "Off") ||
+                        InStr(item["nameFirst"], searchInput, "Off")
+                    ) {
                         filteredItems.InsertAt(1, item)
                     }
                 }
-            } else {
-                ; searching by name fragment
-                for item in loadedItems {
-                    if (item["guestType"] = "内地旅客") {
-                        ; from mainland
-                        if (InStr(item["name"], searchInput)) {
-                            filteredItems.InsertAt(1, item)
-                        }
-                    } else if (item["guestType"] = "港澳台旅客") {
-                        ; from HK/MO/TW
-                        if (InStr(item["name"], searchInput) ||
-                            InStr(item["nameLast"], searchInput, "Off") ||
-                            InStr(item["nameFirst"], searchInput, "Off")
-                        ) {
-                            filteredItems.InsertAt(1, item)
-                        }
-                    } else {
-                        ; from abroad
-                        if (InStr(item["nameLast"], searchInput, "Off") ||
-                            InStr(item["nameFirst"], searchInput, "Off")
-                        ) {
-                            filteredItems.InsertAt(1, item)
-                        }
-                    }
-                }
             }
+        }
         } else if (searchBy.value = "birthday") {
             bd := StrLen(searchInput) = 8
                 ? SubStr(searchInput, 1, 4) . "-" . SubStr(searchInput, 5, 2) . "-" . SubStr(searchInput, 7, 2)
-                : searchInput
+                    : searchInput
             for item in loadedItems {
                 if (InStr(item[searchBy.value], bd)) {
                     filteredItems.InsertAt(1, item)
@@ -313,11 +326,11 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     setHotkeys() {
         HotIfWinActive(popupTitle)
-            Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
-            Hotkey "!Left", (*) => toggleDate("-")
-            Hotkey "!Right", (*) => toggleDate("+")
-            Hotkey "!Up", (*) => togglePeriod("+")
-            Hotkey "!Down", (*) => togglePeriod("-")
+        Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
+        Hotkey "!Left", (*) => toggleDate("-")
+        Hotkey "!Right", (*) => toggleDate("+")
+        Hotkey "!Up", (*) => togglePeriod("+")
+        Hotkey "!Down", (*) => togglePeriod("-")
 
         toggleDate(direction) {
             diff := direction = "-" ? -1 : 1
