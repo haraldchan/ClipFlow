@@ -107,24 +107,26 @@ class BatchData {
     }
 
     static getDepartures(xmlPath) {
-        departedGuests := []
         xmlDoc := ComObject("msxml2.DOMDocument.6.0")
         xmlDoc.async := false
         xmlDoc.load(xmlPath)
+
+        departedGuests := []
+
         roomElements := xmlDoc.getElementsByTagName("ROOM")
         arrivalElements := xmlDoc.getElementsByTagName("ARRIVAL")
         nameElements := xmlDoc.getElementsByTagName("GUEST_NAME") 
 
 
         loop roomElements.Length {
-            try { ; parsing will be error somehow, yet it is readable
+            ; try { ; parsing will be error somehow, yet it is readable
                 roomNum := roomElements[A_Index - 1].ChildNodes[0].nodeValue
                 arrival := StrSplit(arrivalElements[A_Index - 1].ChildNodes[0].nodeValue, "-")
                 ciDate := "20" . arrival[3] . arrival[1] . arrival[2]
                 fullname := nameElements[A_Index - 1].ChildNodes[0].nodeValue
                 nameLast := StrReplace(StrSplit(fullname, ",")[1], "*", "")
                 nameFirst := StrSplit(fullname, ",")[2]
-            }
+            ; }
 
             departedGuests.Push(Map(
                 "roomNum", roomNum,
@@ -147,14 +149,14 @@ class BatchData {
         guestInfosByDay := []
         today := FormatTime(A_Now, "yyyyMMdd")
         loop SEARCH_DAYS {
-            try{
+            ; try{
                 archiveDate := FormatTime(DateAdd(today, 0 - A_Index, "Days"), "yyyyMMdd")
                 guestInfosByDay.Push(
                     Map("date", archiveDate, 
                         "infoList", db.loadArchiveOneDay(archiveDate)
                     )
                 )       
-            }
+            ; }
         }
 
         guestIds := []
@@ -162,13 +164,13 @@ class BatchData {
             dGuest.set(depGuest)
 
             for day in guestInfosByDay {
-                if (day["date"] = depGuest["ciDate"]) {
+                ; if (day["date"] = depGuest["ciDate"]) {
                     target := day["infoList"].find(guest => this.matchGuest(guest, dGuest.value))
                     if (target != "") { 
                         guestIds.Push(target)
                         break
-                    }                     
-                }
+                    }
+                ; }
             }
         }
 
