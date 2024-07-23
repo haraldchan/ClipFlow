@@ -47,7 +47,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; updating from add guest modal
         if (currentGuest.value["idNum"] = incomingGuest["idNum"]
-            && !InStr(incomingGuest["idNum"], "*")
+            && incomingGuest["isMod"] = false
         ) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
@@ -62,7 +62,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; adding guest
         } else {
-            incomingGuest["fileName"] := incomingGuest["regTime"] . A_Sec . A_MSec
+            incomingGuest["fileName"] := A_Now . A_MSec
             db.add(JSON.stringify(incomingGuest))
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
