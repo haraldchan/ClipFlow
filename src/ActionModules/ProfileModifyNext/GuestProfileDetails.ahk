@@ -1,6 +1,6 @@
 GuestProfileDetails(selectedGuest, fillIn, App) {
-    ProfileDetails := Gui("+AlwaysOnTop", "Profile Details")
-    ProfileDetails.SetFont(, "微软雅黑")
+    Profile := Gui("+AlwaysOnTop", "Profile Details")
+    Profile.SetFont(, "微软雅黑")
 
     fieldIndex := Map(
         "addr", "地址",
@@ -16,23 +16,21 @@ GuestProfileDetails(selectedGuest, fillIn, App) {
     )
 
     listInitialize(selectedGuest, fieldIndex) {
-        LV := ProfileDetails.getCtrlByType("ListView")
+        LV := Profile.getCtrlByType("ListView")
 
         for key, field in fieldIndex {
             val := selectedGuest.has(key) ? selectedGuest[key] : ""
-            LV.Add(, field, val)
-        }
-    }
+            if (key = "fileName") {
+                y := SubStr(val, 1, 4)
+                m := SubStr(val, 5, 2)
+                d := SubStr(val, 7, 2)
+                h := SubStr(val, 9, 2)
+                min := SubStr(val, 11, 2)
 
-    updateList(curGuest, fieldIndex) {
-        LV := ProfileDetails.getCtrlByType("ListView")
-        
-        for k, v in curGuest {
-            if (k = "fileName") {
-                v := FormatTime(SubStr(v, 1, 14), "yyyy/MM/dd HH:mm")
+                val := Format("{1}/{2}/{3} {4}:{5}", y, m, d, h, min)
             }
 
-            LV.Modify(A_Index, , fieldIndex[k], v)
+            LV.Add(, field, val)
         }
     }
 
@@ -43,15 +41,15 @@ GuestProfileDetails(selectedGuest, fillIn, App) {
     }
 
     fillInPms(){
-        ProfileDetails.Destroy()
+        profile.Destroy()
         fillIn(App)
     }
 
     return (
-        ProfileDetails.AddListView("vguestProfile LV0x4000 Grid w230 r10", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
+        Profile.AddListView("vguestProfile LV0x4000 Grid w230 r10", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
         listInitialize(selectedGuest, fieldIndex),
-        ProfileDetails.AddButton("h30 w110", "关 闭 (&C)").OnEvent("Click", (*) => ProfileDetails.Destroy()),
-        ProfileDetails.AddButton("x+10 h30 w110 Default", "填   入").OnEvent("Click", (*) => fillInPms()),
-        ProfileDetails.Show()
+        Profile.AddButton("h30 w110", "关 闭 (&C)").OnEvent("Click", (*) => profile.Destroy()),
+        Profile.AddButton("x+10 h30 w110 Default", "填   入").OnEvent("Click", (*) => fillInPms()),
+        Profile.Show()
     )
 }
