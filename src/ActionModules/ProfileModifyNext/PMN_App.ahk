@@ -68,8 +68,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         currentGuest.set(JSON.parse(A_Clipboard))
-
-        Sleep 500
         handleListContentUpdate()
 
         clipHistory := config.read("clipHistory")
@@ -240,32 +238,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         PMN_Fillin.fill(listContent.value[LV.GetNext()])
     }
 
-    addAddtionalEvents() {
-        LV := App.getCtrlByType("ListView")
-        LV.OnEvent("ItemEdit", (guiObj, itemIndex) => handleUpdateItem(itemIndex, LV))
-        LV.OnEvent("ContextMenu", (params*) => showProfileDetails(params[2], LV))
-
-        handleUpdateItem(itemIndex, LV) {
-            selectedItem := listContent.value[itemIndex]
-            selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
-            db.updateOne(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
-        }
-
-        showProfileDetails(itemIndex, LV) {
-            if (itemIndex = 0) {
-                return
-            }
-            selectedItem := listContent.value[itemIndex]
-            GuestProfileDetails(selectedItem, fillPmsProfile, App)
-        }
-
-        searchBox := App.getCtrlByName("searchBox")
-        searchBox.OnEvent("LoseFocus", (*) => handleListContentUpdate())
-
-        period := App.getCtrlByName("period")
-        period.OnEvent("LoseFocus", (*) => handleListContentUpdate())
-    }
-
     setHotkeys() {
         HotIfWinActive(popupTitle)
         Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
@@ -330,28 +302,41 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddGroupBox("R17 w580 y+20", " "),
         App.AddText("xp15 ", moduleTitle . " ⓘ ")
         .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
-        ; date
+        
+        ; datetime
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
         .OnEvent("Change", (ctrl, info) =>
             handleQuery(ctrl.Name, ctrl.Value)
             handleListContentUpdate()),
+        
         ; search conditions
         App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "证件号码", "地址", "电话", "生日"])
         .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
+        
         ; search box
-        App.AddEdit("vsearchBox x+5 w100 h25")
-        .OnEvent("Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value)),
+        App.AddReactiveEdit("vsearchBox x+5 w100 h25")
+        .OnEvent(Map(
+            "Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value),
+            "LoseFocus", (*) => handleListContentUpdate()
+        )),
+        
         ; period
         App.AddText("x+10 yp+5 h20", "最近"),
-        App.AddEdit("vperiod Number x+1 yp-5 w30 h25", queryFilter.value["period"])
-        .OnEvent("Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value)),
+        App.AddReactiveEdit("vperiod Number x+1 yp-5 w30 h25", queryFilter.value["period"])
+        .OnEvent(Map(
+            "Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value),
+            "LoseFocus", (*) => handleListContentUpdate()
+        )),
         App.AddText("x+1 yp+5 h25", "分钟"),
-        ; manual updating
+        
+        ; manual updating btns
         App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
         App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile(App)),
+        
         ; profile list
-        GuestProfileList(App, listContent),
-        addAddtionalEvents(),
+        GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile),
+
+        ; hotkey setup
         setHotkeys()
     )
 }

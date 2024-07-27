@@ -1,4 +1,4 @@
-GuestProfileList(App, listContent) {
+GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
@@ -16,7 +16,26 @@ GuestProfileList(App, listContent) {
         MsgBox(Format("已复制证件号码: `n`n{1} : {2}", key, A_Clipboard), popupTitle, "4096 T1")
     }
 
-    return (
-        App.AddReactiveListView(options, columnDetails, listContent,,["DoubleClick", copyIdNumber])
+    handleUpdateItem(LV, itemIndex) {
+        selectedItem := listContent.value[itemIndex]
+        selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
+        db.updateOne(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
+    }
+
+    showProfileDetails(LV, itemIndex) {
+        if (itemIndex = 0) {
+            return
+        }
+        selectedItem := listContent.value[itemIndex]
+        GuestProfileDetails(selectedItem, fillPmsProfile, App)
+    }
+
+    return (    
+        App.AddReactiveListView(options, columnDetails, listContent)
+           .OnEvent(Map(
+                "DoubleClick", copyIdNumber,
+                "ItemEdit", (LV, itemIndex) => handleUpdateItem(LV, itemIndex),
+                "ContextMenu", (LV, itemIndex, *) => showProfileDetails(LV, itemIndex)
+            ))
     )
 }
