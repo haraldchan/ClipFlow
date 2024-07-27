@@ -326,6 +326,16 @@ class AddReactive {
         this.ctrl.Opt(newOptions)
     }
 
+    OnEvent(event, fn := 0) {
+        if (event is Map) {
+            for e, cb in event {
+                this.ctrl.OnEvent(e, cb)
+            }
+        } else {
+            this.ctrl.OnEvent(event, fn)
+        }
+    }
+
     getValue() {
         return this.ctrl.Value
     }
@@ -349,10 +359,6 @@ class AddReactive {
     setDepend(depend) {
         this.depend := depend
         this.subscribe(this.depend)
-    }
-
-    setEvent(event, callback) {
-        this.ctrl.OnEvent(event, callback)
     }
 
     setFont(options := "", fontName := "Verdana") {
