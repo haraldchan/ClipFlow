@@ -321,17 +321,17 @@ PMN_App(App, moduleTitle, db, identifier) {
         )),
         
         ; period
-        App.AddText("x+10 yp+5 h20", "最近"),
-        App.AddReactiveEdit("vperiod Number x+1 yp-5 w30 h25", queryFilter.value["period"])
+        App.AddText("x+10 h25 0x200", "最近"),
+        App.AddReactiveEdit("vperiod Number x+1 w30 h25", queryFilter.value["period"])
         .OnEvent(Map(
             "Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value),
             "LoseFocus", (*) => handleListContentUpdate()
         )),
-        App.AddText("x+1 yp+5 h25", "分钟"),
+        App.AddText("x+1 h25 0x200", "分钟"),
         
         ; manual updating btns
-        App.AddButton("vupdate x+10 yp-8 w80 h30", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
-        App.AddButton("vfillIn x+5 w80 h30 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile(App)),
+        App.AddButton("vupdate x+10 w80 h25", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
+        App.AddButton("vfillIn x+5 w80 h25 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile(App)),
         
         ; profile list
         GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile),
