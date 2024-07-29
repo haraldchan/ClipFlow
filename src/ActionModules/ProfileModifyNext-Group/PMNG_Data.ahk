@@ -4,42 +4,42 @@ class PMNG_Data {
         BlockInput true
         WinMaximize "ahk_class SunAwtFrame"
         WinActivate "ahk_class SunAwtFrame"
-        Sleep 100
+        utils.waitLoading()
         Send "!m"
-        Sleep 100
+        utils.waitLoading()
         Send "{Text}R"
-        Sleep 100
+        utils.waitLoading()
         Send Format("{Text}{1}", "FO03")
-        Sleep 100
+        utils.waitLoading()
         Send "!h"
-        Sleep 100
+        utils.waitLoading()
         MouseMove initX, initY ; 433, 598
-        Sleep 150
+        utils.waitLoading()
         Click ; click print to file
-        Sleep 150
+        utils.waitLoading()
 
         MouseMove initX + 380, initY
         Click
         loop 2 {
             Send "{Down}"
-            Sleep 10
+            utils.waitLoading()
         }
-        Sleep 100
+        utils.waitLoading()
         Send "{Enter}"
-        Sleep 100
+        utils.waitLoading()
         Send "!o"
 
         ; run saving actions, return filename
         this.saveGroupInhouse(blockcode)
         saveFileName := blockcode . ".XML"
 
-        Sleep 1000
+        utils.waitLoading()
         Send "!f"
-        Sleep 1000
+        utils.waitLoading()
         Send "{Backspace}"
-        Sleep 200
+        utils.waitLoading()
         Send Format("{Text}{1}", saveFileName)
-        Sleep 1000
+        utils.waitLoading()
         Send "{Enter}"
         TrayTip Format("正在保存：{1}", saveFileName)
 
@@ -50,9 +50,9 @@ class PMNG_Data {
             if (!isWindows7 && WinExist("Warning")) {
                 WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
                 WinSetAlwaysOnTop true, "Warning"
-                Sleep 100
+                utils.waitLoading()
                 Send "{Enter}"
-                Sleep 100
+                utils.waitLoading()
                 WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
             }
 
@@ -66,10 +66,10 @@ class PMNG_Data {
             }
         }
 
-        Sleep 200
+        utils.waitLoading()
         MouseMove initX, initY ; WIP
         Click
-        Sleep 200
+        utils.waitLoading()
         Send "!c"
         BlockInput false
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
@@ -102,7 +102,7 @@ class PMNG_Data {
     }
 
     static getGroupGuests(db, inhRooms) {
-        ; roomNums := inhRooms.map(room => room.roomNum).unique()
+        roomNums := inhRooms.map(room => room.roomNum).unique()
         loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 1440)
 
         groupGuests := []

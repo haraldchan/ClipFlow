@@ -13,7 +13,7 @@ PMNG_App(App, popupTitle, db) {
         }
 
         if (!FileExist(A_MyDocuments . "\" . blockcode . ".XML")) {
-            PMNG_Data.reportFilling(blockcode.Value)
+            PMNG_Data.reportFiling(blockcode.value)
         }        
         groupInfo := PMNG_Data.getGroupHouseInformations(A_MyDocuments . "\" . blockcode . ".XML")
         guestInfo := PMNG_Data.getGroupGuests(db, groupInfo["inhRooms"])

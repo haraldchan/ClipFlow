@@ -2,15 +2,18 @@
 class PMNG_Execute {
     static startModify(groupName, inhRooms, groupGuests) {
         for room in inhRooms {
+            curIndex := 1
+
             for guest in groupGuests {
                 if (guest["roomNum"] = room) {
-                    this.search(room, A_Index = 1 ? groupName : 1)
-                    if (this.notFound() = true) {
-                        this.search(room)
-                        this.createShareIn(room)
-                    }
-                    Sleep 500
+                    this.search(room, curIndex = 1 ? groupName : 1)
+                    utils.waitLoading()
                     this.modify()
+                    curIndex++
+                    
+                    if (curIndex > 2) {
+                        break
+                    }
                 }
             }
         }
@@ -26,7 +29,7 @@ class PMNG_Execute {
         return
     }
 
-    static search(roomNum, name, roomLoopIndex) {
+    static search(roomNum, name := 0, roomLoopIndex := 0) {
         Send roomNum
         Sleep 200
         Send "{Tab}"
@@ -38,11 +41,11 @@ class PMNG_Execute {
     }
 
     static createShareIn(room) {
-        ; pending
+        ; TODO: create schedule
 
     }
 
-    static modify(guest) {
+    static modify(guest := 0) {
         CoordMode "Pixel", "Screen"
         anchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
         anchorIsVisible := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, anchorImage)
@@ -60,6 +63,7 @@ class PMNG_Execute {
         Sleep 500
         Send "!o" ; ok
         
+        ; wait for profile win to close
         loop 10 {
             Sleep 1000
             if(!anchorIsVisible) {
