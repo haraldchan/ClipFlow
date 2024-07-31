@@ -5,7 +5,7 @@ PMNG_App(App, popupTitle, db) {
     currentGroupName := signal("")
     currentGroupRooms := signal([])
     loadedGuests := signal([])
-    isCheckedAll := signal(false)
+    ; isCheckedAll := singal(false)
 
     handleListInitialize(){
         blockcode := InputBox("请输入 BlockCode", popupTitle)
@@ -15,26 +15,40 @@ PMNG_App(App, popupTitle, db) {
 
         if (!FileExist(A_MyDocuments . "\" . blockcode.Value . ".XML")) {
             PMNG_Data.reportFiling(blockcode.Value)
-        }        
+        }
+
+        loadedGuests.set([Map("roomNum", "Loading...", "name", "Loading")])
+
         groupInfo := PMNG_Data.getGroupHouseInformations(A_MyDocuments . "\" . blockcode.Value . ".XML")
         guestInfo := PMNG_Data.getGroupGuests(db, groupInfo["inhRooms"])
         
         currentGroupName.set(groupInfo["groupName"])
         currentGroupRooms.set(groupInfo["inhRooms"])
+
         loadedGuests.set(guestInfo)
-        isCheckedAll.set(true)
-        App.getCtrlByName("checkAll").Value := isCheckedAll.Value
+        ; isCheckedAll.set(true)
+        App.getCtrlByName("checkAll").Value := true
     }
 
-
-
     multiCheck(LV, item, isChecked){
-        ; focusedRows := LV.getFocusedRowNumbers()
+        focusedRows := LV.getFocusedRowNumbers()
         
-        ; for focusedRow in focusedRows {
-            ; LV.Modify(focusedRow, isChecked ? "Check" : "-Check")
-        ; }
-        
+        for focusedRow in focusedRows {
+            LV.Modify(focusedRow, isChecked ? "Check" : "-Check")
+        }
+
+        checkedRows := LV.getCheckedRowNumbers()
+
+        if (checkedRows.Length = LV.GetCount()) {
+            ; isCheckedAll.set(true)
+            App.getCtrlByName("checkAll").Value := true
+        } else {
+            App.getCtrlByName("checkAll").Value := false
+        }
+    }
+
+    handleCheckAll(ctrl, _) {
+        App.getCtrlByType("ListView").Modify(0, ctrl.Value = true ? "Check" : "-Check")
     }
 
     performModify() {
@@ -64,7 +78,7 @@ PMNG_App(App, popupTitle, db) {
         App.AddGroupBox("R19 y+20 w270"," "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
-        App.AddCheckBox("vcheckAll h20 y+10", "全选"),
+        App.AddCheckBox("vcheckAll h20 y+10", "全选").OnEvent("Click", handleCheckAll),
         App.AddReactiveText("h20 x+5 0x200", "当前团队：{1}" , currentGroupName).setFont("Bold"),
 
         ; inhouse guests list
