@@ -308,7 +308,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddText("x+10 h25 0x200", "最近"),
         App.AddReactiveEdit("vperiod Number x+1 w30 h25", queryFilter.value["period"])
         .OnEvent(Map(
-            "Change", (ctrl, _) => queryFilter.update("period", ctrl.Value),
+            "Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value),
             "LoseFocus", (*) => handleListContentUpdate()
         )),
         App.AddText("x+1 h25 0x200", "分钟"),
