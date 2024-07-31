@@ -247,6 +247,9 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         togglePeriod(direction) {
             p := App.getCtrlByName("period")
+            if (p.value = "") {
+                p.value := 0
+            }
             newPeriod := direction = "-" ? p.value - 10 : p.value + 10
 
             if (newPeriod <= 0) {
