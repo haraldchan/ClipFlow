@@ -9,7 +9,7 @@ class PMNG_Data {
         utils.waitLoading()
         Send "{Text}R"
         utils.waitLoading()
-        Send Format("{Text}{1}", "FO03")
+        Send Format("{Text}{1}", "grpinhousebyroom")
         utils.waitLoading()
         Send "!h"
         utils.waitLoading()
@@ -44,12 +44,17 @@ class PMNG_Data {
         TrayTip Format("正在保存：{1}", saveFileName)
 
         isWindows7 := StrSplit(A_OSVersion, ".")[1] = 6
+        
+        if (WinWait("Warning",, 20)) {
+            WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+            WinSetAlwaysOnTop true, "Warning"
+        }
+        
         loop 30 {
             sleep 1000
 
             if (!isWindows7 && WinExist("Warning")) {
-                WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-                WinSetAlwaysOnTop true, "Warning"
+
                 utils.waitLoading()
                 Send "{Enter}"
                 utils.waitLoading()
@@ -67,16 +72,30 @@ class PMNG_Data {
         }
 
         utils.waitLoading()
-        MouseMove initX, initY ; WIP
-        Click
-        utils.waitLoading()
+        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         Send "!c"
         BlockInput false
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
     }
 
     static saveGroupInhouse(blockcode) {
-        ; save in group options
+        MouseMove 737, 395
+        utils.waitLoading()
+        Click
+        utils.waitLoading()
+        Send Format("{Text}{1}", blockcode)
+        utils.waitLoading()
+        Send "!h"
+        utils.waitLoading()
+        loop 2 {
+            Send "{Tab}"
+            utils.waitLoading()
+        }
+        Send "{Space}"
+        utils.waitLoading()
+        Send "!o"
+        utils.waitLoading()
+
     }
 
     static getGroupHouseInformations(xmlPath) {
@@ -102,15 +121,18 @@ class PMNG_Data {
     }
 
     static getGroupGuests(db, inhRooms) {
-        roomNums := inhRooms.map(room => room.roomNum).unique()
-        loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 1440)
+        roomNums := inhRooms.unique()
+        loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 60 * 24)
 
         groupGuests := []
-        for roomNum in inhRooms {
+
+        for roomNum in roomNums {
             for guest in loadedGuests {
+
                 if (StrLen(guest["roomNum"]) = 3) {
                     guest["roomNum"] := "0" . guest["roomNum"]
                 }
+
                 if (guest["roomNum"] = roomNum) {
                     groupGuests.Push(guest)
                 }
