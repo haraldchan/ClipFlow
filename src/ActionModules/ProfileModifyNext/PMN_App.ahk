@@ -20,22 +20,6 @@ PMN_App(App, moduleTitle, db, identifier) {
     )
     effect(searchBy, () => App.getCtrlByName("searchBox").Value := "")
 
-    handleQuery(ctrlName, newVal) {
-        updatedQuery := queryFilter.value
-
-        if (ctrlName = "date") {
-            updatedQuery["date"] := FormatTime(newVal, "yyyyMMdd")
-        }
-        if (ctrlName = "searchBox") {
-            updatedQuery["search"] := newVal
-        }
-        if (ctrlName = "period") {
-            updatedQuery["period"] := newVal = "" ? 1440 : newVal
-        }
-
-        queryFilter.set(updatedQuery)
-    }
-
     currentGuest := signal(Map("idNum", 0))
     OnClipboardChange (*) => handleCaptured(identifier)
     handleCaptured(identifier) {
@@ -306,7 +290,6 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; datetime
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
         .OnEvent("Change", (ctrl, _) =>
-            ; handleQuery(ctrl.Name, ctrl.Value)
             queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
             handleListContentUpdate()),
         
@@ -317,8 +300,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; search box
         App.AddReactiveEdit("vsearchBox x+5 w100 h25")
         .OnEvent(Map(
-            ; "Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value),
-            "Change", (ctrl, _) => queryFilter.update("search", ctrl.Value)
+            "Change", (ctrl, _) => queryFilter.update("search", ctrl.Value),
             "LoseFocus", (*) => handleListContentUpdate()
         )),
         
@@ -326,8 +308,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddText("x+10 h25 0x200", "最近"),
         App.AddReactiveEdit("vperiod Number x+1 w30 h25", queryFilter.value["period"])
         .OnEvent(Map(
-            ; "Change", (ctrl, _) => handleQuery(ctrl.Name, ctrl.Value),
-            "Change", (ctrl, _) => queryFilter.update("period", ctrl.Value)
+            "Change", (ctrl, _) => queryFilter.update("period", ctrl.Value),
             "LoseFocus", (*) => handleListContentUpdate()
         )),
         App.AddText("x+1 h25 0x200", "分钟"),
