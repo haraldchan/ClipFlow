@@ -6,7 +6,7 @@ class PMNG_Execute {
 
             for guest in groupGuests {
                 if (guest["roomNum"] = room) {
-                    this.search(room, curIndex = 1 ? groupName : 1)
+                    this.search(room, curIndex)
                     utils.waitLoading()
                     this.modify()
                     curIndex++
@@ -21,28 +21,19 @@ class PMNG_Execute {
         MsgBox("Group Modify 已完成。")
     }
 
-    static notFound() {
-        CoordMode("Pixel", "Screen")
-        PixelGetColor(1, 1)
-        ; check if it is not found ,which means, need to create share
-
-        return
-    }
-
-    static search(roomNum, name := 0, roomLoopIndex := 0) {
+    static search(roomNum, roomLoopIndex) {
         Send roomNum
-        Sleep 200
-        Send "{Tab}"
-        Sleep 200
-        Send name
-        Sleep 200
+        utils.waitLoading()
+        Send "!a"
+        utils.waitLoading()
+        loop 4 {
+            Send "{Tab}"
+            utils.waitLoading()
+        }
+        Send Format("{Text}{1}", roomLoopIndex = 1 ? "TGDA" : "NRR")
+        utils.waitLoading()
         Send "!h" ; alt+h => search
-        Sleep 200
-    }
-
-    static createShareIn(room) {
-        ; TODO: create schedule
-
+        utils.waitLoading()
     }
 
     static modify(guest := 0) {
