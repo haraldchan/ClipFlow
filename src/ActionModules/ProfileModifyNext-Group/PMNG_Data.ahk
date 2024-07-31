@@ -39,7 +39,7 @@ class PMNG_Data {
         Send "{Backspace}"
         utils.waitLoading()
         Send Format("{Text}{1}", saveFileName)
-        utils.waitLoading()
+        Sleep 1500
         Send "{Enter}"
         TrayTip Format("正在保存：{1}", saveFileName)
 
