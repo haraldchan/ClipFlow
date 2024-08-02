@@ -5,7 +5,6 @@ PMNG_App(App, popupTitle, db) {
     currentGroupName := signal("")
     currentGroupRooms := signal([])
     loadedGuests := signal([])
-    ; isCheckedAll := singal(false)
 
     handleListInitialize(){
         blockcode := InputBox("请输入 BlockCode", popupTitle)
@@ -26,29 +25,7 @@ PMNG_App(App, popupTitle, db) {
         currentGroupRooms.set(groupInfo["inhRooms"])
 
         loadedGuests.set(guestInfo)
-        ; isCheckedAll.set(true)
         App.getCtrlByName("checkAll").Value := true
-    }
-
-    multiCheck(LV, item, isChecked){
-        focusedRows := LV.getFocusedRowNumbers()
-        
-        for focusedRow in focusedRows {
-            LV.Modify(focusedRow, isChecked ? "Check" : "-Check")
-        }
-
-        checkedRows := LV.getCheckedRowNumbers()
-
-        if (checkedRows.Length = LV.GetCount()) {
-            ; isCheckedAll.set(true)
-            App.getCtrlByName("checkAll").Value := true
-        } else {
-            App.getCtrlByName("checkAll").Value := false
-        }
-    }
-
-    handleCheckAll(ctrl, _) {
-        App.getCtrlByType("ListView").Modify(0, ctrl.Value = true ? "Check" : "-Check")
     }
 
     performModify() {
@@ -78,17 +55,22 @@ PMNG_App(App, popupTitle, db) {
         App.AddGroupBox("R19 y+20 w270"," "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
-        App.AddCheckBox("vcheckAll h20 y+10", "全选").OnEvent("Click", handleCheckAll),
+
+        ; check all btn
+        App.AddCheckBox("vcheckAll h20 y+10", "全选"),
         App.AddReactiveText("h20 x+5 0x200", "当前团队：{1}" , currentGroupName).setFont("Bold"),
 
         ; inhouse guests list
-        App.AddReactiveListView(options, columnDetails, loadedGuests)
-           .OnEvent("ItemCheck", multiCheck),
+        App.AddReactiveListView(options, columnDetails, loadedGuests),
 
         ; btns
-        App.AddButton("h30 w75", "保存团单")
-           .OnEvent("Click", (*) => handleListInitialize()),
-        App.AddButton("vinfo x+10 w75 h30", "获取信息").OnEvent("Click", (*) => handleListInitialize()),
-        App.AddButton("vbatch x+10 w75 h30", "开始退房").OnEvent("Click", (*) => performModify())
+        App.AddButton("w115 h35", "获取旅客").OnEvent("Click", (*) => handleListInitialize()),
+        App.AddButton("x+15 w115 h35", "开始录入").OnEvent("Click", (*) => performModify()),
+
+        ; link check all status
+        shareCheckStatus(
+            App.getCtrlByName("checkAll"),
+            App.getCtrlByType("ListView")
+        )
     )
 }
