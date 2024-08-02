@@ -384,6 +384,36 @@ class KeyList {
     }
 }
 
+class useCheckStatus {
+    __New(CheckBox, ListView, allowMulti := false, customFn := { CheckBox: () => "", ListView: () => "" }) {
+
+        this.allowMulti := allowMulti
+        this.cbFn := customFn.CheckBox
+        this.lvFn := customFn.ListView
+
+        CheckBox.OnEvent("Click", (ctrl, _) => this.handleCheckAll.Bind(, CheckBox, ListView))
+        ListView.OnEvent("ItemCheck", (LV, item, isChecked) => this.handleItemCheck.Bind(, CheckBox, LV, item, isChecked))
+    }
+
+    handleCheckAll(CB, LV) {
+        this.cbValue := CB.Value
+        LV.Modify(0, CB.Value = true ? "Check" : "-Check")
+    }
+
+    handleItemCheck(CB, LV, item, isChecked) {
+        checkedRows := LV.getCheckedRowNumbers()
+        CB.Value := (checkedRows.Length = LV.GetCount())
+
+        if (this.allowMulti = true) {
+            focusedRows := LV.getFocusedRowNumbers()
+
+            for focusedRow in focusedRows {
+                LV.Modify(focusedRow, isChecked ? "Check" : "-Check")
+            }
+        }
+    }
+}
+
 Gui.Prototype.AddReactive := AddReactive
 Gui.Prototype.IndexList := IndexList
 Gui.Prototype.KeyList := KeyList
