@@ -804,7 +804,7 @@ class useDict {
     }
 
     static fetchPinyin(hanzi) {
-        url := Format("https://hanyu.baidu.com/zici/s?wd=", hanzi)
+        url := Format("https://hanyu.baidu.com/zici/s?wd={1}", hanzi)
 
         httpClient := ComObject("Http.WinHttpRequest.5.1")
         httpClient.Open("POST", url, false)
