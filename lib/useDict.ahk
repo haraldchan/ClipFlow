@@ -789,7 +789,7 @@ class Dict {
 
 class useDict {
     /**
-     * Convert the pinyin of a character.
+     * Convert a Hanzi character to pinyin.
      * @param {string} hanzi A chinese character to convert.
      * @returns {string} 
      */
@@ -803,6 +803,11 @@ class useDict {
         return this.fetchPinyin(hanzi)
     }
 
+    /**
+     * Fetching pinyin of certain Hanzi from hanyu.baidu.com
+     * @param hanzi A chinese character to convert.
+     * @returns {String} 
+     */
     static fetchPinyin(hanzi) {
         url := Format("https://hanyu.baidu.com/zici/s?wd={1}", hanzi)
 
