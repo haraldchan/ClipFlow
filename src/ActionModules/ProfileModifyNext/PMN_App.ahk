@@ -237,11 +237,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             currentDateTime := dt.Value
             dt.Value := DateAdd(currentDateTime, diff, "Days")
-
-            updatedQuery := queryFilter.value
-            updatedQuery["date"] := FormatTime(dt.Value, "yyyyMMdd")
-
-            queryFilter.set(updatedQuery)
+            queryFilter.update("date", FormatTime(dt.Value, "yyyyMMdd"))
             handleListContentUpdate()
         }
 
@@ -257,11 +253,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
 
             p.value := newPeriod
-
-            updatedQuery := queryFilter.value
-            updatedQuery["period"] := p.value
-
-            queryFilter.set(updatedQuery)
+            queryFilter.update("period", newPeriod)
             handleListContentUpdate()
         }
     }
