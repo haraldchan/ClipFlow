@@ -1,6 +1,3 @@
-; #Include "./Dict.ahk"
-; #Include "./DictIndex.ahk"
-
 class PM_CopyPaste {
     static copy() {
         guestType := this.getGuestType()
