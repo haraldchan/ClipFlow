@@ -25,7 +25,6 @@ PMNG_App(App, popupTitle, db) {
         currentGroupRooms.set(groupInfo["inhRooms"])
 
         loadedGuests.set(guestInfo)
-        App.getCtrlByName("checkAll").Value := true
     }
 
     performModify() {
