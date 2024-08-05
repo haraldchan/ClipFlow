@@ -1,5 +1,3 @@
-#Include "./JSON.ahk"
-
 ;utils: general utility methods
 class utils {
     ; Reset windows and key states.

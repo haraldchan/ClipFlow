@@ -1,4 +1,3 @@
-#Include "./JSON.ahk"
 #Include "./AddReactive/AddReactive.ahk"
 
 class useDebug {

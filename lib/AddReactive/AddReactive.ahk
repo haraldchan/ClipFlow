@@ -1,7 +1,8 @@
-#Include "../JSON.ahk"
-#Include "../defineArrayMethods.ahk"
-#Include "./TypeChecker.ahk"
+#Include "./JSON.ahk"
+#Include "./type-checker.ahk"
 #Include "./AddReactive-Ctrls.ahk"
+#Include "./functions/function-index.ahk"
+#Include "./extend-methods/extend-methods-index.ahk"
 
 class signal {
     __New(val) {
@@ -58,6 +59,12 @@ class signal {
             throw TypeError(Format("update can only handle Array/Object/Map; `n`nCurrent Type: {2}", Type(newValue)))
         }
 
+        if (this.value is Map) {
+            updater := Map()
+        } else if (this.value is Array) {
+            updater := []
+        }
+        
         updater := this.value
         updater[key] := newValue
 
@@ -370,28 +377,6 @@ class AddReactive {
     disable(state) {
         this.ctrl.Enabled := state
     }
-
-    ; ctrl type specific APIs
-    useCheckStatus(isCheckedSignal) {
-        checkType(isCheckedSignal, signal, "First parameter is not a signal.")
-        checkType(this.ctrl, [Gui.CheckBox, Gui.ListView], "useCheckStatus can only use on CheckBox or ListView.")
-
-        this.checkStatus := isCheckedSignal
-
-        isCheckedSignal.addSub(this)
-        
-        if (this.ctrl is Gui.CheckBox) {
-            this.OnEvent("Click", (ctrl, _) => isCheckedSignal.set(ctrl.Value))
-        }
-
-        if (this.ctrl is Gui.ListView) {
-            ; link check all status with by using shared signal
-
-            this.OnEvent("ItemCheck", (LV, *) => 
-                isCheckedSignal.set(LV.getCheckedRowNumbers().Length = LV.GetCount())
-            )
-        }
-    }
 }
 
 class IndexList {
@@ -406,52 +391,6 @@ class KeyList {
     __New(guiObj, controlType, options, innerText, depend := 0, key := 0, event := 0) {
         loop depend.value.length {
             guiObj.AddReactive(controlType, options, innerText, depend, [[A_Index], key*], event)
-        }
-    }
-}
-
-class shareCheckStatus {
-    __New(CheckBox, ListView, customFn := { CheckBox: (*) => {}, ListView: (*) => {} }) {
-        this.cbFn := customFn.hasOwnProp("CheckBox") ? customFn.CheckBox : (*) => {}
-        this.lvFn := customFn.hasOwnProp("ListView") ? customFn.ListView : (*) => {}
-
-        CheckBox.OnEvent("Click", (ctrl, _) => this.handleCheckAll(CheckBox, ListView))
-        
-        ListView.OnEvent("ItemCheck", (LV, item, isChecked) => this.handleItemCheck(CheckBox, LV, item, isChecked))
-    }
-
-    handleCheckAll(CB, LV) {
-        LV.Modify(0, CB.Value = true ? "Check" : "-Check")
-
-        if (this.cbFn is Func) {
-            this.cbFn()
-        } 
-
-        if (this.cbFn is Array) {
-            for fn in this.cbFn {
-                fn()
-            }
-        }
-    }
-
-    handleItemCheck(CB, LV, item, isChecked) {
-        focusedRows := LV.getFocusedRowNumbers()
-
-        for focusedRow in focusedRows {
-            LV.Modify(focusedRow, isChecked ? "Check" : "-Check")
-        }
-        
-
-        setTimer(() => CB.Value := (LV.getCheckedRowNumbers().Length = LV.GetCount()), -1)
-
-        if (this.lvFn is Func) {
-            this.lvFn()
-        } 
-
-        if (this.lvFn is Array) {
-            for fn in this.lvFn {
-                fn()
-            }
         }
     }
 }

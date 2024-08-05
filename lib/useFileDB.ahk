@@ -1,5 +1,3 @@
-#Include "./JSON.ahk"
-
 class useFileDB {
 	__New(dbSetting) {
 		this.main := dbSetting.main
