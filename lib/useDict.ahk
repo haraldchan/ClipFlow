@@ -429,6 +429,29 @@ class Dict {
         "百里", "Bai Li",
     )
 
+    static tone := Map(
+        "ā", "a",
+        "á", "a",
+        "ǎ", "a",
+        "à", "a",
+        "ē", "e",
+        "é", "e",
+        "ě", "e",
+        "è", "e",
+        "ī", "i",
+        "í", "i",
+        "ǐ", "i",
+        "ì", "i",
+        "ō", "i",
+        "ó", "i",
+        "ǒ", "i",
+        "ò", "o",
+        "ū", "i",
+        "ú", "i",
+        "ǔ", "i",
+        "ù", "u",
+    )
+
     static regionISO := Map(
         "阿富汗", "AF",
         "阿尔巴尼亚", "AL",
@@ -765,8 +788,6 @@ class Dict {
 }
 
 class useDict {
-    static MISSING := false
-    static missingChar := []
     /**
      * Convert the pinyin of a character.
      * @param {string} hanzi A chinese character to convert.
@@ -778,17 +799,32 @@ class useDict {
                 return pinyin
             }
         }
-
-        ; if not found, mark it.
-        this.MISSING := true
-        this.missingChar.Push(hanzi)
+        ; if not found in Dict, fetch from baidu hanyu
+        return this.fetchPinyin(hanzi)
     }
 
-    static notFoundNotifier() {
-        for char in this.missingChar {
-            MsgBox(Format("{1}：该汉字未能找到匹配拼音。", char), "useDict", "4096")
-            Run Format("https://www.baidu.com/s?wd={1}%20读音", char)
+    static fetchPinyin(hanzi) {
+        url := Format("https://hanyu.baidu.com/zici/s?wd=", hanzi)
+
+        httpClient := ComObject("Http.WinHttpRequest.5.1")
+        httpClient.Open("POST", url, false)
+        httpClient.Send()
+        httpClient.WaitForResponse()
+        page := httpClient.ResponseText
+
+        html := ComObject("HTMLFile")
+        html.write(page)
+
+        pinyin := html.getElementsByTagName("b")[0].innerText
+        unToned := ""
+
+        for tonedChar, char in Dict.tone {
+            if (InStr(pinyin, tonedChar)) {
+                unToned := StrReplace(pinyin, tonedChar, char)
+            }
         }
+
+        return unToned
     }
 
     /**
@@ -810,12 +846,6 @@ class useDict {
         loop firstnameSplit.Length {
             firstname .= this.getPinyin(firstnameSplit[A_Index]) . " "
         }
-
-        if (this.MISSING = true) {
-            SetTimer(() => this.notFoundNotifier(), -1500)
-            this.MISSING := false
-            this.missingChar := []
-        } 
 
         return [lastname, Trim(firstname)]
     }
