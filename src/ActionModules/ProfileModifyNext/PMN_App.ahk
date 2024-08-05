@@ -99,16 +99,21 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleListContentUpdate() {
-        listContent.set([
-            Map(
-                "roomNum", "Loading...",
-                "name", "Loading...",
-                "gender", "Loading...",
-                "idType", "Loading...",
-                "idNum", "Loading...",
-                "addr", "Loading..."
-            )
-        ])
+        ; listContent.set([
+        ;     Map(
+        ;         "roomNum", "Loading...",
+        ;         "name", "Loading...",
+        ;         "gender", "Loading...",
+        ;         "idType", "Loading...",
+        ;         "idNum", "Loading...",
+        ;         "addr", "Loading..."
+        ;     )
+        ; ])
+        useListPlaceholder(
+            listContent, 
+            ["roomNum","name", "gender", "idType", "idNum", "addr"],
+            "Loading..."
+        )
 
         if (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")) {
             App.getCtrlByName("period").Enabled := true
@@ -118,16 +123,21 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
         if (loadedItems.Length = 0) {
-            listContent.set([
-                Map(
-                    "roomNum", "NO DATA",
-                    "name", "NO DATA",
-                    "gender", "NO DATA",
-                    "idType", "NO DATA",
-                    "idNum", "NO DATA",
-                    "addr", "NO DATA"
-                )
-            ])
+            ; listContent.set([
+            ;     Map(
+            ;         "roomNum", "NO DATA",
+            ;         "name", "NO DATA",
+            ;         "gender", "NO DATA",
+            ;         "idType", "NO DATA",
+            ;         "idNum", "NO DATA",
+            ;         "addr", "NO DATA"
+            ;     )
+            ; ])
+            useListPlaceholder(
+                listContent, 
+                ["roomNum","name", "gender", "idType", "idNum", "addr"],
+                "No Data"
+            )
             return
         }
 
