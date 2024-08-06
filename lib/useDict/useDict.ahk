@@ -98,15 +98,10 @@ class useDict {
         whr := ""
 
         ; update pinyin dictionary
-        SetTimer(() => (
-            Dict.pinyin[unToned] := Dict.pinyin[unToned] . hanzi,
-            FileDelete(Dict.DICT_PATH . "\pinyin.json"),
-            FileAppend(
-                JSON.stringify(Dict.pinyin), 
-                Dict.DICT_PATH . "\pinyin.json" ,
-                "UTF-8"
-            )
-        ), -1)
+
+        Dict.pinyin[unToned] := Dict.pinyin[unToned] . hanzi
+        FileDelete(Dict.DICT_PATH . "\pinyin.json")
+        FileAppend(JSON.stringify(Dict.pinyin), Dict.DICT_PATH . "\pinyin.json" ,"UTF-8")
 
         return unToned
     }
