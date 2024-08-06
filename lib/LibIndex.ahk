@@ -2,12 +2,12 @@
 #Include "./useConfigJSON.ahk"
 #Include "./useSingleScript.ahk"
 #Include "./useFileDB.ahk"
-#Include "./useDict.ahk"
+#Include "./useDict/useDict.ahk"
 #Include "./useDebug.ahk"
 
 #Include "./AddReactive/AddReactive.ahk"
 /************************************************************************
  * @author haraldchan
- * @date 2024/08/5
+ * @date 2024/08/05
  * @version 1.1.0
  ***********************************************************************/
