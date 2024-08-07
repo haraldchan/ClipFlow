@@ -25,6 +25,7 @@ PMNG_App(App, popupTitle, db) {
         currentGroupRooms.set(groupInfo["inhRooms"])
 
         loadedGuests.set(guestInfo)
+        App.getCtrlByName("checkAll").Value := true
     }
 
     performModify() {
@@ -34,7 +35,7 @@ PMNG_App(App, popupTitle, db) {
             selectedGuests.Push(loadedGuests.value[row])
         }
 
-        PMNG_Execute.startModify(currentGroupName.value, currentGroupRooms.value, selectedGuests)
+        PMNG_Execute.startModify(currentGroupRooms.value, selectedGuests)
     }
 
     columnDetails := {
@@ -69,7 +70,7 @@ PMNG_App(App, popupTitle, db) {
         ; link check all status
         shareCheckStatus(
             App.getCtrlByName("checkAll"),
-            App.getCtrlByType("ListView")
+            App.getCtrlByType("ListView"),
         )
     )
 }
