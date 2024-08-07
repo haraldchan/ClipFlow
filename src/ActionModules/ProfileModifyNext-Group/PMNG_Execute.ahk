@@ -1,16 +1,22 @@
 #Include "../ProfileModifyNext/PMN_FillIn.ahk"
 class PMNG_Execute {
-    static startModify(groupName, inhRooms, groupGuests) {
-        for room in inhRooms {
+    static startModify(inhRooms, groupGuests) {
+        uInhRomms := inhRooms.unique()
+
+        WinMaximize "ahk_class SunAwtFrame"
+        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
+        BlockInput true
+
+        for room in uInhRomms {
             curIndex := 1
 
             for guest in groupGuests {
                 if (guest["roomNum"] = room) {
                     this.search(room, curIndex)
                     utils.waitLoading()
-                    this.modify()
+                    this.modify(guest)
+
                     curIndex++
-                    
                     if (curIndex > 2) {
                         break
                     }
@@ -18,10 +24,18 @@ class PMNG_Execute {
             }
         }
 
+        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        BlockInput false
+        Sleep 1000
         MsgBox("Group Modify 已完成。")
     }
 
     static search(roomNum, roomLoopIndex) {
+
+        MouseMove 329, 196
+        click 3
+        utils.waitLoading()
+
         Send roomNum
         utils.waitLoading()
         Send "!a"
@@ -41,27 +55,16 @@ class PMNG_Execute {
         anchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
         anchorIsVisible := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, anchorImage)
         
-        Send "!p" ; profile
-        ; wait for profile win
-        loop 10 {
-            Sleep 1000
-            if (anchorIsVisible) {
-                break
-            }
-        }
+        Send "!p" ; 
+        utils.waitLoading()
+        sleep 1000
         
         PMN_FillIn.fill(guest)
-        Sleep 500
+        Sleep 1000
         Send "!o" ; ok
         
-        ; wait for profile win to close
-        loop 10 {
-            Sleep 1000
-            if(!anchorIsVisible) {
-                break
-            }
-        }
-
+        utils.waitLoading()
+        sleep 1000
         Send "!r" ; clear
     }
 }
