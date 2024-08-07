@@ -234,7 +234,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             for row in LV.getCheckedRowNumbers() {
                 selectedGuests.Push(listContent.value[row])
             }
-            PMN_Waterfall.cascade(selectedGuests)
+            PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests)
         } else {
             PMN_Fillin.fill(listContent.value[LV.GetNext()])
         }
