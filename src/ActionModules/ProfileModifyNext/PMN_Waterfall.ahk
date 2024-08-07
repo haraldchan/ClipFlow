@@ -1,14 +1,8 @@
 class PMN_Waterfall {
-    static cascade(selectedGuests) {
+    static cascade(rooms, selectedGuests) {
         WinMaximize "ahk_class SunAwtFrame"
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         BlockInput true
-
-        rooms := []
-        for guest in selectedGuests {
-            rooms.Push(guest["roomNum"])
-        }
-        rooms := rooms.unique()
 
         for room in rooms {
 
@@ -21,6 +15,8 @@ class PMN_Waterfall {
                     utils.waitLoading()
                     this.modify(guest)
                 }
+
+                guest["roomNum"] := ""
             }
         }
 
