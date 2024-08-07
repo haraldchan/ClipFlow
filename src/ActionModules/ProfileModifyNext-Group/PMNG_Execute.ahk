@@ -31,8 +31,7 @@ class PMNG_Execute {
     }
 
     static search(roomNum, roomLoopIndex) {
-
-        MouseMove 329, 196
+        MouseMove 329, 196 ; room number field
         click 3
         utils.waitLoading()
 
@@ -50,12 +49,8 @@ class PMNG_Execute {
         utils.waitLoading()
     }
 
-    static modify(guest := 0) {
-        CoordMode "Pixel", "Screen"
-        anchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
-        anchorIsVisible := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, anchorImage)
-        
-        Send "!p" ; 
+    static modify(guest) {        
+        Send "!p" ; open profile
         utils.waitLoading()
         sleep 1000
         
