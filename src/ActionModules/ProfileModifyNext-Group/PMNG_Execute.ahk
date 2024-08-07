@@ -6,6 +6,7 @@ class PMNG_Execute {
         WinMaximize "ahk_class SunAwtFrame"
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         BlockInput true
+        index := 1
 
         for room in uInhRomms {
 
@@ -13,7 +14,7 @@ class PMNG_Execute {
                 remaining := groupGuests.filter(g => g["roomNum"] = room).Length
                 isLastOne := remaining = 1 ? true : false
 
-                if (A_Index > inhRooms.filter(r => r = room).Length) {
+                if (index > inhRooms.filter(r => r = room).Length) {
                     this.search(room, false)
                     this.makeShare()
                     Send "!r" ; clear
@@ -26,6 +27,7 @@ class PMNG_Execute {
                 }
                 
                 guest["roomNum"] := ""
+                index := isLastOne ? 1 : index + 1
             }
         }
 
