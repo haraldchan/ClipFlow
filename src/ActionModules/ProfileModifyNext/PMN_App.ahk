@@ -1,6 +1,7 @@
 #Include "./GuestProfileList.ahk"
 #Include "./GuestProfileDetails.ahk"
 #Include "./PMN_FillIn.ahk"
+#Include "./PMN_Waterfall.ahk"
 
 PMN_App(App, moduleTitle, db, identifier) {
     listContent := signal(db.load())
@@ -17,8 +18,14 @@ PMN_App(App, moduleTitle, db, identifier) {
         "地址", "addr",
         "电话", "tel",
         "生日", "birthday",
+        "瀑流模式", "waterfall"
     )
-    effect(searchBy, () => App.getCtrlByName("searchBox").Value := "")
+    ; handling search conditon changes
+    effect(searchBy, new => handleSearchByChange(new))
+    handleSearchByChange(cur) {
+        App.getCtrlByName("searchBox").Value := ""
+        App.getCtrlByType("ListView").Opt(cur = "waterfall" ? "+Checked" : "-Checked")
+    }
 
     currentGuest := signal(Map("idNum", 0))
     OnClipboardChange (*) => handleCaptured(identifier)
@@ -99,16 +106,6 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleListContentUpdate() {
-        ; listContent.set([
-        ;     Map(
-        ;         "roomNum", "Loading...",
-        ;         "name", "Loading...",
-        ;         "gender", "Loading...",
-        ;         "idType", "Loading...",
-        ;         "idNum", "Loading...",
-        ;         "addr", "Loading..."
-        ;     )
-        ; ])
         useListPlaceholder(
             listContent, 
             ["roomNum","name", "gender", "idType", "idNum", "addr"],
@@ -123,16 +120,6 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
         if (loadedItems.Length = 0) {
-            ; listContent.set([
-            ;     Map(
-            ;         "roomNum", "NO DATA",
-            ;         "name", "NO DATA",
-            ;         "gender", "NO DATA",
-            ;         "idType", "NO DATA",
-            ;         "idNum", "NO DATA",
-            ;         "addr", "NO DATA"
-            ;     )
-            ; ])
             useListPlaceholder(
                 listContent, 
                 ["roomNum","name", "gender", "idType", "idNum", "addr"],
@@ -153,49 +140,60 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         if (searchBy.value = "nameRoom") {
-            typeConvert(content) {
-            converted := ""
-            try {
-                converted := Number(content)
-            } catch {
-                converted := content
+                typeConvert(content) {
+                converted := ""
+                try {
+                    converted := Number(content)
+                } catch {
+                    converted := content
+                }
+                return converted
             }
-            return converted
-        }
 
-        if (typeConvert(searchInput) is Number) {
-            ; searching by room number
-            for item in loadedItems {
-                if (InStr(item["roomNum"], searchInput)) {
-                    filteredItems.InsertAt(1, item)
-                }
-            }
-        } else {
-            ; searching by name fragment
-            for item in loadedItems {
-                if (item["guestType"] = "内地旅客") {
-                    ; from mainland
-                    if (InStr(item["name"], searchInput)) {
-                        filteredItems.InsertAt(1, item)
-                    }
-                } else if (item["guestType"] = "港澳台旅客") {
-                    ; from HK/MO/TW
-                    if (InStr(item["name"], searchInput) ||
-                        InStr(item["nameLast"], searchInput, "Off") ||
-                        InStr(item["nameFirst"], searchInput, "Off")
-                    ) {
-                        filteredItems.InsertAt(1, item)
-                    }
-                } else {
-                    ; from abroad
-                    if (InStr(item["nameLast"], searchInput, "Off") ||
-                        InStr(item["nameFirst"], searchInput, "Off")
-                    ) {
+            if (typeConvert(searchInput) is Number) {
+                ; searching by room number
+                for item in loadedItems {
+                    if (InStr(item["roomNum"], searchInput)) {
                         filteredItems.InsertAt(1, item)
                     }
                 }
+            } else {
+                ; searching by name fragment
+                for item in loadedItems {
+                    if (item["guestType"] = "内地旅客") {
+                        ; from mainland
+                        if (InStr(item["name"], searchInput)) {
+                            filteredItems.InsertAt(1, item)
+                        }
+                    } else if (item["guestType"] = "港澳台旅客") {
+                        ; from HK/MO/TW
+                        if (InStr(item["name"], searchInput) ||
+                            InStr(item["nameLast"], searchInput, "Off") ||
+                            InStr(item["nameFirst"], searchInput, "Off")
+                        ) {
+                            filteredItems.InsertAt(1, item)
+                        }
+                    } else {
+                        ; from abroad
+                        if (InStr(item["nameLast"], searchInput, "Off") ||
+                            InStr(item["nameFirst"], searchInput, "Off")
+                        ) {
+                            filteredItems.InsertAt(1, item)
+                        }
+                    }
+                }
             }
-        }
+        } else if (searchBy.value = "waterfall"){
+            roomNums := StrSplit(queryFilter.value["search"], " ")
+            ; filtering all entered room numbers
+            for roomNum in roomNums {
+                for item in loadedItems {
+                    if (InStr(item["roomNum"], roomNum)) {
+                        filteredItems.InsertAt(1, item)
+                    }
+                }
+            }
+
         } else if (searchBy.value = "birthday") {
             bd := StrLen(searchInput) = 8
                 ? SubStr(searchInput, 1, 4) . "-" . SubStr(searchInput, 5, 2) . "-" . SubStr(searchInput, 7, 2)
@@ -229,7 +227,17 @@ PMN_App(App, moduleTitle, db, identifier) {
         if (LV.GetNext() = 0) {
             return
         }
-        PMN_Fillin.fill(listContent.value[LV.GetNext()])
+
+        if (searchBy.value = "waterfall") {
+            selectedGuests := []
+            ; pick selected guests
+            for row in LV.getCheckedRowNumbers() {
+                selectedGuests.Push(listContent.value[row])
+            }
+            PMN_Waterfall.cascade(selectedGuests)
+        } else {
+            PMN_Fillin.fill(listContent.value[LV.GetNext()])
+        }
     }
 
     setHotkeys() {
@@ -290,17 +298,18 @@ PMN_App(App, moduleTitle, db, identifier) {
     return (
         App.AddGroupBox("R17 w580 y+20", " "),
         App.AddText("xp15 ", moduleTitle . " ⓘ ")
-        .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
+           .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
         
         ; datetime
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
-        .OnEvent("Change", (ctrl, _) =>
+           .OnEvent("Change", (ctrl, _) =>
             queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
-            handleListContentUpdate()),
+            handleListContentUpdate()
+        ),
         
         ; search conditions
-        App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "证件号码", "地址", "电话", "生日"])
-        .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
+        App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "证件号码", "地址", "电话", "生日", "瀑流模式"])
+           .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
         
         ; search box
         App.AddReactiveEdit("vsearchBox x+5 w100 h25")
