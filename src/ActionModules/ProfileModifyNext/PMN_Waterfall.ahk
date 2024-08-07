@@ -33,10 +33,23 @@ class PMN_Waterfall {
         
         Send roomNum
         utils.waitLoading()
-        Send "{Tab}" ; last name field
+
+        ; solution 1: filter by "1"
+        ; Send "{Tab}" ; last name field
+        ; utils.waitLoading()
+        ; Send Format("{Text}{1}", isLastOne ? "" : "1") ; send "1" if not last one
+        ; utils.waitLoading()
+
+        ; solution 2: filter by NRR
+        Send "!a"
         utils.waitLoading()
-        Send Format("{Text}{1}", isLastOne ? "" : "1") ; send "1" if not last one
+        loop 4 {
+            Send "{Tab}"
+            utils.waitLoading()
+        }
+        Send Format("{Text}{1}", isLastOne ? "NRR" : "TGDA")
         utils.waitLoading()
+
         Send "!h" ; alt+h => search
         utils.waitLoading()
 
