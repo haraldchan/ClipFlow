@@ -4,6 +4,7 @@
 PMNG_App(App, popupTitle, db) {
     currentGroupName := signal("")
     currentGroupRooms := signal([])
+    fetchPeriod := signal(3)
     loadedGuests := signal([])
 
     handleListInitialize(){
@@ -19,7 +20,7 @@ PMNG_App(App, popupTitle, db) {
         loadedGuests.set([Map("roomNum", "Loading...", "name", "Loading")])
 
         groupInfo := PMNG_Data.getGroupHouseInformations(A_MyDocuments . "\" . blockcode.Value . ".XML")
-        guestInfo := PMNG_Data.getGroupGuests(db, groupInfo["inhRooms"])
+        guestInfo := PMNG_Data.getGroupGuests(db, groupInfo["inhRooms"], fetchPeriod.value)
         
         currentGroupName.set(groupInfo["groupName"])
         currentGroupRooms.set(groupInfo["inhRooms"])
@@ -52,13 +53,13 @@ PMNG_App(App, popupTitle, db) {
     helpInfo := ""
 
     return (
-        App.AddGroupBox("R19 y+20 w270"," "),
+        App.AddGroupBox("R20 y+20 w270"," "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
            .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
 
         ; check all btn
         App.AddCheckBox("vcheckAll h20 y+10", "全选"),
-        App.AddReactiveText("h20 x+5 0x200", "当前团队：{1}" , currentGroupName).setFont("Bold"),
+        App.AddReactiveText("w200 h20 x+5 0x200", "当前团队：{1}" , currentGroupName).setFont("Bold"),
 
         ; inhouse guests list
         App.AddReactiveListView(options, columnDetails, loadedGuests),
