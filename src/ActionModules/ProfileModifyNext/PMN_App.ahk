@@ -1,4 +1,5 @@
 #Include "./GuestProfileList.ahk"
+#Include "./GuestProfileList.ahk"
 #Include "./GuestProfileDetails.ahk"
 #Include "./PMN_FillIn.ahk"
 #Include "./PMN_Waterfall.ahk"
@@ -24,7 +25,9 @@ PMN_App(App, moduleTitle, db, identifier) {
     effect(searchBy, new => handleSearchByChange(new))
     handleSearchByChange(cur) {
         App.getCtrlByName("searchBox").Value := ""
-        App.getCtrlByType("ListView").Opt(cur = "waterfall" ? "+Checked" : "-Checked")
+        
+        LV := App.getCtrlByType("ListView")
+        LV.Opt(cur = "waterfall" ? "+Checked" : "-Checked")
     }
 
     currentGuest := signal(Map("idNum", 0))
@@ -308,7 +311,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         ),
         
         ; search conditions
-        App.AddDropDownList("x+10 w80 Choose1", ["姓名/房号", "证件号码", "地址", "电话", "生日", "瀑流模式"])
+        App.AddDropDownList("x+10 w80 Choose2", ["瀑流模式", "姓名/房号", "证件号码", "地址", "电话", "生日"])
            .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
         
         ; search box

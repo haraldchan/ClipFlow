@@ -1,77 +1,86 @@
 class PMN_Waterfall {
     static cascade(rooms, selectedGuests) {
-        WinMaximize "ahk_class SunAwtFrame"
-        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput true
+        ; WinMaximize "ahk_class SunAwtFrame"
+        ; WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
+        ; BlockInput true
+
+        curRoom := signal(0)
 
         for room in rooms {
+            curRoom.set(room)
 
             for guest in selectedGuests {
-                remaining := selectedGuests.filter(g => g["roomNum"] = room).Length
+                remaining := selectedGuests.filter(g => g["roomNum"] = curRoom.value).Length
                 isLastOne := remaining = 1 ? true : false
                 
-                if (guest["roomNum"] = room) {
+                if (guest["roomNum"] = curRoom.value) {
                     this.search(room, isLastOne)
                     utils.waitLoading()
-                    this.modify(guest)
+                    this.modify(guest, isLastOne)
+                    guest["roomNum"] := ""
                 }
-
-                guest["roomNum"] := ""
             }
         }
 
-        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-        BlockInput false
+        ; WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        ; BlockInput false
         Sleep 1000
-        MsgBox("Modify 已完成。", "Waterfall")
+        MsgBox("Waterfall cascaded.", popupTitle, "4096 T1")
     }
 
     static search(roomNum, isLastOne) {
+        formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
+
         MouseMove 329, 196 ; room number field
         Click 3
         utils.waitLoading()
         
-        Send roomNum
+        Send formattedRoom
         utils.waitLoading()
 
-        ; solution 1: filter by "1"
-        ; Send "{Tab}" ; last name field
-        ; utils.waitLoading()
-        ; Send Format("{Text}{1}", isLastOne ? "" : "1") ; send "1" if not last one
-        ; utils.waitLoading()
+        if (isLastOne = false) {
+            Send "{Tab}" ; last name field
+            utils.waitLoading()
+            Send Format("{Text}{1}", "1") 
+            utils.waitLoading()
 
-        ; solution 2: filter by NRR
-        Send "!a"
-        utils.waitLoading()
-        loop 4 {
-            Send "{Tab}"
+            Send "!a"
+            utils.waitLoading()
+            loop 4 {
+                Send "{Tab}"
+                utils.waitLoading()
+            }
+            Send Format("{Text}{1}", "NRR")
             utils.waitLoading()
         }
-        Send Format("{Text}{1}", isLastOne ? "NRR" : "TGDA")
-        utils.waitLoading()
 
         Send "!h" ; alt+h => search
         utils.waitLoading()
 
         if (isLastOne = true) {
-            MouseMove 1, 1 ; TODO: this should be the adult sorting field
-            Click
+            Click 838, 378, "Right" 
             utils.waitLoading()
-            ; TODO: see if the main profile is on-top and focused
+            Send "a"
         }
     }
 
-    static modify(guest) {        
+    static modify(guest, isLastOne) {        
         Send "!p" ; open profile
         utils.waitLoading()
         sleep 1000
+
+        Send "!n"
+        utils.waitLoading()
         
         PMN_FillIn.fill(guest)
         Sleep 1000
-        Send "!o" ; ok
         
+        Send "!o" ; ok
         utils.waitLoading()
         sleep 1000
-        Send "!r" ; clear
+
+        if (isLastOne = false) {
+            Send "!r" ; clear
+        }
     }
 }
