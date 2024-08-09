@@ -120,9 +120,9 @@ class PMNG_Data {
         return Map("groupName", groupName, "inhRooms", inhRooms)
     }
 
-    static getGroupGuests(db, inhRooms) {
+    static getGroupGuests(db, inhRooms, fetchPeriod) {
         roomNums := inhRooms.unique()
-        loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 60 * 24)
+        loadedGuests := db.load(, FormatTime(A_Now, "yyyyMMdd"), 60 * fetchPeriod)
 
         groupGuests := []
 
