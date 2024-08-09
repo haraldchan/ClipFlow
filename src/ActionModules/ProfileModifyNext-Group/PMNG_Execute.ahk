@@ -1,20 +1,23 @@
 #Include "../ProfileModifyNext/PMN_FillIn.ahk"
 class PMNG_Execute {
     static startModify(inhRooms, groupGuests) {
-        uInhRomms := inhRooms.unique()
-
         WinMaximize "ahk_class SunAwtFrame"
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         BlockInput true
-        index := 1
 
-        for room in uInhRomms {
+        uInhRooms := inhRooms.unique()
+        index := 1
+        curRoom := signal("")
+
+        for room in uInhRooms {
+            curRoom.set(room)
 
             for guest in groupGuests {
-                remaining := groupGuests.filter(g => g["roomNum"] = room).Length
+                remaining := groupGuests.filter(g => g["roomNum"] = curRoom.value).Length
                 isLastOne := remaining = 1 ? true : false
 
-                if (index > inhRooms.filter(r => r = room).Length) {
+                if (index > inhRooms.filter(r => r = curRoom.value).Length && remaining > 0) {
+                    msgbox(inhRooms.filter(r => r = curRoom.value).Length)
                     this.search(room, false)
                     this.makeShare()
                     Send "!r" ; clear
@@ -24,10 +27,13 @@ class PMNG_Execute {
                     this.search(room, isLastOne)
                     utils.waitLoading()
                     this.modify(guest)
+                    guest["roomNum"] := ""
+                    index := (remaining = 1) ? 1 : index + 1
                 }
                 
-                guest["roomNum"] := ""
-                index := isLastOne ? 1 : index + 1
+                if (remaining = 1) {
+                    break
+                }
             }
         }
 
@@ -38,11 +44,13 @@ class PMNG_Execute {
     }
 
     static search(roomNum, isLastOne) {
+        formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
+
         MouseMove 329, 196 ; room number field
         click 3
         utils.waitLoading()
 
-        Send roomNum
+        Send formattedRoom
         utils.waitLoading()
         Send "!a"
         utils.waitLoading()
