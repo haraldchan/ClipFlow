@@ -33,10 +33,6 @@ class PMN_FillIn {
         parsedInfo["country"] := currentGuest["guestType"] = "国外旅客"
             ? useDict.getCountryCode(currentGuest["country"])
             : "CN"
-        ; address
-        parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客"
-            ? currentGuest["addr"]
-            : " "
         ; province(mainland & hk/mo/tw)
         if (currentGuest["guestType"] = "内地旅客") {
             parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])
@@ -58,20 +54,6 @@ class PMN_FillIn {
         parsedInfo["tel"] := currentGuest["tel"]
 
         return parsedInfo
-    }
-
-    static waitAltWin(anchorX, anchorY){
-        CoordMode "Pixel", "Screen"
-        WIN_HEADER_BLUE := "0xBFCDDB"
-        loop 16 {
-            Sleep 250
-            if (PixelGetColor(anchorX, anchorY - 98) != WIN_HEADER_BLUE) {
-                continue
-            } else {
-                Sleep 500 
-                break
-            }
-        }
     }
 
     static fillAction(guestProfileMap) {
