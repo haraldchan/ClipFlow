@@ -25,7 +25,7 @@ class PMN_Waterfall {
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
         BlockInput false
         Sleep 1000
-        MsgBox("Waterfall cascaded.", popupTitle, "4096 T1")
+        MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
     }
 
     static search(roomNum, isLastOne) {
