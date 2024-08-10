@@ -5,7 +5,7 @@ CoordMode "Mouse", "Screen"
 TraySetIcon A_ScriptDir . "\src\Assets\CFTray.ico"
 
 ; Initializing configuration
-version := "1.3.0"
+version := "1.4.0"
 popupTitle := "ClipFlow " . version
 winGroup := ["ahk_class SunAwtFrame", "旅客信息"]
 config := useConfigJSON(
