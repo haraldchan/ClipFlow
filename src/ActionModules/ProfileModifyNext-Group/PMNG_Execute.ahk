@@ -41,6 +41,8 @@ class PMNG_Execute {
         BlockInput false
         Sleep 1000
         MsgBox("Group Modify 已完成。")
+        ; clean up xml
+        FileDelete(A_MyDocuments . PMNG_Data.saveFileName)
     }
 
     static search(roomNum, isLastOne) {

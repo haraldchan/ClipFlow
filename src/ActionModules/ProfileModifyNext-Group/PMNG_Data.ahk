@@ -1,4 +1,6 @@
 class PMNG_Data {
+    static saveFileName := ""
+
     static reportFiling(blockcode, initX := 433, initY := 598) {
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         BlockInput true
@@ -31,17 +33,17 @@ class PMNG_Data {
 
         ; run saving actions, return filename
         this.saveGroupInhouse(blockcode)
-        saveFileName := blockcode . ".XML"
+        this.saveFileName := blockcode . ".XML"
 
         utils.waitLoading()
         Send "!f"
         utils.waitLoading()
         Send "{Backspace}"
         utils.waitLoading()
-        Send Format("{Text}{1}", saveFileName)
+        Send Format("{Text}{1}", this.saveFileName)
         Sleep 1500
         Send "{Enter}"
-        TrayTip Format("正在保存：{1}", saveFileName)
+        TrayTip Format("正在保存：{1}", this.saveFileName)
 
         isWindows7 := StrSplit(A_OSVersion, ".")[1] = 6
         
@@ -61,7 +63,7 @@ class PMNG_Data {
                 WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
             }
 
-            if (FileExist(A_MyDocuments . "\" . saveFileName)) {
+            if (FileExist(A_MyDocuments . "\" . this.saveFileName)) {
                 break
             }
 
