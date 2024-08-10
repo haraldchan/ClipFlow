@@ -1,0 +1,7 @@
+#Include "./BatchCheckout/BatchCheckout.ahk"
+#Include "./InvoiceWechat/InvoiceWechat.ahk"
+#Include "./ProfileModify/ProfileModifyNew.ahk"
+#Include "./ProfileModifyNext/ProfileModifyNext.ahk"
+#Include "./ProfileModifyNext-Group/ProfileModifyNext-Group.ahk"
+#Include "./ReservationHandler/ReservationHandler.ahk"
+#Include "./ShareClip/ShareClip.ahk"

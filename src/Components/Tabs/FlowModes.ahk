@@ -1,10 +1,4 @@
-﻿#Include "../../ActionModules/ProfileModify/ProfileModifyNew.ahk"
-#Include "../../ActionModules/ProfileModifyNext/ProfileModifyNext.ahk"
-#Include "../../ActionModules/InvoiceWechat/InvoiceWechat.ahk"
-#Include "../../ActionModules/ShareClip/ShareClip.ahk"
-#Include "../../ActionModules/ReservationHandler/ReservationHandler.ahk"
-#Include "../../ActionModules/BatchCheckout/BatchCheckout.ahk"
-#Include "../../ActionModules/ProfileModifyNext-Group/ProfileModifyNext-Group.ahk"
+﻿#Include "../../ActionModules/action-module-index.ahk"
 
 FlowModes(CF) {
 	modules := [
