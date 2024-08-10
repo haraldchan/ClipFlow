@@ -1,7 +1,7 @@
 #Include "./PMN_App.ahk"
 
 class ProfileModifyNext {
-    static name := "Profile Modify Next"
+    static name := "ProfileModifyNext"
     static title := "Flow Mode - " . this.name
     static popupTitle := "ClipFlow - " . this.name
     static identifier := "04047fce826f48f751891b4721f7ac70" ; MD5 hash: ProfileModifyNext
