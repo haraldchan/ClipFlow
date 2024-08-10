@@ -1,8 +1,8 @@
 class PMN_Waterfall {
     static cascade(rooms, selectedGuests) {
-        ; WinMaximize "ahk_class SunAwtFrame"
-        ; WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        ; BlockInput true
+        WinMaximize "ahk_class SunAwtFrame"
+        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
+        BlockInput true
 
         curRoom := signal(0)
 
@@ -22,8 +22,8 @@ class PMN_Waterfall {
             }
         }
 
-        ; WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-        ; BlockInput false
+        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        BlockInput false
         Sleep 1000
         MsgBox("Waterfall cascaded.", popupTitle, "4096 T1")
     }
