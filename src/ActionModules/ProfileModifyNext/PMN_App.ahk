@@ -90,10 +90,8 @@ PMN_App(App, moduleTitle, db, identifier) {
                     if (InStr(updater[item], "*")) {
                         continue
                     }
-
                     guest[item] := updater[item]
                 }
-
                 matchedGuest.set(guest)
             }
         }
