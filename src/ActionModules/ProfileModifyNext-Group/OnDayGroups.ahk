@@ -1,5 +1,3 @@
-; a on-day-group excel file display component
-
 OnDayGroups(App, groups, selectedGroup) {
     XL_FILE_PATH := Format("\\10.0.2.13\fd\9-ON DAY GROUP DETAILS\{2}\{2}{3}\{1}Group ARR&DEP.xlsx", FormatTime(A_Now, "yyyyMMdd"), A_Year, A_MM)
 
@@ -22,7 +20,6 @@ OnDayGroups(App, groups, selectedGroup) {
                     "blockCode", blockCodeReceived
                 )
             )
-
         }
         Xl.Workbooks.Close()
         Xl.Quit()
@@ -33,8 +30,8 @@ OnDayGroups(App, groups, selectedGroup) {
     return (
         App.AddText("w300 h30", "今日团队"),
         groups.value.map(group => 
-            App.AddRadio("x30 h30 w200 y+10", Format("{1} `t- {2}", group["blockName"], group["blockCode"]))
+            App.AddRadio("x30 h20 w200 y+10", Format("{1} `t- {2}", group["blockName"], group["blockCode"]))
                .OnEvent("Click", (*) => selectedGroup.set(group))
-        ),
+        )
     )
 }

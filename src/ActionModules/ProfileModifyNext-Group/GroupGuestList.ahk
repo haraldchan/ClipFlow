@@ -1,5 +1,3 @@
-; a guest list component
-
 GroupGuestList(App, loadedGuests) {
     columnDetails := {
         keys: ["roomNum", "name"],
