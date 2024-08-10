@@ -109,25 +109,14 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleListContentUpdate() {
-        useListPlaceholder(
-            listContent, 
-            ["roomNum","name", "gender", "idType", "idNum", "addr"],
-            "Loading..."
-        )
+        colTitles := ["roomNum","name", "gender", "idType", "idNum", "addr"]
+        useListPlaceholder(listContent, colTitles,"Loading...")
 
-        if (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd")) {
-            App.getCtrlByName("period").Enabled := true
-        } else {
-            App.getCtrlByName("period").Enabled := false
-        }
+        App.getCtrlByName("period").Enabled := (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd"))
 
         loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
         if (loadedItems.Length = 0) {
-            useListPlaceholder(
-                listContent, 
-                ["roomNum","name", "gender", "idType", "idNum", "addr"],
-                "No Data"
-            )
+            useListPlaceholder(listContent, colTitles,"No Data")
             return
         }
 
