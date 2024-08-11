@@ -110,6 +110,9 @@ class PMNG_Execute {
         utils.waitLoading()
         Send "{Text}6"
         utils.waitLoading()
+        
+        ; TODO: change the flow, keep no post 
+
         Send "!o"
         utils.waitLoading()
         Send "!r"
