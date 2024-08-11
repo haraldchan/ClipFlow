@@ -2,16 +2,16 @@ GroupGuestList(App, loadedGuests) {
     columnDetails := {
         keys: ["roomNum", "name"],
         titles: ["房号", "姓名"],
-        widths: [60, 170]
+        widths: [60, 150]
     }
 
     options := {
-        lvOptions: "Checked Grid NoSortHdr LV0x4000 -ReadOnly w245 r16 xp-55 y+10",
+        lvOptions: "Checked Grid NoSortHdr -ReadOnly w245 r14 y+5",
         itemOptions: "Check"
     }
 
     return (
-        App.AddCheckBox("vcheckAll h20 y+10", "全选"),
+        App.AddCheckBox("vcheckAll Checked h20 x310 y155", " 全选").SetFont("bold s10"),
         App.AddReactiveListView(options, columnDetails, loadedGuests),
         ; link check all status
         shareCheckStatus(
