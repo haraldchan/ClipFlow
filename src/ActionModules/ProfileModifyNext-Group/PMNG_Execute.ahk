@@ -14,23 +14,21 @@ class PMNG_Execute {
 
             for guest in groupGuests {
                 remaining := groupGuests.filter(g => g["roomNum"] = curRoom.value).Length
-                isLastOne := remaining = 1 ? true : false
 
                 if (index > inhRooms.filter(r => r = curRoom.value).Length && remaining > 0) {
-                    msgbox(inhRooms.filter(r => r = curRoom.value).Length)
-                    this.search(room, false)
+                    this.search(room, 1) ; find main resv and make share on it
                     this.makeShare()
                     Send "!r" ; clear
                 }
 
                 if (guest["roomNum"] = room) {
-                    this.search(room, isLastOne)
+                    this.search(room, index)
                     utils.waitLoading()
                     this.modify(guest)
                     guest["roomNum"] := ""
                     index := (remaining = 1) ? 1 : index + 1
                 }
-                
+
                 if (remaining = 1) {
                     break
                 }
@@ -45,8 +43,9 @@ class PMNG_Execute {
         FileDelete(A_MyDocuments . PMNG_Data.saveFileName)
     }
 
-    static search(roomNum, isLastOne) {
+    static search(roomNum, index) {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
+        rateCode := index = 1 ? "TGDA" : "NRR"
 
         MouseMove 329, 196 ; room number field
         click 3
@@ -54,13 +53,21 @@ class PMNG_Execute {
 
         Send formattedRoom
         utils.waitLoading()
+
+        if (rateCode = "NRR") {
+            Send "{Tab}" ; last name field
+            utils.waitLoading()
+            Send Format("{Text}{1}", "1")
+            utils.waitLoading()
+        }
+
         Send "!a"
         utils.waitLoading()
         loop 4 {
             Send "{Tab}"
             utils.waitLoading()
         }
-        Send Format("{Text}{1}", isLastOne ? "NRR" : "TGDA")
+        Send Format("{Text}{1}", rateCode)
         utils.waitLoading()
         Send "!h" ; alt+h => search
         utils.waitLoading()
