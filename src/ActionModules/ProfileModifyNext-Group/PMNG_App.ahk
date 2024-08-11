@@ -1,7 +1,8 @@
 #Include "./OnDayGroups.ahk"
 #Include "./GroupGuestList.ahk"
-#Include "PMNG_Data.ahk"
-#Include "PMNG_Execute.ahk"
+#Include "./Settings.ahk"
+#Include "./PMNG_Data.ahk"
+#Include "./PMNG_Execute.ahk"
 
 PMNG_App(App, popupTitle, db) {
     groups := signal([])
@@ -9,6 +10,7 @@ PMNG_App(App, popupTitle, db) {
 
     currentGroupRooms := signal([])
     fetchPeriod := signal(5)
+    rateCode := signal("TGDA")
     loadedGuests := signal([])
 
     effect(selectedGroup, () => loadedGuests.set([]))
@@ -34,7 +36,7 @@ PMNG_App(App, popupTitle, db) {
             selectedGuests.Push(loadedGuests.value[row])
         }
 
-        PMNG_Execute.startModify(currentGroupRooms.value, selectedGuests)
+        PMNG_Execute.startModify(currentGroupRooms.value, selectedGuests, rateCode.value)
     }
 
     helpInfo := ""
@@ -42,7 +44,7 @@ PMNG_App(App, popupTitle, db) {
     return (
         App.AddGroupBox("R16 y+20 w550", " "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
-        .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
+        .OnEvent("Click", (*) => PMNG_Settings(fetchPeriod, rateCode)),
 
         ; shows due in groups
         OnDayGroups(App, groups, selectedGroup),
