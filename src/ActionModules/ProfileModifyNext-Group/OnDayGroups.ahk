@@ -1,5 +1,5 @@
 OnDayGroups(App, groups, selectedGroup) {
-    XL_FILE_PATH := Format("\\10.0.2.13\fd\9-ON DAY GROUP DETAILS\{2}\{2}{3}\{1}Group ARR&DEP.xlsx", FormatTime(A_Now, "yyyyMMdd"), A_Year, A_MM)
+    XL_FILE_PATH := Format("\\10.0.2.13\fd\9-ON DAY GROUP DETAILS\{2}\{2}{3}\{1}Group ARR&DEP.xlsx", FormatTime("20240811", "yyyyMMdd"), A_Year, A_MM)
 
     groups.set(getBlockInfo(XL_FILE_PATH))
     getBlockInfo(fileName) {
@@ -24,6 +24,7 @@ OnDayGroups(App, groups, selectedGroup) {
         Xl.Workbooks.Close()
         Xl.Quit()
 
+        selectedGroup.set(blockInfo[1])
         return blockInfo
     }
 
