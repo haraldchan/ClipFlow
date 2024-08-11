@@ -60,12 +60,10 @@ class useDict {
      */
     static fetchPinyin(hanzi) {
         url := Format("https://hanyu.baidu.com/zici/s?wd={1}", hanzi)
+        isWindows7 := StrSplit(A_OSVersion, ".")[1] = 6
 
         whr := ComObject("WinHttp.WinHttpRequest.5.1")
         html := ComObject("HTMLFile")
-
-        notifier := () => TrayTip(Format("正在获取 {1} 的拼音...", hanzi))
-        SetTimer(notifier, 1000)
 
         loop {
             whr.Open("POST", url, false)
@@ -73,7 +71,6 @@ class useDict {
             whr.WaitForResponse()
             page := whr.ResponseText
 
-            html.OpenNew(true)
             html.Write(page)
             Sleep 500
 
@@ -81,9 +78,11 @@ class useDict {
                 sleep 500
                 continue
             } else {
-                pinyin := html.getElementsByTagName("b")[0].textContent
-                SetTimer(notifier, 0)
-                TrayTip("已完成")
+                if (isWindows7 = true) {
+                    pinyin := html.getElementsByTagName("b")[0].textContent
+                } else {
+                    pinyin := html.getElementsByTagName("b")[0].innerText
+                }
                 break
             }
         }
@@ -100,7 +99,6 @@ class useDict {
         whr := ""
 
         ; update pinyin dictionary
-
         Dict.pinyin[unToned] := Dict.pinyin[unToned] . hanzi
         FileDelete(Dict.DICT_PATH . "\pinyin.json")
         FileAppend(JSON.stringify(Dict.pinyin), Dict.DICT_PATH . "\pinyin.json" ,"UTF-8")
