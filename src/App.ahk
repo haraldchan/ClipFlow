@@ -10,18 +10,21 @@ App(CF) {
 	}
 
 	clearList(*) {
-		FileDelete(config.path)
+		try {
+			FileDelete(config.path)
+		}
 		config.createLocal()
     	utils.cleanReload(winGroup)
 	}
 
 	return (
-		onTopCheckBox := CF.AddCheckbox("h25 x15", "保持 ClipFlow 置顶    / 停止脚本: Ctrl+F12"),
+
+		onTopCheckBox := CF.AddCheckbox("h20 x15", "保持 ClipFlow 置顶    / 停止脚本: F11"),
 		onTopCheckBox.OnEvent("Click", keepOnTop),
 
 		Tabs(CF, onTop, onTopCheckBox),
 
-		CF.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
-		CF.AddButton("h30 w130 x+20", "Refresh").OnEvent("Click", (*) => utils.cleanReload(winGroup))
+		ClipFlow.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
+		ClipFlow.AddButton("h30 w130 x+20", "Refresh").OnEvent("Click", (*) => utils.cleanReload(winGroup))
 	)
 }

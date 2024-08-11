@@ -24,6 +24,6 @@ ClipFlow.Show()
 
 ; hotkeys setup
 Pause:: ClipFlow.Show()
-^F12:: utils.cleanReload(winGroup)
+F11:: utils.cleanReload(winGroup)
 #Hotif WinActive(popupTitle)
 Esc:: ClipFlow.Hide()
