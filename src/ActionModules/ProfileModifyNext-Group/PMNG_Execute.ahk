@@ -1,4 +1,5 @@
 #Include "../ProfileModifyNext/PMN_FillIn.ahk"
+
 class PMNG_Execute {
     static startModify(inhRooms, groupGuests) {
         WinMaximize "ahk_class SunAwtFrame"
@@ -39,8 +40,6 @@ class PMNG_Execute {
         BlockInput false
         Sleep 1000
         MsgBox("Group Modify 已完成。")
-        ; clean up xml
-        FileDelete(A_MyDocuments . PMNG_Data.saveFileName)
     }
 
     static search(roomNum, index) {
