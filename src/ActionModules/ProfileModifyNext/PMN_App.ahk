@@ -25,9 +25,12 @@ PMN_App(App, moduleTitle, db, identifier) {
     effect(searchBy, new => handleSearchByChange(new))
     handleSearchByChange(cur) {
         App.getCtrlByName("searchBox").Value := ""
+        queryFilter.update("search", "")
         
         LV := App.getCtrlByType("ListView")
         LV.Opt(cur = "waterfall" ? "+Checked" : "-Checked")
+
+        handleListContentUpdate()
     }
 
     currentGuest := signal(Map("idNum", 0))
@@ -108,13 +111,13 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     handleListContentUpdate() {
         colTitles := ["roomNum","name", "gender", "idType", "idNum", "addr"]
-        useListPlaceholder(listContent, colTitles,"Loading...")
+        useListPlaceholder(listContent, colTitles, "Loading...")
 
         App.getCtrlByName("period").Enabled := (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd"))
 
         loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
         if (loadedItems.Length = 0) {
-            useListPlaceholder(listContent, colTitles,"No Data")
+            useListPlaceholder(listContent, colTitles, "No Data")
             return
         }
 
@@ -219,11 +222,23 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         if (searchBy.value = "waterfall") {
+            if (queryFilter.value["search"] = "") {
+                MsgBox("瀑流模式必须提供房号。", popupTitle, "T2")
+                App.Show()
+                return
+            }
+
             selectedGuests := []
             ; pick selected guests
             for row in LV.getCheckedRowNumbers() {
+                if (LV.getCheckedRowNumbers()[1] = "0") {
+                    MsgBox("未选中 Profile。", popupTitle, "T2")
+                    App.Show()
+                    return
+                }
                 selectedGuests.Push(listContent.value[row])
             }
+
             PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests)
         } else {
             PMN_Fillin.fill(listContent.value[LV.GetNext()])
