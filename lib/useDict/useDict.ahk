@@ -72,7 +72,9 @@ class useDict {
             whr.Send()
             whr.WaitForResponse()
             page := whr.ResponseText
-            html.write(page)
+
+            html.OpenNew(true)
+            html.Write(page)
 
             if (html.getElementsByTagName("b")[0] = "") {
                 sleep 500
@@ -93,7 +95,6 @@ class useDict {
             }
         }
 
-        html.write("")
         html := ""
         whr := ""
 
