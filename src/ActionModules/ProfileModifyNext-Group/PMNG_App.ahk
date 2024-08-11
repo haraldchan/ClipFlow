@@ -11,6 +11,8 @@ PMNG_App(App, popupTitle, db) {
     fetchPeriod := signal(5)
     loadedGuests := signal([])
 
+    effect(selectedGroup, () => loadedGuests.set([]))
+
     handleListInitialize() {
         if (!FileExist(A_MyDocuments . "\" . selectedGroup.value["blockCode"] . ".XML")) {
             PMNG_Data.reportFiling(selectedGroup.value["blockCode"])
