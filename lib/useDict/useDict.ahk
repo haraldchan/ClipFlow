@@ -75,6 +75,7 @@ class useDict {
 
             html.OpenNew(true)
             html.Write(page)
+            Sleep 500
 
             if (html.getElementsByTagName("b")[0] = "") {
                 sleep 500
