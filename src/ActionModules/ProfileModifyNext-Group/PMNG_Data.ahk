@@ -105,9 +105,6 @@ class PMNG_Data {
         xmlDoc.async := false
         xmlDoc.load(xmlPath)
         roomElements := xmlDoc.getElementsByTagName("ROOM")
-        groupNameElements := xmlDoc.getElementsByTagName("GROUP_NAME")
-        
-        groupName := Trim(groupNameElements[0].ChildNodes[0].nodeValue)
         
         inhRooms := []
         loop roomElements.Length {
@@ -119,7 +116,7 @@ class PMNG_Data {
             inhRooms.Push(roomNum)
         }
 
-        return Map("groupName", groupName, "inhRooms", inhRooms)
+        return Map("inhRooms", inhRooms)
     }
 
     static getGroupGuests(db, inhRooms, fetchPeriod) {
