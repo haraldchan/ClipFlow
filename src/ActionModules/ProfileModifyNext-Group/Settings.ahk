@@ -1,12 +1,10 @@
 PMNG_Settings(fetchPeriod, rateCode) {
-    Settings := Gui(, "Settings")
+    if (WinExist("PMNG Settings")) {
+        return
+    }
+
+    Settings := Gui(, "PMNG Settings")
     Settings.SetFont(, "微软雅黑")
-    Settings.OnEvent("Close", (this) => (
-        rateCode.set(this.getCtrlByName("rc").Value),
-        fetchPeriod.set(this.getCtrlByName("fp").Value),
-        Sleep(100),
-        this.Destroy()
-    ))
 
     helpInfo := "
     (
@@ -35,6 +33,16 @@ PMNG_Settings(fetchPeriod, rateCode) {
         ; fetchPeriod setting
         Settings.AddText("x10 w150 h25 0x200", "获取旅客时间范围（小时）："),
         Settings.AddReactiveEdit("vfp w80 h25 x+10", "{1}", fetchPeriod),
+        ; btns
+        Settings.AddButton("x10 y+15 w120 h35", "取 消(&C)")
+            .OnEvent("Click", (*) => Settings.Hide()),
+        Settings.AddButton("x+5 w120 h35", "保 存(&S)")
+            .OnEvent("Click", (*) => (
+                rateCode.set(Settings.getCtrlByName("rc").Value),
+                fetchPeriod.set(Settings.getCtrlByName("fp").Value),
+                Sleep(200),
+                Settings.Hide()
+            )),
 
         Settings.Show()
     )
