@@ -28,9 +28,9 @@ OnDayGroups(App, groups, selectedGroup) {
     }
 
     return (
-        App.AddText("w300 h30", "今日团队"),
+        App.AddText("w300 h20 0x200", "今日团队").SetFont("bold s11 q4"),
         groups.value.map(group => 
-            App.AddRadio("x30 h20 w200 y+10", Format("{1} `t- {2}", group["blockName"], group["blockCode"]))
+            App.AddRadio((A_Index = 1 ? "Checked " : "") . "h22 w200 y+10", Format("{1} - {2}", group["blockName"], group["blockCode"]))
                .OnEvent("Click", (*) => selectedGroup.set(group))
         )
     )
