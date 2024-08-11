@@ -60,7 +60,10 @@ class PMN_Waterfall {
         if (isLastOne = true) {
             Click 838, 378, "Right" 
             utils.waitLoading()
-            Send "a"
+            Send "{Down}"
+            utils.waitLoading()
+            Send "{Enter}"
+            utils.waitLoading()
         }
     }
 
