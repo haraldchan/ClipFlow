@@ -5,20 +5,25 @@ class PMN_Waterfall {
         BlockInput true
 
         curRoom := signal(0)
+        index := 1
 
         for room in rooms {
             curRoom.set(room)
 
             for guest in selectedGuests {
                 remaining := selectedGuests.filter(g => g["roomNum"] = curRoom.value).Length
-                isLastOne := remaining = 1 ? true : false
                 
                 if (guest["roomNum"] = curRoom.value) {
-                    this.search(room, isLastOne)
+                    this.search(room, index)
                     utils.waitLoading()
-                    this.modify(guest, isLastOne)
+                    this.modify(guest, index)
                     guest["roomNum"] := ""
+                    index := (remaining = 1) ? 1 : index + 1
                 }
+            }
+
+            if (remaining = 1) {
+                break
             }
         }
 
@@ -28,7 +33,7 @@ class PMN_Waterfall {
         MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
     }
 
-    static search(roomNum, isLastOne) {
+    static search(roomNum, index) {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
         MouseMove 329, 196 ; room number field
@@ -38,7 +43,17 @@ class PMN_Waterfall {
         Send formattedRoom
         utils.waitLoading()
 
-        if (isLastOne = false) {
+        if (index = 1) {
+            Send "!h" ; alt+h => search
+            utils.waitLoading()
+
+            Click 838, 378, "Right" 
+            utils.waitLoading()
+            Send "{Down}"
+            utils.waitLoading()
+            Send "{Enter}"
+            utils.waitLoading()
+        } else {
             Send "{Tab}" ; last name field
             utils.waitLoading()
             Send Format("{Text}{1}", "1") 
@@ -52,17 +67,8 @@ class PMN_Waterfall {
             }
             Send Format("{Text}{1}", "NRR")
             utils.waitLoading()
-        }
 
-        Send "!h" ; alt+h => search
-        utils.waitLoading()
-
-        if (isLastOne = true) {
-            Click 838, 378, "Right" 
-            utils.waitLoading()
-            Send "{Down}"
-            utils.waitLoading()
-            Send "{Enter}"
+            Send "!h" ; alt+h => search
             utils.waitLoading()
         }
     }
