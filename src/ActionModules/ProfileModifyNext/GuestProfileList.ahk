@@ -22,7 +22,7 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
         db.updateOne(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
     }
 
-    showProfileDetails(LV, itemIndex) {
+    showProfileDetails(LV, itemIndex, *) {
         if (itemIndex = 0) {
             return
         }
@@ -34,8 +34,8 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
         App.AddReactiveListView(options, columnDetails, listContent)
            .OnEvent(Map(
                 "DoubleClick", copyIdNumber,
-                "ItemEdit", (LV, itemIndex) => handleUpdateItem(LV, itemIndex),
-                "ContextMenu", (LV, itemIndex, *) => showProfileDetails(LV, itemIndex)
+                "ItemEdit", handleUpdateItem,
+                "ContextMenu", showProfileDetails
             ))
     )
 }
