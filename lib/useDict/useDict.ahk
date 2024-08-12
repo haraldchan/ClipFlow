@@ -70,28 +70,21 @@ class useDict {
             whr.Send()
             whr.WaitForResponse()
             page := whr.ResponseText
-
             html.Write(page)
-            Sleep 500
 
-            if (html.getElementsByTagName("b")[0] = "") {
-                sleep 500
+            if (html.getElementById("pinyin") = "") {
+                Sleep 500
                 continue
             } else {
-                if (isWindows7 = true) {
-                    pinyin := html.getElementsByTagName("b")[0].textContent
-                } else {
-                    pinyin := html.getElementsByTagName("b")[0].innerText
-                }
+                toned := html.getElementById("pinyin").InnerText
                 break
             }
         }
         
         unToned := ""
-
         for tonedChar, char in Dict.tone {
-            if (InStr(pinyin, tonedChar)) {
-                unToned := StrReplace(pinyin, tonedChar, char)
+            if (InStr(toned, tonedChar)) {
+                unToned := Trim(StrReplace(toned, tonedChar, char))
             }
         }
 
