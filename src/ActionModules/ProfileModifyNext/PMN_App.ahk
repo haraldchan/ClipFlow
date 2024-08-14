@@ -57,6 +57,14 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
             MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), popupTitle, "T1.5")
 
+        ; for revealing info on web
+        } else if (incomingGuest["isMod"] = "reveal") {
+            updatedGuest := handleGuestInfoUpdateFromMod(incomingGuest)
+            if (updatedGuest = "") {
+                return
+            }
+            A_Clipboard := JSON.stringify(updatedGuest)
+
         ; adding guest
         } else {
             incomingGuest["fileName"] := A_Now . A_MSec
@@ -67,8 +75,10 @@ PMN_App(App, moduleTitle, db, identifier) {
         currentGuest.set(JSON.parse(A_Clipboard))
         handleListContentUpdate()
 
-        clipHistory := config.read("clipHistory")
-        A_Clipboard := clipHistory.Length > 1 ? clipHistory[1] : ""
+        if (incomingGuest["isMod"] != "reveal") {
+            clipHistory := config.read("clipHistory")
+            A_Clipboard := clipHistory.Length > 1 ? clipHistory[1] : ""
+        }
     }
 
     handleGuestInfoUpdateFromAdd(captured) {
@@ -318,12 +328,12 @@ PMN_App(App, moduleTitle, db, identifier) {
         
         ; search box
         App.AddReactiveEdit("vsearchBox x+5 w100 h25")
-           .OnEvent("Change", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
+        .OnEvent("Change", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
         
         ; period
         App.AddText("x+10 h25 0x200", "最近"),
         App.AddReactiveEdit("vperiod Number x+1 w30 h25", queryFilter.value["period"])
-           .OnEvent("Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
+        .OnEvent("Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
         App.AddText("x+1 h25 0x200", "分钟"),
         
         ; manual updating btns
