@@ -73,17 +73,47 @@ class PMN_Waterfall {
         }
     }
 
-    static modify(guest, isLastOne) {        
+    static modify(guest, isLastOne) { 
+        CoordMode "Pixel", "Screen"
+        CoordMode "Mouse", "Screen"
+        AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
+        FOUND := "0x000080"
+        NOT_FOUND := "0x808080"
+
         Send "!p" ; open profile
         utils.waitLoading()
-        sleep 1000
+        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, AnchorImage)
+        x := Number(FoundX) + 350
+        y := Number(FoundY) + 80
 
-        Send "!n"
+        sleep 1000
         utils.waitLoading()
+
+        Send "!h" ; search
+        utils.waitLoading()
+        loop 12 {
+            Send "{Tab}"
+            Sleep 10
+        }
+        Send Format("{Text}{1}", guest["idNum"])
+        utils.waitLoading()
+        Send "!h" ; search 
+        utils.waitLoading()
+
+        res := PixelGetColor(x, y)
+        utils.waitLoading()
+        if (res = FOUND) {
+            Send "!o"
+        } else {
+            Send "!c"
+            utils.waitLoading()
+            Send "!n"
+            utils.waitLoading()
         
-        PMN_FillIn.fill(guest)
-        Sleep 1000
-        
+            PMN_FillIn.fill(guest)
+            Sleep 1000
+        }
+
         Send "!o" ; ok
         utils.waitLoading()
         sleep 1000
