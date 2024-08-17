@@ -16,7 +16,7 @@ class PMN_Waterfall {
                 if (guest["roomNum"] = curRoom.value) {
                     this.search(room, index)
                     utils.waitLoading()
-                    this.modify(guest, index)
+                    this.modify(guest, remaining)
                     guest["roomNum"] := ""
                     index := (remaining = 1) ? 1 : index + 1
                 }
@@ -73,7 +73,7 @@ class PMN_Waterfall {
         }
     }
 
-    static modify(guest, isLastOne) { 
+    static modify(guest, remaining) { 
         CoordMode "Pixel", "Screen"
         CoordMode "Mouse", "Screen"
         AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
@@ -82,6 +82,7 @@ class PMN_Waterfall {
 
         Send "!p" ; open profile
         utils.waitLoading()
+        Sleep 500
         ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, AnchorImage)
         x := Number(FoundX) + 350
         y := Number(FoundY) + 80
@@ -118,7 +119,7 @@ class PMN_Waterfall {
         utils.waitLoading()
         sleep 1000
 
-        if (isLastOne = false) {
+        if (remaining > 1) {
             Send "!r" ; clear
         }
     }
