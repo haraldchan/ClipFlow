@@ -1,10 +1,20 @@
 #Include "../ProfileModifyNext/PMN_FillIn.ahk"
 
 class PMNG_Execute {
+    static operaLogo := A_ScriptDir . "\src\Assets\opera-logo.PNG"
+
     static startModify(inhRooms, groupGuests, rateCode) {
         WinMaximize "ahk_class SunAwtFrame"
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput true
+        BlockInput "SendAndMouse"
+
+        isFound := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.operaLogo)
+        if (isFound = false) {
+            WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+            BlockInput false
+            MsgBox("请先清空 Opera 界面中的子窗口。", popupTitle, "T3 4096")
+            return
+        }
 
         uInhRooms := inhRooms.unique()
         index := 1
