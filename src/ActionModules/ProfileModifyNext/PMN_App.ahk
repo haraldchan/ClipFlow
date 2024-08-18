@@ -28,8 +28,8 @@ PMN_App(App, moduleTitle, db, identifier) {
         queryFilter.update("search", "")
         
         LV := App.getCtrlByType("ListView")
-        LV.Opt(cur = "waterfall" ? "+Checked" : "-Checked")
-
+        LV.Opt(cur = "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
+        App.getCtrlByName("selectAll").visible := cur = "waterfall" ? true : false
         handleListContentUpdate()
     }
 
@@ -57,14 +57,6 @@ PMN_App(App, moduleTitle, db, identifier) {
             }
             MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), popupTitle, "T1.5")
 
-        ; for revealing info on web
-        } else if (incomingGuest["isMod"] = "reveal") {
-            updatedGuest := handleGuestInfoUpdateFromMod(incomingGuest)
-            if (updatedGuest = "") {
-                return
-            }
-            A_Clipboard := JSON.stringify(updatedGuest)
-
         ; adding guest
         } else {
             incomingGuest["fileName"] := A_Now . A_MSec
@@ -75,10 +67,9 @@ PMN_App(App, moduleTitle, db, identifier) {
         currentGuest.set(JSON.parse(A_Clipboard))
         handleListContentUpdate()
 
-        if (incomingGuest["isMod"] != "reveal") {
-            clipHistory := config.read("clipHistory")
-            A_Clipboard := clipHistory.Length > 1 ? clipHistory[1] : ""
-        }
+
+        clipHistory := config.read("clipHistory")
+        A_Clipboard := clipHistory.Length > 1 ? clipHistory[1] : ""
     }
 
     handleGuestInfoUpdateFromAdd(captured) {
@@ -339,10 +330,13 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; manual updating btns
         App.AddButton("vupdate x+10 w80 h25", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
         App.AddButton("vfillIn x+5 w80 h25 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile(App)),
-        
+
         ; profile list
         GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile),
 
+        ; select all button
+        App.AddCheckBox("vselectAll Hidden w50 h20 xp6 y+3", "全选"),
+        shareCheckStatus(App.getCtrlByName("selectAll"), App.getCtrlByType("ListView")),
         ; hotkey setup
         setHotkeys()
     )

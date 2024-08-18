@@ -2,7 +2,7 @@ class PMN_Waterfall {
     static cascade(rooms, selectedGuests) {
         WinMaximize "ahk_class SunAwtFrame"
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput true
+        BlockInput "SendAndMouse"
 
         curRoom := signal(0)
         index := 1
@@ -20,10 +20,10 @@ class PMN_Waterfall {
                     guest["roomNum"] := ""
                     index := (remaining = 1) ? 1 : index + 1
                 }
-            }
 
-            if (remaining = 1) {
-                break
+                if (remaining = 1) {
+                    break
+                }
             }
         }
 
@@ -82,7 +82,7 @@ class PMN_Waterfall {
 
         Send "!p" ; open profile
         utils.waitLoading()
-        Sleep 500
+        Sleep 100
         ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, AnchorImage)
         x := Number(FoundX) + 350
         y := Number(FoundY) + 80
@@ -100,6 +100,7 @@ class PMN_Waterfall {
         utils.waitLoading()
         Send "!h" ; search 
         utils.waitLoading()
+        Sleep 500
 
         res := PixelGetColor(x, y)
         utils.waitLoading()
