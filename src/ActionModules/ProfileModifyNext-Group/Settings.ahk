@@ -1,4 +1,4 @@
-PMNG_Settings(fetchPeriod, rateCode) {
+PMNG_Settings(fetchPeriod) {
     if (WinExist("PMNG Settings")) {
         return
     }
@@ -28,10 +28,6 @@ PMNG_Settings(fetchPeriod, rateCode) {
     return (
         Settings.AddText("x10 w250", helpInfo),
 
-        ; rate code setting
-        Settings.AddText("x10 w150 h25 0x200", "主Profile RateCode："),
-        Settings.AddReactiveEdit("vrc w80 h25 x+10", "{1}", rateCode),
-
         ; fetchPeriod setting
         Settings.AddText("x10 w150 h25 0x200", "获取旅客时间范围（小时）："),
         Settings.AddReactiveEdit("vfp w80 h25 x+10", "{1}", fetchPeriod),
@@ -41,8 +37,8 @@ PMNG_Settings(fetchPeriod, rateCode) {
             .OnEvent("Click", (*) => Settings.Hide()),
         Settings.AddButton("x+5 w120 h35", "保 存(&S)")
             .OnEvent("Click", (*) => (
-                rateCode.set(Settings.getCtrlByName("rc").Value),
                 fetchPeriod.set(Settings.getCtrlByName("fp").Value),
+                Sleep(200),
                 Settings.Hide()
             )),
 
