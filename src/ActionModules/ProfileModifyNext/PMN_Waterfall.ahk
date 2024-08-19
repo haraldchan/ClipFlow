@@ -16,7 +16,7 @@ class PMN_Waterfall {
                 if (guest["roomNum"] = curRoom.value) {
                     this.search(room, index)
                     utils.waitLoading()
-                    this.modify(guest, remaining)
+                    this.modify(guest)
                     guest["roomNum"] := ""
                     index := (remaining = 1) ? 1 : index + 1
                 }
@@ -73,7 +73,7 @@ class PMN_Waterfall {
         }
     }
 
-    static modify(guest, remaining) { 
+    static modify(guest) { 
         CoordMode "Pixel", "Screen"
         CoordMode "Mouse", "Screen"
         AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
@@ -82,13 +82,22 @@ class PMN_Waterfall {
 
         Send "!p" ; open profile
         utils.waitLoading()
-        Sleep 100
-        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, AnchorImage)
-        x := Number(FoundX) + 350
-        y := Number(FoundY) + 80
+        
+        loop {
+            Sleep 100
+            if (A_Index > 30) {
+                MsgBox("界面定位失败", popupTitle, "T2 4096")
+                utils.cleanReload(winGroup)
+            }
 
-        sleep 1000
-        utils.waitLoading()
+            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, AnchorImage)) {
+                x := Number(FoundX) + 350
+                y := Number(FoundY) + 80
+                break
+            } else {
+                continue
+            }
+        }
 
         Send "!h" ; search
         utils.waitLoading()
@@ -119,9 +128,5 @@ class PMN_Waterfall {
         Send "!o" ; ok
         utils.waitLoading()
         sleep 1000
-
-        if (remaining > 1) {
-            Send "!r" ; clear
-        }
     }
 }
