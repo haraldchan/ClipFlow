@@ -6,6 +6,7 @@
 
 PMN_App(App, moduleTitle, db, identifier) {
     listContent := signal(db.load())
+    lvIsCheckedAll := signal(true)
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
         search: "",
@@ -123,6 +124,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         listContent.set(handleSearchByConditions(loadedItems))
+        App.getCtrlByName("selectAll").value := false
     }
 
     handleSearchByConditions(loadedItems) {
@@ -253,6 +255,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         Hotkey "!Right", (*) => toggleDate("+")
         Hotkey "!Up", (*) => togglePeriod("+")
         Hotkey "!Down", (*) => togglePeriod("-")
+        Hotkey "!a", (*) => waterfallSelectAll()
 
         toggleDate(direction) {
             diff := direction = "-" ? -1 : 1
@@ -279,6 +282,17 @@ PMN_App(App, moduleTitle, db, identifier) {
             p.value := newPeriod
             queryFilter.update("period", newPeriod)
             handleListContentUpdate()
+        }
+
+        waterfallSelectAll() {
+            if (App.getCtrlByName("selectAll").Visible = false) {
+                return
+            }
+
+            App.getCtrlByType("ListView").Modify(0, lvIsCheckedAll.value = true ? "-Checked" : "+Checked")
+            App.getCtrlByName("selectAll").value := lvIsCheckedAll.value
+
+            lvIsCheckedAll.set(c => !c)
         }
     }
 
