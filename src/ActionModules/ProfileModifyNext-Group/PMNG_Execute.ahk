@@ -3,7 +3,7 @@
 class PMNG_Execute {
     static operaLogo := A_ScriptDir . "\src\Assets\opera-logo.PNG"
 
-    static startModify(inhRooms, groupGuests, rateCode) {
+    static startModify(inhRooms, groupGuests) {
         WinMaximize "ahk_class SunAwtFrame"
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         BlockInput "SendAndMouse"
@@ -22,13 +22,13 @@ class PMNG_Execute {
                 remaining := groupGuests.filter(g => g["roomNum"] = curRoom.value).Length
 
                 if (index > inhRooms.filter(r => r = curRoom.value).Length && remaining > 0) {
-                    this.search(room, 1, rateCode) ; find main resv and make share on it
+                    this.search(room, 1) ; find main resv and make share on it
                     this.makeShare()
                     Send "!r" ; clear
                 }
 
                 if (guest["roomNum"] = room) {
-                    this.search(room, index, rateCode)
+                    this.search(room, index)
                     utils.waitLoading()
                     this.modify(guest)
                     guest["roomNum"] := ""
@@ -48,40 +48,40 @@ class PMNG_Execute {
     }
 
     static openInHouse() {
+        WinActivate "ahk_class SunAwtFrame"
         Send "!f"
         utils.waitLoading()
         Send "{Text}i"
         utils.waitLoading()
+        Sleep 500
     }
 
-    static search(roomNum, index, rateCode) {
+    static search(roomNum, index) {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
-        rateCodeSearch := index = 1 ? rateCode : "NRR"
 
         MouseMove 329, 196 ; room number field
-        click 3
+        Click 3
         utils.waitLoading()
-
+        
         Send formattedRoom
         utils.waitLoading()
 
-        if (rateCodeSearch = "NRR") {
-            Send "{Tab}" ; last name field
-            utils.waitLoading()
-            Send Format("{Text}{1}", "1")
-            utils.waitLoading()
-        }
-
-        Send "!a"
-        utils.waitLoading()
-        loop 4 {
-            Send "{Tab}"
-            utils.waitLoading()
-        }
-        Send Format("{Text}{1}", rateCodeSearch)
-        utils.waitLoading()
         Send "!h" ; alt+h => search
         utils.waitLoading()
+
+        ; sort by Prs.
+        Click 838, 378, "Right" 
+        utils.waitLoading()
+        Send "{Down}"
+        utils.waitLoading()
+        Send "{Enter}"
+        utils.waitLoading() 
+
+        ; choose resv
+        loop (index - 1) {
+            Send "{Down}"
+            utils.waitLoading()
+        }
     }
 
     static modify(guest) {
