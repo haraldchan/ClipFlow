@@ -350,7 +350,11 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; select all button
         App.AddCheckBox("vselectAll Hidden w50 h20 xp6 y+3", "全选"),
-        shareCheckStatus(App.getCtrlByName("selectAll"), App.getCtrlByType("ListView")),
+        shareCheckStatus(
+            App.getCtrlByName("selectAll"), 
+            App.getCtrlByType("ListView"), 
+            { Checkbox: (*) => lvIsCheckedAll.set(c => !c) }
+        ),
         ; hotkey setup
         setHotkeys()
     )
