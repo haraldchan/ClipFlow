@@ -19,10 +19,10 @@ class PMN_Waterfall {
                     this.modify(guest)
                     guest["roomNum"] := ""
                     index := (remaining = 1) ? 1 : index + 1
-                }
 
-                if (remaining = 1) {
-                    break
+                    if (remaining = 1) {
+                        break
+                    }
                 }
             }
         }
