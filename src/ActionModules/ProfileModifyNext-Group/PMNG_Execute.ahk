@@ -8,13 +8,8 @@ class PMNG_Execute {
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         BlockInput "SendAndMouse"
 
-        isFound := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.operaLogo)
-        if (isFound = false) {
-            WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-            BlockInput false
-            MsgBox("请先清空 Opera 界面中的子窗口。", popupTitle, "T3 4096")
-            return
-        }
+        utils.checkClearWin(popupTitle, this.operaLogo)
+        this.openInHouse()
 
         uInhRooms := inhRooms.unique()
         index := 1
@@ -50,6 +45,13 @@ class PMNG_Execute {
         BlockInput false
         Sleep 1000
         MsgBox("Group Modify 已完成。")
+    }
+
+    static openInHouse() {
+        Send "!f"
+        utils.waitLoading()
+        Send "{Text}i"
+        utils.waitLoading()
     }
 
     static search(roomNum, index, rateCode) {
@@ -119,8 +121,8 @@ class PMNG_Execute {
         utils.waitLoading()
         Send "{Text}6"
         utils.waitLoading()
-        
-        ; TODO: change the flow, keep no post 
+
+        ; TODO: change the flow, keep no post
 
         Send "!o"
         utils.waitLoading()

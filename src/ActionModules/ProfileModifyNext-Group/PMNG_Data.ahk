@@ -1,6 +1,5 @@
 class PMNG_Data {
     static saveFileName := ""
-
     static operaLogo := A_ScriptDir . "\src\Assets\opera-logo.PNG"
 
     static reportFiling(blockcode, initX := 433, initY := 598) {
@@ -9,13 +8,7 @@ class PMNG_Data {
         WinMaximize "ahk_class SunAwtFrame"
         WinActivate "ahk_class SunAwtFrame"
 
-        isFound := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.operaLogo)
-        if (isFound = false) {
-            WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-            BlockInput false
-            MsgBox("请先清空 Opera 界面中的子窗口。", popupTitle, "T3 4096")
-            return
-        }
+        utils.checkClearWin(popupTitle, this.operaLogo)
 
         utils.waitLoading()
         Send "!m"
