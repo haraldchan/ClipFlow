@@ -73,6 +73,21 @@ class utils {
             }
         }
     }
+
+    static checkClearWin(msgboxTitle, operaLogo){
+        isFound := ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, operaLogo)
+        if (isFound = false) {
+            WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+            BlockInput false
+            clearWin := MsgBox("请先清空 Opera 界面中的子窗口。", msgboxTitle, "OKCancel 4096")
+            if (clearWin = "Cancel") {
+                return
+            } else {
+                WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
+                BlockInput "SendAndMouse"
+            }
+        }
+    }
 }
 
 ;debug: save output log / show msgbox
