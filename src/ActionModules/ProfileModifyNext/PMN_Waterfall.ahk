@@ -29,7 +29,6 @@ class PMN_Waterfall {
 
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
         BlockInput false
-        Sleep 1000
         MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
     }
 
@@ -43,32 +42,20 @@ class PMN_Waterfall {
         Send formattedRoom
         utils.waitLoading()
 
-        if (index = 1) {
-            Send "!h" ; alt+h => search
-            utils.waitLoading()
+        Send "!h" ; alt+h => search
+        utils.waitLoading()
 
-            Click 838, 378, "Right" 
-            utils.waitLoading()
+        ; sort by Prs.
+        Click 838, 378, "Right" 
+        utils.waitLoading()
+        Send "{Down}"
+        utils.waitLoading()
+        Send "{Enter}"
+        utils.waitLoading() 
+
+        ; choose resv
+        loop (index - 1) {
             Send "{Down}"
-            utils.waitLoading()
-            Send "{Enter}"
-            utils.waitLoading()
-        } else {
-            Send "{Tab}" ; last name field
-            utils.waitLoading()
-            Send Format("{Text}{1}", "1") 
-            utils.waitLoading()
-
-            Send "!a"
-            utils.waitLoading()
-            loop 4 {
-                Send "{Tab}"
-                utils.waitLoading()
-            }
-            Send Format("{Text}{1}", "NRR")
-            utils.waitLoading()
-
-            Send "!h" ; alt+h => search
             utils.waitLoading()
         }
     }
