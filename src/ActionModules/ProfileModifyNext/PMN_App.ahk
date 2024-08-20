@@ -25,9 +25,6 @@ PMN_App(App, moduleTitle, db, identifier) {
     ; handling search conditon changes
     effect(searchBy, new => handleSearchByChange(new))
     handleSearchByChange(cur) {
-        App.getCtrlByName("searchBox").Value := ""
-        queryFilter.update("search", "")
-        
         LV := App.getCtrlByType("ListView")
         LV.Opt(cur = "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
         App.getCtrlByName("selectAll").visible := cur = "waterfall" ? true : false
@@ -255,7 +252,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         Hotkey "!Right", (*) => toggleDate("+")
         Hotkey "!Up", (*) => togglePeriod("+")
         Hotkey "!Down", (*) => togglePeriod("-")
-        Hotkey "!a", (*) => waterfallSelectAll()
+        Hotkey "!a", (*) => toggleSelectAll()
 
         toggleDate(direction) {
             diff := direction = "-" ? -1 : 1
@@ -284,7 +281,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             handleListContentUpdate()
         }
 
-        waterfallSelectAll() {
+        toggleSelectAll() {
             if (App.getCtrlByName("selectAll").Visible = false) {
                 return
             }
@@ -311,6 +308,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         Alt+上/下`t- 增减搜索时间  
         Alt+F`t- 搜索框
         Alt+R`t- 根据条件搜索
+        Alt+A`t- (瀑流模式下)全选搜索结果
         Enter`t- 填入信息到Profile
 
     )"
