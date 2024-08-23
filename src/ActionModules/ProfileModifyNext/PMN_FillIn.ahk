@@ -1,6 +1,58 @@
 class PMN_FillIn {
+    static AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
+    static FOUND := "0x000080"
+    static NOT_FOUND := "0x008080"
+
     static fill(currentGuest) {
-        this.fillAction(this.parse(currentGuest))
+        if (this.matchHistory(currentGuest) = this.FOUND) {
+            Send "!o"
+        } else {
+            Send "!c"
+            utils.waitLoading()
+            Send "!n"
+            utils.waitLoading()
+        
+            PMN_FillIn.fill(currentGuest)
+            Sleep 1000        
+        }
+    }
+
+    static matchHistory(guest) {
+        CoordMode "Pixel", "Screen"
+        CoordMode "Mouse", "Screen"
+
+        loop {
+            Sleep 100
+            if (A_Index > 30) {
+                MsgBox("界面定位失败", popupTitle, "T2 4096")
+                utils.cleanReload(winGroup)
+            }
+
+            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
+                x := Number(FoundX) + 350
+                y := Number(FoundY) + 80
+                break
+            } else {
+                continue
+            }
+        }
+
+        Send "!h" ; search
+        utils.waitLoading()
+        loop 12 {
+            Send "{Tab}"
+            Sleep 10
+        }
+        Send Format("{Text}{1}", guest["idNum"])
+        utils.waitLoading()
+        Send "!h" ; search 
+        utils.waitLoading()
+        Sleep 500
+
+        res := PixelGetColor(x, y)
+        utils.waitLoading()
+
+        return res
     }
 
     static parse(currentGuest) {
@@ -72,7 +124,7 @@ class PMN_FillIn {
 
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         CoordMode "Mouse", "Screen"
-        BlockInput true
+        BlockInput "SendAndMouse"
         ; { fillin common info: nameLast, nameFirst, language, gender, country, birthday, idType, idNum
         MouseMove anchorX, anchorY
         Click 3

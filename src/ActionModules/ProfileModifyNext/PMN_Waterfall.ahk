@@ -12,7 +12,7 @@ class PMN_Waterfall {
 
             for guest in selectedGuests {
                 remaining := selectedGuests.filter(g => g["roomNum"] = curRoom.value).Length
-                
+
                 if (guest["roomNum"] = curRoom.value) {
                     this.search(room, index)
                     utils.waitLoading()
@@ -70,47 +70,7 @@ class PMN_Waterfall {
         Send "!p" ; open profile
         utils.waitLoading()
         
-        loop {
-            Sleep 100
-            if (A_Index > 30) {
-                MsgBox("界面定位失败", popupTitle, "T2 4096")
-                utils.cleanReload(winGroup)
-            }
-
-            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, AnchorImage)) {
-                x := Number(FoundX) + 350
-                y := Number(FoundY) + 80
-                break
-            } else {
-                continue
-            }
-        }
-
-        Send "!h" ; search
-        utils.waitLoading()
-        loop 12 {
-            Send "{Tab}"
-            Sleep 10
-        }
-        Send Format("{Text}{1}", guest["idNum"])
-        utils.waitLoading()
-        Send "!h" ; search 
-        utils.waitLoading()
-        Sleep 500
-
-        res := PixelGetColor(x, y)
-        utils.waitLoading()
-        if (res = FOUND) {
-            Send "!o"
-        } else {
-            Send "!c"
-            utils.waitLoading()
-            Send "!n"
-            utils.waitLoading()
-        
-            PMN_FillIn.fill(guest)
-            Sleep 1000
-        }
+        PMN_FillIn.fill(guest)
 
         Send "!o" ; ok
         utils.waitLoading()
