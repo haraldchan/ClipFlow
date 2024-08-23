@@ -2,11 +2,11 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
-        widths: [60, 90, 40, 80, 145, 120]
+        widths: [60, 90, 38, 80, 140, 120]
     }
 
     options := {
-        lvOptions: "Grid NoSortHdr -ReadOnly -Multi LV0x4000 w550 r15 xp-470 y+10",
+        lvOptions: "$guestProfileList Grid NoSortHdr -ReadOnly -Multi LV0x4000 w550 r15 xp-470 y+10",
         itemOptions: ""
     }
 
