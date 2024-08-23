@@ -15,14 +15,14 @@ class PMN_FillIn {
             Send "!n"
             utils.waitLoading()
         
-            PMN_FillIn.fill(currentGuest)
+            this.fillAction(this.parse(currentGuest))
             utils.waitLoading()
 
             MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
         }
     }
 
-    static matchHistory(guest) {
+    static matchHistory(currentGuest) {
         CoordMode "Pixel", "Screen"
         CoordMode "Mouse", "Screen"
 
@@ -48,7 +48,7 @@ class PMN_FillIn {
             Send "{Tab}"
             Sleep 10
         }
-        Send Format("{Text}{1}", guest["idNum"])
+        Send Format("{Text}{1}", currentGuest["idNum"])
         utils.waitLoading()
         Send "!h" ; search 
         utils.waitLoading()
