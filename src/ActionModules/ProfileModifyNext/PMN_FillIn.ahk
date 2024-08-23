@@ -6,6 +6,9 @@ class PMN_FillIn {
     static fill(currentGuest) {
         if (this.matchHistory(currentGuest) = this.FOUND) {
             Send "!o"
+            utils.waitLoading()
+
+            MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
         } else {
             Send "!c"
             utils.waitLoading()
@@ -13,7 +16,9 @@ class PMN_FillIn {
             utils.waitLoading()
         
             PMN_FillIn.fill(currentGuest)
-            Sleep 1000        
+            utils.waitLoading()
+
+            MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
         }
     }
 
@@ -219,8 +224,5 @@ class PMN_FillIn {
         }
         BlockInput false
         WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-
-        MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
     }
-    
 }

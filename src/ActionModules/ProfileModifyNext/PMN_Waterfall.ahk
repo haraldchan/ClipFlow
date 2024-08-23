@@ -71,6 +71,8 @@ class PMN_Waterfall {
         utils.waitLoading()
         
         PMN_FillIn.fill(guest)
+        utils.waitLoading()
+        Sleep 1000
 
         Send "!o" ; ok
         utils.waitLoading()
