@@ -1,40 +1,89 @@
 class shareCheckStatus {
     /**
      * Bind values of CheckBox and ListView for check-all status.
-     * @param CheckBox CheckBox control.
-     * @param ListView ListView Control.
-     * @param {Object} customFn Additional callback for CheckBox "Click" event and ListView "ItemCheck" event/.
+     * @param ARCheckBox AddReactive CheckBox.
+     * @param ARListView AddReactive Control.
+     * @param {Object} options Additional options.
      * 
-     * @example shareCheckStatus(cb, lv, {CheckBox: (*) => {...}, ListView: (*) => {...}})
+     * @example shareCheckStatus(cb, lv, {CheckBox: (*) => {...}, ListView: (*) => {...}, checkStatus: isCheckedSignal})
      */
-    __New(CheckBox, ListView, customFn := { CheckBox: (*) => {}, ListView: (*) => {} }) {
-        checkType(CheckBox, Gui.CheckBox, "First parameter is not a Gui.CheckBox")
-        checkType(ListView, Gui.ListView, "Second parameter is not a Gui.ListView")
-        checkType(customFn, Object, "Third parameter is not an Object")
+    __New(CheckBox, ListView, options := { CheckBox: (*) => {}, ListView: (*) => {} }) {
+        ; param type checking
+        checkType(CheckBox, [Gui.CheckBox, AddReactiveCheckBox], "First parameter is not a Gui.CheckBox or AddReactiveCheckBox")
+        checkType(ListView, [Gui.ListView, AddReactiveListView], "Second parameter is not a Gui.ListView or AddReactiveListView")
+        if (!(CheckBox is Gui.CheckBox && ListView is Gui.ListView)
+            && !(CheckBox is AddReactiveCheckBox && ListView is AddReactiveListView)
+        ) {
+            Throw TypeError("CheckBox and ListView control have to be both navive or AddReactive controls.")
+        }
+        checkType(options, Object, "Third parameter is not an Object")
+        if options.hasOwnProp("CheckBox") {
+            checkType(options.CheckBox, Func, "This property must be a callback function")
+        }
+        if options.hasOwnProp("ListView") {
+            checkType(options.ListView, Func, "This property must be a callback function")
+        }
+        if options.hasOwnProp("checkValue") {
+            checkType(options.checkStatus, signal, "checkStatus must be a signal")
+        }
 
-        this.cbFn := customFn.hasOwnProp("CheckBox") ? customFn.CheckBox : (*) => {}
-        this.lvFn := customFn.hasOwnProp("ListView") ? customFn.ListView : (*) => {}
+        this.cb := CheckBox
+        this.lv := ListView
+        this.cbFn := options.hasOwnProp("CheckBox") ? options.CheckBox : (*) => {}
+        this.lvFn := options.hasOwnProp("ListView") ? options.ListView : (*) => {}
+        this.checkStatusDepend := options.hasOwnProp("checkStatus") ? options.checkStatus : ""
 
-        CheckBox.OnEvent("Click", (ctrl, _) => this.handleCheckAll(CheckBox, ListView))
-        ListView.OnEvent("ItemCheck", (LV, item, isChecked) => this.handleItemCheck(CheckBox, LV, item, isChecked))
+        ; diversing native/AR control
+        if (this.cb is AddReactiveCheckBox && this.lv is AddReactiveListView) {
+            checkType(options.checkStatus, signal, "checkStatus is not a signal.")
+            ; add checkStatusDepend, sub signal
+            CheckBox.checkStatusDepend := options.checkStatus
+            options.checkStatus.addSub(CheckBox)
+            ListView.checkStatusDepend := options.checkStatus
+            options.checkStatus.addSub(ListView)
+
+            CheckBox.ctrl.OnEvent("Click", (ctrl, _) => this.handleCheckAll(ctrl, ListView.ctrl))
+            ListView.ctrl.OnEvent("ItemCheck", (LV, item, isChecked) => this.handleItemCheck(CheckBox.ctrl, LV, item, isChecked))
+        } else {
+            CheckBox.OnEvent("Click", (ctrl, _) => this.handleCheckAll(CheckBox, ListView))
+            ListView.OnEvent("ItemCheck", (LV, item, isChecked) => this.handleItemCheck(CheckBox, LV, item, isChecked))
+        }
     }
 
     handleCheckAll(CB, LV) {
-        LV.Modify(0, CB.Value = true ? "Check" : "-Check")
+        if (this.cb is AddReactiveCheckBox && this.lv is AddReactiveListView) {
+            this.checkStatusDepend.set(cur => !cur)
+        } else {
+            LV.Modify(0, CB.Value = true ? "Check" : "-Check")
+        }
         this.runCustomFn(this.cbFn)
     }
 
     handleItemCheck(CB, LV, item, isChecked) {
+        ; multi-check
         focusedRows := LV.getFocusedRowNumbers()
-
         for focusedRow in focusedRows {
             LV.Modify(focusedRow, isChecked ? "Check" : "-Check")
         }
-        ; get checked rows aynchronously, wait for other items to change check status
-        setTimer(() => CB.Value := (LV.getCheckedRowNumbers().Length = LV.GetCount()), -1)
 
+        prevCheckedRows := []
+        if (this.checkStatusDepend = "") {
+            SetTimer(() => CB.Value := (LV.getCheckedRowNumbers().Length = LV.GetCount()), -1)
+        } else {
+            SetTimer(() => (
+                prevCheckedRows := LV.getCheckedRowNumbers(),
+                this.checkStatusDepend.set(LV.getCheckedRowNumbers().Length = LV.GetCount())
+            ), -1)
+            Sleep 30
+            if (isChecked = false) {
+                for row in prevCheckedRows {
+                    LV.Modify(row, "+Check")
+                }
+            }
+        }
         this.runCustomFn(this.lvFn)
     }
+
 
     runCustomFn(userFunctions) {
         checkType(userFunctions, [Func, Array], "Parameter is not a Function or Array")

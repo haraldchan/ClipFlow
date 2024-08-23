@@ -11,11 +11,7 @@ class signal {
      * @return {Signal}
      */
     __New(val) {
-        this.value := ((val is Class) or (val is Func))
-            ? val
-                : val is Object
-                    ? this.mapify(val)
-                    : val
+        this.value := (val is Object && !(val is Func) && !(val is Class)) ? this.mapify(val) : val
         this.subs := []
         this.comps := []
         this.effects := []
@@ -33,9 +29,7 @@ class signal {
             return
         }
 
-        this.value := newSignalValue is Func
-            ? newSignalValue(this.value)
-                : newSignalValue
+        this.value := newSignalValue is Func ? newSignalValue(this.value) : newSignalValue
 
         ; change to Map()
         if (!(newSignalValue is Class) && newSignalValue is Object) {
@@ -44,7 +38,7 @@ class signal {
 
         ; notify all subscribers to update
         for ctrl in this.subs {
-            ctrl.update()
+            ctrl.update(this)
         }
 
         ; notify all computed signals
@@ -203,86 +197,107 @@ class AddReactive {
      * @returns {AddReactive} 
      */
     __New(GuiObject, controlType, options := "", textString := "", depend := 0, key := 0, event := 0) {
-        ; params type checking
-        checkType(GuiObject, Gui, "Second(GuiObject) param is not a Gui Object.")
-        if (controlType != "ListView") {
-            checkType(options, String, "First(options) param is not a String.")
-        }
-        checkTypeDepend(depend)
-        ; checkTypeEvent(event)
-
         this.GuiObject := GuiObject
         this.ctrlType := controlType
-        this.options := options
+        this.options := this.handleArcName(options)
         this.formattedString := textString
-        this.depend := depend
+        this.depend := this.filterDepends(depend)
+        this.checkStatusDepend := ""
         this.key := key
 
         ; ListView options
         if (controlType = "ListView") {
             this.lvOptions := options.lvOptions
-            this.itemOptions := options.HasOwnProp("itemOptions")
-                ? options.itemOptions
-                    : ""
+            this.itemOptions := options.HasOwnProp("itemOptions") ? options.itemOptions : ""
             this.checkedRows := []
         }
 
         ; textString handling
-        if (controlType = "ComboBox" ||
-            controlType = "DropDownList") {
+        if (controlType = "ComboBox" || controlType = "DropDownList") {
             this.innerText := textString
         } else if (controlType = "ListView") {
             this.titleKeys := textString.keys
-            this.innerText := textString.HasOwnProp("titles")
-                ? textString.titles
-                    : this.titleKeys
-            this.colWidths := textString.HasOwnProp("widths")
-                ? textString.widths
-                    : this.titleKeys.map(item => "AutoHdr")
+            this.innerText := textString.HasOwnProp("titles") ? textString.titles : this.titleKeys
+            this.colWidths := textString.HasOwnProp("widths") ? textString.widths : this.titleKeys.map(item => "AutoHdr")
         } else {
-            this.innerText := RegExMatch(textString, "\{\d+\}")
-                ? this.handleFormatStr(textString, depend, key)
-                    : textString
+            this.innerText := RegExMatch(textString, "\{\d+\}") ? this.handleFormatStr(textString, depend, key) : textString
         }
 
         ; add control
         if (controlType = "ListView") {
             this.ctrl := this.GuiObject.Add(this.ctrlType, this.lvOptions, this.innerText)
-            this.handleListViewUpdate(true)
-
+            this.handleListViewUpdate()
             for width in this.colWidths {
                 this.ctrl.ModifyCol(A_Index, width)
             }
-
+        } else if (controlType = "CheckBox" && this.HasOwnProp("checkValueDepend")) {
+            this.ctrl := this.GuiObject.Add(this.ctrlType, this.options, this.innerText)
+            this.ctrl.Value := this.checkValueDepend.value
+            this.ctrl.OnEvent("Click", (ctrl, *) => this.checkValueDepend.set(ctrl.Value))
         } else {
             this.ctrl := this.GuiObject.Add(this.ctrlType, this.options, this.innerText)
         }
 
         ; add subscribe
-        if (depend = 0) {
+        if (this.depend = 0) {
             return
-        } else if (depend is Array) {
-            for dep in depend {
+        } else if (this.depend is Array) {
+            for dep in this.depend {
                 dep.addSub(this)
             }
         } else {
-            depend.addSub(this)
+            this.depend.addSub(this)
         }
 
         ; add event
         if (event != 0) {
-            if (event.every(item => item is Array)) {
-                ; multiple events
-                for e in event {
-                    this.ctrl.OnEvent(e[1], e[2])
-                }
-            } else {
-                ; single event
-                this.ctrl.OnEvent(event[1], event[2])
+            for e, cb in event {
+                this.ctrl.OnEvent(e, cb)
             }
         }
     }
 
+    handleArcName(options){
+        optionsString := this.ctrlType = "ListView" ? options.lvOptions : options
+
+        optionsArr := StrSplit(optionsString, " ")
+        arcNameIndex := optionsArr.findIndex(item => InStr(item, "$"))
+
+        if (arcNameIndex != "") {
+            this.name := optionsArr.RemoveAt(optionsArr.findIndex(item => InStr(item, "$")))
+            this.GuiObject.arcs.Push(this)
+        }
+
+        formattedOptions := ""
+        for option in optionsArr {
+            formattedOptions .= option . " "
+        }
+
+        if (this.ctrlType = "ListView") {
+            options.lvOptions := formattedOptions
+            return options
+        }
+
+        return formattedOptions
+    }
+
+    filterDepends(depend) {
+        if (depend is Array) {
+            checkValueObject := depend.find(d => d is Object && d.HasOwnProp("checkValue"))
+            if (checkValueObject != "") {
+                this.checkValueDepend := (depend.RemoveAt(depend.findIndex(d => d is Object && d.HasOwnProp("checkValue")))).checkValue
+                this.checkValueDepend.addSub(this)
+            }
+            return depend
+        } else if (depend is Object && depend.HasOwnProp("checkValue")) {
+            this.checkValueDepend := depend.checkValue
+            this.checkValueDepend.addSub(this)
+            return 0
+        } else {
+            return depend
+        }
+    }
+        
     handleFormatStr(formatStr, depend, key) {
         vals := []
 
@@ -334,7 +349,7 @@ class AddReactive {
         return Format(formatStr, vals*)
     }
 
-    handleListViewUpdate(isFirst := false) {
+    handleListViewUpdate() {
         this.ctrl.Delete()
         for item in this.depend.value {
             itemIn := item
@@ -346,7 +361,8 @@ class AddReactive {
         this.ctrl.Focus()
     }
 
-    update() {
+    ; updating subs
+    update(signal) {
         if (this.ctrl is Gui.Text || this.ctrl is Gui.Button) {
             ; update text label
             this.ctrl.Text := this.handleFormatStr(this.formattedString, this.depend, this.key)
@@ -358,13 +374,26 @@ class AddReactive {
         }
 
         if (this.ctrl is Gui.ListView) {
+            ; update from checkStatusDepend
+            if (this.checkStatusDepend = signal) {
+                this.ctrl.Modify(0, this.checkStatusDepend.value = true ? "-Checked" : "+Checked")
+                return
+            }
             ; update list items
             this.handleListViewUpdate()
         }
 
         if (this.ctrl is Gui.CheckBox) {
+            ; update from checkStatusDepend
+            if (this.checkStatusDepend = signal) {
+                this.ctrl.Value := this.CheckStatusDepend.value
+                return
+            }
             ; update text label
             this.ctrl.Text := this.handleFormatStr(this.formattedString, this.depend, this.key)
+            if (this.HasOwnProp("checkValueDepend")) {
+                this.ctrl.Value := this.checkValueDepend.Value
+            }
         }
     }
 
@@ -392,112 +421,6 @@ class AddReactive {
     setFont(options := "", fontName := "") {
         this.ctrl.SetFont(options, fontName)
     }
-
-    getValue() {
-        return this.ctrl.Value
-    }
-
-    setValue(newValue) {
-        this.ctrl.Value := newValue is Func
-            ? newValue(this.ctrl.Value)
-                : newValue
-    }
-
-    getInnerText() {
-        return this.ctrl.Text
-    }
-
-    setInnerText(newInnerText) {
-        this.ctrl.Text := newInnerText is Func
-            ? newInnerText(this.ctrl.Text)
-                : newInnerText
-    }
-
-    disable(state) {
-        this.ctrl.Enabled := state
-    }
-}
-
-class IndexList {
-    /**
-     * Creates a list of multiple reactive controls, ordered by index.
-     * @param {Gui} GuiObject The target Gui Object.
-     * @param {string} controlType Control type to create. Available: Text, Edit, CheckBox, Radio.
-     * @param {string} options Options apply to the control, same as Gui.Add.
-     * @param {string} innerText Text or formatted text to hold signal values.
-     * @param {signal} depend Subscribed signal
-     * @param {[ event: Event, callback: ()=>void ]} event Events and callback function objects.
-     * @return {Gui.Control[]}
-     */
-    __New(guiObj, controlType, options, innerText, depend := 0, key := 0, event := 0) {
-        loop depend.value.length {
-            guiObj.AddReactive(controlType, options, innerText, depend, A_Index, event)
-        }
-    }
-}
-
-class KeyList {
-    /**
-     * Creates a list of multiple reactive controls, render each item by keys.
-     * @param {Gui} GuiObject The target Gui Object.
-     * @param {string} controlType Control type to create. Available: Text, Edit, CheckBox, Radio.
-     * @param {string} options Options apply to the control, same as Gui.Add.
-     * @param {string} innerText Text or formatted text to hold signal values.
-     * @param {signal} depend Subscribed signal
-     * @param {array} key the keys of the signal's value
-     * @param {[ event: Event, callback: ()=>void ]} event Events and callback function objects.
-     * @return {Gui.Control[]}
-     */
-    __New(guiObj, controlType, options, innerText, depend := 0, key := 0, event := 0) {
-        loop depend.value.length {
-            guiObj.AddReactive(controlType, options, innerText, depend, [[A_Index], key*], event)
-        }
-    }
 }
 
 Gui.Prototype.AddReactive := AddReactive
-Gui.Prototype.IndexList := IndexList
-Gui.Prototype.KeyList := KeyList
-
-; for lsp {
-; revue.ahk
-; /**
-;  *D
-;  */
-; AddReactive(controlType[, options, textString, depend, key, event]) => Gui.Control
-
-; /**
-;  *
-;  */
-; AddReactiveText([options, textString, depend, key, event]) => Gui.Text
-
-; /**
-;  *
-;  */
-; AddReactiveEdit([options, textString, depend, key, event]) => Gui.Edit
-
-; /**
-;  *
-;  */
-; AddReactiveButton([options, textString, depend, key, event]) => Gui.Button
-
-; /**
-;  *
-;  */
-; AddReactiveCheckBox([options, textString, depend, key, event]) => Gui.CheckBox
-
-; /**
-;  *
-;  */
-; AddReactiveRadio([options, textString, depend, key, event]) => Gui.Radio
-
-; /**
-;  *
-;  */
-; AddReactiveDropDownList([options, mapObject, depend, key, event]) => Gui.DDL
-
-; /**
-;  *
-;  */
-; AddReactiveComboBox([options, mapObject, depend, key, event]) => Gui.ComboBox
-; }
