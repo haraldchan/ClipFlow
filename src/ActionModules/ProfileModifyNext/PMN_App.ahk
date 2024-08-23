@@ -27,7 +27,7 @@ PMN_App(App, moduleTitle, db, identifier) {
     handleSearchByChange(cur) {
         LV := App.getCtrlByType("ListView")
         LV.Opt(cur = "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
-        App.getCtrlByName("selectAll").visible := cur = "waterfall" ? true : false
+        App.getCtrlByName("$selectAllBtn").ctrl.visible := cur = "waterfall" ? true : false
         handleListContentUpdate()
     }
 
@@ -121,7 +121,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         listContent.set(handleSearchByConditions(loadedItems))
-        App.getCtrlByName("selectAll").value := false
+        lvIsCheckedAll.set(false)
     }
 
     handleSearchByConditions(loadedItems) {
@@ -282,12 +282,9 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         toggleSelectAll() {
-            if (App.getCtrlByName("selectAll").Visible = false) {
+            if (searchBy.value != "waterfall") {
                 return
             }
-
-            App.getCtrlByType("ListView").Modify(0, lvIsCheckedAll.value = true ? "-Checked" : "+Checked")
-            App.getCtrlByName("selectAll").value := lvIsCheckedAll.value
 
             lvIsCheckedAll.set(c => !c)
         }
@@ -316,7 +313,7 @@ PMN_App(App, moduleTitle, db, identifier) {
     return (
         App.AddGroupBox("R17 w580 y+20", " "),
         App.AddText("xp15 ", moduleTitle . " ⓘ ")
-           .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096"))
+           .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
         
         ; datetime
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
@@ -347,11 +344,11 @@ PMN_App(App, moduleTitle, db, identifier) {
         GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile),
 
         ; select all button
-        App.AddCheckBox("vselectAll Hidden w50 h20 xp6 y+3", "全选"),
+        App.AddReactiveCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+3", "全选"),
         shareCheckStatus(
-            App.getCtrlByName("selectAll"), 
-            App.getCtrlByType("ListView"), 
-            { Checkbox: (*) => lvIsCheckedAll.set(c => !c) }
+            App.getCtrlByName("$selectAllBtn"), 
+            App.getCtrlByName("$guestProfileList"), 
+            { checkStatus: lvIsCheckedAll }
         ),
         ; hotkey setup
         setHotkeys()
