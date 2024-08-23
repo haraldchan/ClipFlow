@@ -5,7 +5,7 @@
 #Include "./PMN_Waterfall.ahk"
 
 PMN_App(App, moduleTitle, db, identifier) {
-    listContent := signal(db.load())
+    listContent := signal([])
     lvIsCheckedAll := signal(true)
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
@@ -95,6 +95,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                     guest[item] := updater[item]
                 }
                 matchedGuest.set(guest)
+                break
             }
         }
 
@@ -351,6 +352,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             { checkStatus: lvIsCheckedAll }
         ),
         ; hotkey setup
-        setHotkeys()
+        setHotkeys(),
+        handleListContentUpdate()
     )
 }
