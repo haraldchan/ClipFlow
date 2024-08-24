@@ -44,6 +44,10 @@ class PMN_FillIn {
 
         Send "!h" ; search
         utils.waitLoading()
+        ; { ip - cancel the "save changes msgbox"
+        Send "{Esc}"
+        utils.waitLoading()
+        ; }
         loop 12 {
             Send "{Tab}"
             Sleep 10
