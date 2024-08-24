@@ -42,19 +42,19 @@ class PMN_FillIn {
             }
         }
 
-        Send "!h" ; search
+        Send "!h" 
         utils.waitLoading()
-        ; { ip - cancel the "save changes msgbox"
-        Send "{Esc}"
+        Send "{Esc}" ; cancel the "save changes msgbox"
         utils.waitLoading()
-        ; }
+
         loop 12 {
             Send "{Tab}"
             Sleep 10
         }
+
         Send Format("{Text}{1}", currentGuest["idNum"])
         utils.waitLoading()
-        Send "!h" ; search 
+        Send "!h" 
         utils.waitLoading()
         Sleep 500
 
