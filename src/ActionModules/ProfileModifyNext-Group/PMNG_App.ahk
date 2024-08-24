@@ -36,7 +36,7 @@ PMNG_App(App, popupTitle, db) {
             selectedGuests.Push(loadedGuests.value[row])
         }
 
-        PMNG_Execute.startModify(currentGroupRooms.value, selectedGuests, rateCode.value)
+        PMNG_Execute.startModify(currentGroupRooms.value, selectedGuests)
     }
 
     helpInfo := ""
