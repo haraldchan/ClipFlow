@@ -10,6 +10,7 @@ defineArrayMethods(arr) {
     arr.Prototype.toReversed := toReversed
     arr.Prototype.unique := unique
     arr.Prototype.find := find
+    arr.Prototype.findIndex := findIndex
 
     some(arr, fn) {
         for item in arr {
@@ -45,7 +46,17 @@ defineArrayMethods(arr) {
             if (fn(item)) {
                 return item
             }
-        }   
+        }
+
+        return ""
+    }
+
+    findIndex(arr, fn) {
+        for item in arr {
+            if (fn(item)) {
+                return A_Index
+            }
+        }
     }
 
     map(arr, fn) {
