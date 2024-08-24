@@ -44,7 +44,7 @@ PMNG_App(App, popupTitle, db) {
     return (
         App.AddGroupBox("R16 y+20 w550", " "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
-        .OnEvent("Click", (*) => PMNG_Settings(fetchPeriod, rateCode)),
+        .OnEvent("Click", (*) => PMNG_Settings(fetchPeriod)),
 
         ; shows due in groups
         OnDayGroups(App, groups, selectedGroup),
