@@ -1,18 +1,18 @@
 #Include "./GuestProfileList.ahk"
-#Include "./GuestProfileList.ahk"
 #Include "./GuestProfileDetails.ahk"
+#Include "./Settings.ahk"
 #Include "./PMN_FillIn.ahk"
 #Include "./PMN_Waterfall.ahk"
 
 PMN_App(App, moduleTitle, db, identifier) {
-    listContent := signal([])
-    lvIsCheckedAll := signal(true)
+    listContent := signal(db.load())
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
         search: "",
         period: 60
     })
-
+    
+    lvIsCheckedAll := signal(true)
     searchBy := signal("nameRoom")
     searchByMap := Map(
         "姓名/房号", "nameRoom",
@@ -65,7 +65,12 @@ PMN_App(App, moduleTitle, db, identifier) {
         currentGuest.set(JSON.parse(A_Clipboard))
         handleListContentUpdate()
 
+        ; update recent backup
+        if (DateDiff(A_Now, FileGetTime(db.backup . "\recent.json", "C"), "Minutes") > 60) {
+            SetTimer(db.createRecentBackup(), -1)
+        }
 
+        ; restore previous clip to clb
         clipHistory := config.read("clipHistory")
         A_Clipboard := clipHistory.Length > 1 ? clipHistory[1] : ""
     }
@@ -291,30 +296,10 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
     }
 
-    helpInfo := "
-    (
-        ============ 基本功能 ============
-
-        点击房号`t- 修改房号
-        鼠标右键`t- 显示详细信息
-        双击信息`t- (主界面中) 复制身份证号
-        `t- (详情信息) 复制单条信息
-
-        ============= 快捷键 =============
-
-        Alt+左/右`t- 日期搜索翻页
-        Alt+上/下`t- 增减搜索时间  
-        Alt+F`t- 搜索框
-        Alt+R`t- 根据条件搜索
-        Alt+A`t- (瀑流模式下)全选搜索结果
-        Enter`t- 填入信息到Profile
-
-    )"
-
     return (
         App.AddGroupBox("R17 w580 y+20", " "),
         App.AddText("xp15 ", moduleTitle . " ⓘ ")
-           .OnEvent("Click", (*) => MsgBox(helpInfo, "操作指引", "4096")),
+           .OnEvent("Click", (*) => PMN_Settings()),
         
         ; datetime
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
@@ -352,7 +337,6 @@ PMN_App(App, moduleTitle, db, identifier) {
             { checkStatus: lvIsCheckedAll }
         ),
         ; hotkey setup
-        setHotkeys(),
-        handleListContentUpdate()
+        setHotkeys()
     )
 }
