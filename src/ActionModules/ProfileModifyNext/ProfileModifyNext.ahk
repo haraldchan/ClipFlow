@@ -7,9 +7,10 @@ class ProfileModifyNext {
     static identifier := "04047fce826f48f751891b4721f7ac70" ; MD5 hash: ProfileModifyNext
     static dbSetting := {
         main: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow" . "\src\ActionModules\ProfileModifyNext\GuestProfiles",
-        ; backup: A_MyDocuments . "\GuestProfiles",
+        backup: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\GuestProfilesBackup",
+        archive: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow" . "\src\ActionModules\ProfileModifyNext\GuestProfilesArchive",
         cleanPeriod: 182,
-        archive: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\ClipFlow" . "\src\ActionModules\ProfileModifyNext\GuestProfilesArchive"
+        recentLength: 1000
     }
     static db := useFileDB(this.dbSetting)
 
@@ -18,6 +19,7 @@ class ProfileModifyNext {
         yesterday := FormatTime(DateAdd(today, -1, "Days"), "yyyyMMdd")
         if (!FileExist(this.db.archive . "\" . yesterday . " - archive.json")) {
             this.db.createArchive(yesterday)
+            this.db.createArchiveBackup(yesterday)
         }
         
         PMN_App(App, this.title, this.db, this.identifier)
