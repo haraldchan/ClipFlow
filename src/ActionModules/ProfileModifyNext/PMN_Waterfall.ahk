@@ -61,12 +61,6 @@ class PMN_Waterfall {
     }
 
     static modify(guest) { 
-        CoordMode "Pixel", "Screen"
-        CoordMode "Mouse", "Screen"
-        AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
-        FOUND := "0x000080"
-        NOT_FOUND := "0x008080"
-
         Send "!p" ; open profile
         utils.waitLoading()
         
