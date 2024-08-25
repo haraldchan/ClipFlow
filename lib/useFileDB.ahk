@@ -132,13 +132,23 @@ class useFileDB {
 		}
 	}
 
-	restoreArchiveOneDay(restoreMonth) {
-		loop files, (this.backup . "\" . restoreMonth . "\*.json") {
+	restoreArchiveOneDay(restoreDate) {
+		month := SubStr(restoreDate, 1, 4)
+
+		loop files, (this.backup . "\" . month . "\*.json") {
+			if (!InStr(A_LoopFileName, restoreDate)) {
+				continue
+			}
+
 			archive := FileRead(A_LoopFileFullPath, "UTF-8")
 			filename := StrReplace(A_LoopFileName, "backup", "archive")
-			if (!FileExist(this.archive . "\" . filename . ".json")) {
-				FileAppend(archive, this.archive . "\" . filename . ".json", "UTF-8")
+			archiveFullPath := this.archive . "\" . filename . ".json"
+			
+			if (FileExist(archiveFullPath)) {
+				FileDelete(archiveFullPath)
 			}
+			FileAppend(archive, archiveFullPath, "UTF-8")
+			break
 		}
 	}
 }
