@@ -1,28 +1,22 @@
 class useFileDB {
 	__New(dbSetting) {
 		this.main := dbSetting.main
+		this.local := dbSetting.HasOwnProp("local") ? dbSetting.backup : ""
+		this.archive := dbSetting.HasOwnProp("archive") ? dbSetting.archive : ""
 		this.backup := dbSetting.HasOwnProp("backup") ? dbSetting.backup : ""
-		this.cleanPeriod := dbSetting.HasOwnProp("cleanPeriod") ? dbSetting.cleanPeriod : 0,
-			this.archive := dbSetting.archive
-		this.using := dbSetting.main
-	}
-
-	useMain() {
-		this.using := this.main
-	}
-
-	useBackup() {
-		this.using := this.backup
+		this.cleanPeriod := dbSetting.HasOwnProp("cleanPeriod") ? dbSetting.cleanPeriod : 0
+		this.recentLength := dbSetting.HasOwnProp("recentLength") ? dbSetting.recentLength : 1000
+		this.IS_BACKINGUP_RECENT := false
 	}
 
 	add(jsonString) {
 		dateFolder := "\" . FormatTime(A_Now, "yyyyMMdd")
 		fileName := "\" . JSON.parse(jsonString)["fileName"] . ".json"
 		; create dateFolder if not exist yet
-		if (!DirExist(this.using . dateFolder)) {
-			DirCreate(this.using . dateFolder)
+		if (!DirExist(this.main . dateFolder)) {
+			DirCreate(this.main . dateFolder)
 		}
-		FileAppend(jsonString, this.using . dateFolder . fileName, "UTF-8")
+		FileAppend(jsonString, this.main . dateFolder . fileName, "UTF-8")
 		Sleep 100
 		; cleanup outdated if cleanPeriod is unset/0
 		if (this.cleanPeriod > 0) {
@@ -41,29 +35,29 @@ class useFileDB {
 	}
 
 	cleanup() {
-		loop files, this.using . "\*", "D" {
+		loop files, this.main . "\*", "D" {
 			if (DateDiff(A_Now, A_LoopFileName, "Days") > this.cleanPeriod) {
 				DirDelete(A_LoopFileFullPath, true)
 			}
 		}
 	}
 
-	load(db := this.using, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
-		 if (queryDate = FormatTime(A_Now, "yyyyMMdd")) {
-            return this.loadOneDay(db, queryDate, queryPeriodInput)
-        } else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
-            return this.loadArchiveOneDay(queryDate)
-        } else {
+	load(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
+		if (queryDate = FormatTime(A_Now, "yyyyMMdd")) {
+			return this.loadOneDay(db, queryDate, queryPeriodInput)
+		} else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
+			return this.loadArchiveOneDay(queryDate)
+		} else {
 			if (!FileExist(this.archive . "\" . queryDate . " - archive.json")) {
 				if (DateDiff(A_Now, queryDate, "Days") > 0) {
 					SetTimer(() => this.createArchive(queryDate), -100)
 				}
 				return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriod)
 			}
-        }
+		}
 	}
 
-	loadOneDay(db := this.using, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
+	loadOneDay(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
 		loadedData := this.findByPeriod(db, queryDate, queryPeriodInput)
 			.map(file => JSON.parse(FileRead(file, "UTF-8")))
 
@@ -71,16 +65,17 @@ class useFileDB {
 	}
 
 	updateOne(fileName, queryDate, newJsonString) {
-		loop files, (this.using . "\" . queryDate . "\*.json") {
+		loop files, (this.main . "\" . queryDate . "\*.json") {
 			if (fileName . ".json" = A_LoopFileName) {
 				FileDelete(A_LoopFileFullPath)
-				FileAppend(newJsonString, this.using . "\" . queryDate . "\" . filename . ".json", "UTF-8")
+				FileAppend(newJsonString, this.main . "\" . queryDate . "\" . filename . ".json", "UTF-8")
 			}
 		}
 
 		if (queryDate != FormatTime(A_Now, "yyyyMMdd")) {
 			FileDelete(this.archive . "\" . queryDate . " - archive.json")
-			this.createArchive(queryDate)		
+			this.createArchive(queryDate)
+			this.createArchiveBackup(queryDate)
 		}
 	}
 
@@ -94,5 +89,56 @@ class useFileDB {
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
 		archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
 		return archivedData
+	}
+
+	createRecentBackup(period := 60) {
+		if (this.IS_BACKINGUP_RECENT = true) {
+			return
+		} else {
+			this.IS_BACKINGUP_RECENT := true
+		}
+		recentBackupFullPath := this.backup . "\recent.json"
+		stock := FileExist(recentBackupFullPath) ? JSON.parse(FileRead(recentBackupFullPath, "UTF-8")) : []
+		recent := stock.InsertAt(stock.Length + 1, this.loadOneDay(, , period)*)
+
+		if (recent.Length > this.recentLength) {
+			recent.RemoveAt(this.recentLength + 1, recent.Length - this.recentLength)
+		}
+
+		if (FileExist(recentBackupFullPath)) {
+			FileDelete(recentBackupFullPath)
+		}
+		FileAppend(recent, recentBackupFullPath, "UTF-8")
+		this.IS_BACKINGUP_RECENT := false
+	}
+
+	createArchiveBackup(backupDate) {
+		archiveData := JSON.stringify(this.loadOneDay(, backupDate, 60 * 24 * this.cleanPeriod))
+		monthFolder := "\" . SubStr(backupDate, 1, 4)
+		backupFullPath := this.backup . "\" . monthFolder . "\" . backupDate . " - backup.json"
+		if (!DirExist(this.backup . "\" . monthFolder)) {
+			DirCreate(this.backup . "\" . monthFolder)
+		}
+		if (FileExist(backupFullPath)) {
+			FileDelete(backupFullPath)
+		}
+		FileAppend(archiveData, backupFullPath, "UTF-8")
+	}
+
+	restoreRecent() {
+		recent := JSON.parse(FileRead(this.backup . "\recent.json", "UTF-8"))
+		for snippet in recent {
+			this.add(JSON.stringify(snippet))
+		}
+	}
+
+	restoreArchiveOneDay(restoreMonth) {
+		loop files, (this.backup . "\" . restoreMonth . "\*.json") {
+			archive := FileRead(A_LoopFileFullPath, "UTF-8")
+			filename := StrReplace(A_LoopFileName, "backup", "archive")
+			if (!FileExist(this.archive . "\" . filename . ".json")) {
+				FileAppend(archive, this.archive . "\" . filename . ".json", "UTF-8")
+			}
+		}
 	}
 }
