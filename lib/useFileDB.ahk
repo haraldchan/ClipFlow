@@ -130,7 +130,6 @@ class useFileDB {
 			FileDelete(backupFullPath)
 		}
 		FileAppend(archiveData, backupFullPath, "UTF-8")
-		run backupFullPath
 	}
 
 	restoreRecent() {
