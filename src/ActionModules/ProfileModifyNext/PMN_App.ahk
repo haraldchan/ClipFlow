@@ -5,6 +5,7 @@
 #Include "./PMN_Waterfall.ahk"
 
 PMN_App(App, moduleTitle, db, identifier) {
+    RECENT_BACKUP_INTERVAL := 30
     listContent := signal(db.load())
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
@@ -66,8 +67,8 @@ PMN_App(App, moduleTitle, db, identifier) {
         handleListContentUpdate()
 
         ; update recent backup
-        if (DateDiff(A_Now, FileGetTime(db.backup . "\recent.json", "C"), "Minutes") > 60) {
-            SetTimer(db.createRecentBackup(), -1)
+        if (DateDiff(A_Now, FileGetTime(db.backup . "\recent.json", "C"), "Minutes") > RECENT_BACKUP_INTERVAL) {
+            SetTimer(db.createRecentBackup(RECENT_BACKUP_INTERVAL), -1)
         }
 
         ; restore previous clip to clb
