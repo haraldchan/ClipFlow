@@ -8,7 +8,9 @@ class PMNG_Execute {
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         BlockInput "SendAndMouse"
 
-        utils.checkClearWin(popupTitle, this.operaLogo)
+        if (utils.checkClearWin(popupTitle, this.operaLogo) = "Cancel"){
+            utils.cleanReload(winGroup)
+        }
         this.openInHouse()
 
         uInhRooms := inhRooms.unique()

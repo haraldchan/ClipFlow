@@ -8,7 +8,9 @@ class PMNG_Data {
         WinMaximize "ahk_class SunAwtFrame"
         WinActivate "ahk_class SunAwtFrame"
 
-        utils.checkClearWin(popupTitle, this.operaLogo)
+        if (utils.checkClearWin(popupTitle, this.operaLogo) = "Cancel"){
+            utils.cleanReload(winGroup)
+        }
 
         utils.waitLoading()
         Send "!m"

@@ -81,10 +81,11 @@ class utils {
             BlockInput false
             clearWin := MsgBox("请先清空 Opera 界面中的子窗口。", msgboxTitle, "OKCancel 4096")
             if (clearWin = "Cancel") {
-                return
+                return "Cancel"
             } else {
                 WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
                 BlockInput "SendAndMouse"
+                return "OK"
             }
         }
     }
