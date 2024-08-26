@@ -101,13 +101,11 @@ class useFileDB {
 			this.IS_BACKINGUP_RECENT := true
 		}
 		recentBackupFullPath := this.backup . "\recent.json"
-		recent := FileExist(recentBackupFullPath) ? JSON.parse(FileRead(recentBackupFullPath, "UTF-8")) : []		
-		recent.Push(this.loadOneDay(,, period)*)
-
-		
+		recent := FileExist(recentBackupFullPath) ? JSON.parse(FileRead(recentBackupFullPath, "UTF-8")) : []
+		recent.Push(this.loadOneDay(, , period)*)
 
 		if (recent.Length > this.recentLength) {
-			recent.RemoveAt( this.recentLength + 1, recent.Length - this.recentLength)
+			recent.RemoveAt(this.recentLength + 1, recent.Length - this.recentLength)
 		}
 
 		if (FileExist(recentBackupFullPath)) {
