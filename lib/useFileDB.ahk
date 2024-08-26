@@ -16,6 +16,9 @@ class useFileDB {
 		if (!DirExist(this.main . dateFolder)) {
 			DirCreate(this.main . dateFolder)
 		}
+		if (FileExist(this.main . dateFolder . fileName)) {
+			return
+		}
 		FileAppend(jsonString, this.main . dateFolder . fileName, "UTF-8")
 		Sleep 100
 		; cleanup outdated if cleanPeriod is unset/0
@@ -98,31 +101,36 @@ class useFileDB {
 			this.IS_BACKINGUP_RECENT := true
 		}
 		recentBackupFullPath := this.backup . "\recent.json"
-		stock := FileExist(recentBackupFullPath) ? JSON.parse(FileRead(recentBackupFullPath, "UTF-8")) : []
-		recent := stock.InsertAt(stock.Length + 1, this.loadOneDay(, , period)*)
+		recent := FileExist(recentBackupFullPath) ? JSON.parse(FileRead(recentBackupFullPath, "UTF-8")) : []		
+		recent.Push(this.loadOneDay(,, period)*)
+
+		
 
 		if (recent.Length > this.recentLength) {
-			recent.RemoveAt(this.recentLength + 1, recent.Length - this.recentLength)
+			recent.RemoveAt( this.recentLength + 1, recent.Length - this.recentLength)
 		}
 
 		if (FileExist(recentBackupFullPath)) {
 			FileDelete(recentBackupFullPath)
 		}
-		FileAppend(recent, recentBackupFullPath, "UTF-8")
+
+		FileAppend(JSON.stringify(recent), recentBackupFullPath, "UTF-8")
 		this.IS_BACKINGUP_RECENT := false
 	}
 
 	createArchiveBackup(backupDate) {
 		archiveData := JSON.stringify(this.loadOneDay(, backupDate, 60 * 24 * this.cleanPeriod))
-		monthFolder := "\" . SubStr(backupDate, 1, 4)
-		backupFullPath := this.backup . "\" . monthFolder . "\" . backupDate . " - backup.json"
-		if (!DirExist(this.backup . "\" . monthFolder)) {
-			DirCreate(this.backup . "\" . monthFolder)
+		monthFolder := "\" . SubStr(backupDate, 1, 6)
+		backupFullPath := this.backup . monthFolder . "\" . backupDate . " - backup.json"
+
+		if (!DirExist(this.backup . monthFolder)) {
+			DirCreate(this.backup . monthFolder)
 		}
 		if (FileExist(backupFullPath)) {
 			FileDelete(backupFullPath)
 		}
 		FileAppend(archiveData, backupFullPath, "UTF-8")
+		run backupFullPath
 	}
 
 	restoreRecent() {
@@ -133,17 +141,17 @@ class useFileDB {
 	}
 
 	restoreArchiveOneDay(restoreDate) {
-		month := SubStr(restoreDate, 1, 4)
-
-		loop files, (this.backup . "\" . month . "\*.json") {
+		monthFolder := "\" . SubStr(restoreDate, 1, 6)
+		loop files, (this.backup . monthFolder . "\*.json") {
+			msgbox A_LoopFileName
 			if (!InStr(A_LoopFileName, restoreDate)) {
 				continue
 			}
 
 			archive := FileRead(A_LoopFileFullPath, "UTF-8")
 			filename := StrReplace(A_LoopFileName, "backup", "archive")
-			archiveFullPath := this.archive . "\" . filename . ".json"
-			
+			archiveFullPath := this.archive . "\" . filename
+
 			if (FileExist(archiveFullPath)) {
 				FileDelete(archiveFullPath)
 			}
