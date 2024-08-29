@@ -14,6 +14,8 @@ class PMN_FillIn {
             utils.waitLoading()
             Send "!n"
             utils.waitLoading()
+            Send "{Esc}" ; cancel the "save changes msgbox"
+            utils.waitLoading()
         
             this.fillAction(this.parse(currentGuest))
             utils.waitLoading()
