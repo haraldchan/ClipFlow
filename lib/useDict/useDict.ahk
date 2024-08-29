@@ -76,7 +76,7 @@ class useDict {
                 Sleep 500
                 continue
             } else {
-                toned := html.getElementById("pinyin").InnerText
+                toned := StrSplit(html.getElementById("pinyin").InnerText, " ")[1]
                 break
             }
         }
