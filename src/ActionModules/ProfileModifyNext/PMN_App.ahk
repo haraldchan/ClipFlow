@@ -6,6 +6,7 @@
 
 PMN_App(App, moduleTitle, db, identifier) {
     RECENT_BACKUP_INTERVAL := 30
+    fillOverwrite := signal(false)
     listContent := signal(db.load())
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
@@ -31,7 +32,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.getCtrlByName("$selectAllBtn").ctrl.visible := cur = "waterfall" ? true : false
         handleListContentUpdate()
     }
-
+    
     currentGuest := signal(Map("idNum", 0))
     OnClipboardChange (*) => handleCaptured(identifier)
     handleCaptured(identifier) {
@@ -68,7 +69,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; update recent backup
         if (DateDiff(A_Now, FileGetTime(db.backup . "\recent.json", "C"), "Minutes") > RECENT_BACKUP_INTERVAL) {
-            SetTimer(db.createRecentBackup(RECENT_BACKUP_INTERVAL), -1)
+            SetTimer(() => db.createRecentBackup(RECENT_BACKUP_INTERVAL), -1)
         }
 
         ; restore previous clip to clb
@@ -214,7 +215,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         return filteredItems
     }
 
-    fillPmsProfile(App) {
+    fillPmsProfile() {
         if (!WinExist("ahk_class SunAwtFrame")) {
             MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
             return
@@ -248,7 +249,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests)
         } else {
-            PMN_Fillin.fill(listContent.value[LV.GetNext()])
+            PMN_Fillin.fill(listContent.value[LV.GetNext()], fillOverwrite.value)
         }
     }
 
@@ -300,7 +301,7 @@ PMN_App(App, moduleTitle, db, identifier) {
     return (
         App.AddGroupBox("R17 w580 y+20", " "),
         App.AddText("xp15 ", moduleTitle . " ⓘ ")
-           .OnEvent("Click", (*) => PMN_Settings()),
+           .OnEvent("Click", (*) => PMN_Settings(fillOverwrite)),
         
         ; datetime
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
@@ -325,7 +326,11 @@ PMN_App(App, moduleTitle, db, identifier) {
         
         ; manual updating btns
         App.AddButton("vupdate x+10 w80 h25", "刷 新(&R)").OnEvent("Click", (*) => handleListContentUpdate()),
-        App.AddButton("vfillIn x+5 w80 h25 Default", "填 入").OnEvent("Click", (*) => fillPmsProfile(App)),
+        App.AddReactiveButton("vfillIn x+5 w80 h25 Default", "填 入")
+           .OnEvent(Map(
+                "Click", (*) => fillPmsProfile(),
+                "ContextMenu", (ctrl, *) => (fillOverwrite.set(o => !o), ctrl.Text := fillOverwrite.value ? "覆盖填入" : "填 入")
+        )),
 
         ; profile list
         GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile),

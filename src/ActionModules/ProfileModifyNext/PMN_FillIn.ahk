@@ -3,25 +3,28 @@ class PMN_FillIn {
     static FOUND := "0x000080"
     static NOT_FOUND := "0x008080"
 
-    static fill(currentGuest) {
-        if (this.matchHistory(currentGuest) = this.FOUND) {
-            Send "!o"
-            utils.waitLoading()
+    static fill(currentGuest, isOverwrite) {
+        if (isOverwrite = false) {
+            if (this.matchHistory(currentGuest) = this.FOUND) {
+                Send "!o"
+                utils.waitLoading()
 
-            MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
-        } else {
-            Send "!c"
-            utils.waitLoading()
-            Send "!n"
-            utils.waitLoading()
-            Send "{Esc}" ; cancel the "save changes msgbox"
-            utils.waitLoading()
-        
-            this.fillAction(this.parse(currentGuest))
-            utils.waitLoading()
+                MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
+                return
+            } else {
+                Send "!c"
+                utils.waitLoading()
+                Send "!n"
+                utils.waitLoading()
+                Send "{Esc}" ; cancel the "save changes msgbox"
+                utils.waitLoading()
+            }  
+        } 
+            
+        this.fillAction(this.parse(currentGuest))
+        utils.waitLoading()
 
-            MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
-        }
+        MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
     }
 
     static matchHistory(currentGuest) {
