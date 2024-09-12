@@ -4,27 +4,76 @@ class PMN_FillIn {
     static NOT_FOUND := "0x008080"
 
     static fill(currentGuest, isOverwrite) {
-        if (isOverwrite = false) {
-            if (this.matchHistory(currentGuest) = this.FOUND) {
-                Send "!o"
-                utils.waitLoading()
+        WinActivate "ahk_class SunAwtFrame"
+        guest := this.parse(currentGuest)
+        
+        ; force overwrite
+        if (isOverwrite = true) {
+            this.fillAction(guest)
+            utils.waitLoading()
+            MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+            return
+        }
 
-                MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
-                return
+        currentId := this.getCurrentId()
+        ; on-screen profile matched
+        if (currentId = guest["idNum"]) {
+            MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
+            return
+        } 
+
+        ; matched in database
+        if (this.matchHistory(guest) = this.FOUND) {
+            Send "!o"
+            utils.waitLoading()
+            MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
+            return
+        } else {
+            Send "!c"
+            utils.waitLoading()
+            sleep 100
+            if (currentId = "") {
+                this.fillAction(guest)
             } else {
-                Send "!c"
-                utils.waitLoading()
                 Send "!n"
                 utils.waitLoading()
-                Send "{Esc}" ; cancel the "save changes msgbox"
+                Send "{Esc}"
                 utils.waitLoading()
-            }  
-        } 
-            
-        this.fillAction(this.parse(currentGuest))
+                this.fillAction(guest)
+            }
+        }
+
+        utils.waitLoading()
+        MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+    }
+
+    static getCurrentId() {
+        CoordMode "Pixel", "Screen"
+        CoordMode "Mouse", "Screen"
+        
+        prevClip := A_Clipboard
+
+        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
+            anchorX := FoundX - 10
+            anchorY := FoundY
+        } else {
+            msgbox("not found", , "T1")
+            return
+        }
+
+        MouseMove anchorX + 393, anchorY + 50
+        utils.waitLoading()
+        Click 2
+        Sleep 200
+        Send "^c"
+        utils.waitLoading()
+        Send "!s"
         utils.waitLoading()
 
-        MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+        currentId := (A_Clipboard = prevClip || A_Clipboard = "") ? "" : A_Clipboard
+        A_Clipboard := prevClip
+
+        return currentId
     }
 
     static matchHistory(currentGuest) {
@@ -49,7 +98,7 @@ class PMN_FillIn {
 
         Send "!h" 
         utils.waitLoading()
-        Send "{Esc}" ; cancel the "save changes msgbox"
+        Send "!y" ; cancel the "save changes msgbox"
         utils.waitLoading()
 
         loop 12 {
@@ -124,11 +173,8 @@ class PMN_FillIn {
 
     static fillAction(guestProfileMap) {
         CoordMode "Pixel", "Screen"
-        AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
-        anchorX := 0
-        anchorY := 0
 
-        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, AnchorImage)) {
+        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
             anchorX := FoundX - 10
             anchorY := FoundY
         } else {
@@ -137,6 +183,7 @@ class PMN_FillIn {
         }
 
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
+        WinActivate "ahk_class SunAwtFrame"
         CoordMode "Mouse", "Screen"
         BlockInput "SendAndMouse"
         ; { fillin common info: nameLast, nameFirst, language, gender, country, birthday, idType, idNum
