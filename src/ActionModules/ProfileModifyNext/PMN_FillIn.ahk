@@ -41,10 +41,10 @@ class PMN_FillIn {
                 utils.waitLoading()
                 this.fillAction(guest)
             }
-        }
 
-        utils.waitLoading()
-        MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+            utils.waitLoading()
+            MsgBox("已完成 Profile Modify", "Profile Modify Next", "T1 4096")
+        }
     }
 
     static getCurrentId() {
@@ -68,6 +68,8 @@ class PMN_FillIn {
         Send "^c"
         utils.waitLoading()
         Send "!s"
+        utils.waitLoading()
+        Send "{Enter}"
         utils.waitLoading()
 
         currentId := (A_Clipboard = prevClip || A_Clipboard = "") ? "" : A_Clipboard
@@ -98,7 +100,7 @@ class PMN_FillIn {
 
         Send "!h" 
         utils.waitLoading()
-        Send "!y" ; cancel the "save changes msgbox"
+        Send "{Esc}" ; cancel the "save changes msgbox"
         utils.waitLoading()
 
         loop 12 {
