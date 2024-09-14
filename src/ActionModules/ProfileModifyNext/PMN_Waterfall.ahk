@@ -1,5 +1,5 @@
 class PMN_Waterfall {
-    static cascade(rooms, selectedGuests) {
+    static cascade(rooms, selectedGuests, isOverwrite) {
         WinMaximize "ahk_class SunAwtFrame"
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
         BlockInput "SendAndMouse"
@@ -16,7 +16,7 @@ class PMN_Waterfall {
                 if (guest["roomNum"] = curRoom.value) {
                     this.search(room, index)
                     utils.waitLoading()
-                    this.modify(guest)
+                    this.modify(guest, isOverwrite)
                     guest["roomNum"] := ""
                     index := (remaining = 1) ? 1 : index + 1
 
@@ -60,11 +60,11 @@ class PMN_Waterfall {
         }
     }
 
-    static modify(guest) { 
+    static modify(guest, isOverwrite) { 
         Send "!p" ; open profile
         utils.waitLoading()
         
-        PMN_FillIn.fill(guest)
+        PMN_FillIn.fill(guest, isOverwrite)
         utils.waitLoading()
         Sleep 1000
 
