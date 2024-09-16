@@ -105,7 +105,7 @@ class useFileDB {
 		recent.Push(this.loadOneDay(, , period)*)
 
 		if (recent.Length > this.recentLength) {
-			recent.RemoveAt(this.recentLength + 1, recent.Length - this.recentLength)
+			recent.RemoveAt(1, recent.Length - this.recentLength)
 		}
 
 		if (FileExist(recentBackupFullPath)) {
