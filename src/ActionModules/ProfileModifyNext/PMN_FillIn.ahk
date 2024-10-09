@@ -168,7 +168,16 @@ class PMN_FillIn {
         bd := StrSplit(currentGuest["birthday"], "-")
         parsedInfo["birthday"] := bd[2] . bd[3] . bd[1]
         ; tel number
-        parsedInfo["tel"] := currentGuest["tel"]
+        tel := currentGuest["tel"]
+        if (StrLen(tel) = 11) {
+            f := SubStr(tel,1, 3)
+            s := SubStr(tel, 4, 4)
+            r := SubStr(tel, 8, 4)
+
+            parsedInfo["tel"] := f . "-" . s . "-" . r
+        } else {
+            parsedInfo["tel"] := tel
+        }
 
         return parsedInfo
     }
