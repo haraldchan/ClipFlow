@@ -9,9 +9,9 @@ class useFileDB {
 		this.IS_BACKINGUP_RECENT := false
 	}
 
-	add(jsonString) {
-		dateFolder := "\" . FormatTime(A_Now, "yyyyMMdd")
-		fileName := "\" . JSON.parse(jsonString)["fileName"] . ".json"
+	add(jsonString, date := FormatTime(A_Now, "yyyyMMdd"), saveName := JSON.parse(jsonString)["fileName"] . ".json") {
+		dateFolder := "\" . date
+		fileName := "\" . saveName
 		; create dateFolder if not exist yet
 		if (!DirExist(this.main . dateFolder)) {
 			DirCreate(this.main . dateFolder)
