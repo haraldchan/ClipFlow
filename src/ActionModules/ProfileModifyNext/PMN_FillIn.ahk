@@ -130,11 +130,11 @@ class PMN_FillIn {
         parsedInfo["nameLast"] := currentGuest["guestType"] = "内地旅客"
             ? useDict.getFullnamePinyin(currentGuest["name"])[1]
             : currentGuest["nameLast"] = " "
-                ? useDict.getFullnamePinyin(currentGuest["name"])[1]
+                ? useDict.getFullnamePinyin(currentGuest["name"], true)[1]
                 : currentGuest["nameLast"]
         ; first name
         parsedInfo["nameFirst"] := currentGuest["guestType"] = "内地旅客"
-            ? useDict.getFullnamePinyin(currentGuest["name"])[2]
+            ? useDict.getFullnamePinyin(currentGuest["name"], true)[2]
             : currentGuest["nameFirst"] = " "
                 ? useDict.getFullnamePinyin(currentGuest["name"])[2]
                 : currentGuest["nameFirst"] 

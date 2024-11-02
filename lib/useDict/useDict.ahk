@@ -3,6 +3,8 @@ class Dict {
 
     static pinyin := JSON.parse(FileRead(this.DICT_PATH . "\pinyin.json", "UTF-8"))
 
+    static pinyinWade := JSON.parse(FileRead(this.DICT_PATH . "\pinyin-wade.json", "UTF-8"))
+
     static doubleLastName := JSON.parse(FileRead(this.DICT_PATH . "\double-last-name.json", "UTF-8"))
 
     static tone := Map(
@@ -80,7 +82,7 @@ class useDict {
                 break
             }
         }
-        
+
         unToned := ""
         for tonedChar, char in Dict.tone {
             if (InStr(toned, tonedChar)) {
@@ -94,7 +96,7 @@ class useDict {
         ; update pinyin dictionary
         Dict.pinyin[unToned] := Dict.pinyin[unToned] . hanzi
         FileDelete(Dict.DICT_PATH . "\pinyin.json")
-        FileAppend(JSON.stringify(Dict.pinyin), Dict.DICT_PATH . "\pinyin.json" ,"UTF-8")
+        FileAppend(JSON.stringify(Dict.pinyin), Dict.DICT_PATH . "\pinyin.json", "UTF-8")
 
         return unToned
     }
@@ -104,7 +106,7 @@ class useDict {
      * @param {string} fullname The name to convert.
      * @returns {array} [last name, first name]
      */
-    static getFullnamePinyin(fullname) {
+    static getFullnamePinyin(fullname, useWade := false) {
         if (Dict.doubleLastName.Has(SubStr(fullname, 1, 2))) {
             lastname := Dict.doubleLastName[SubStr(fullname, 1, 2)]
             lastnameLength := 2
@@ -113,13 +115,16 @@ class useDict {
             lastnameLength := 1
         }
 
-        firstnameSplit := StrSplit(SubStr(fullname, lastnameLength + 1), "")
-        firstname := ""
-        loop firstnameSplit.Length {
-            firstname .= this.getPinyin(firstnameSplit[A_Index]) . " "
+        firstname := StrSplit(SubStr(fullname, lastnameLength + 1), "")
+                     .map(hanzi => this.getPinyin(hanzi))
+                     .join(" ")
+
+        if (useWade == true) {
+            lastname := StrSplit(lastname, " ").map(p => Dict.pinyinWade[p]).join(" ")
+            firstname := StrSplit(firstname, " ").map(p => Dict.pinyinWade[p]).join("-")
         }
 
-        return [lastname, Trim(firstname)]
+        return [Trim(firstname), Trim(firstname)]
     }
 
     /**
