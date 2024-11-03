@@ -49,7 +49,7 @@ class useDict {
     static getPinyin(hanzi, useWade := false) {
         for pinyin, hanCharacters in Dict.pinyin {
             if (InStr(hanCharacters, hanzi)) {
-                return pinyin
+                return useWade == false ? pinyin : Dict.pinyinWade[pinyin]
             }
         }
         ; if not found in Dict, fetch from baidu hanyu
@@ -61,7 +61,7 @@ class useDict {
      * @param hanzi A chinese character to convert.
      * @returns {String} 
      */
-    static fetchPinyin(hanzi) {
+    static fetchPinyin(hanzi, useWade := false) {
         url := Format("https://hanyu.baidu.com/zici/s?wd={1}", hanzi)
         isWindows7 := StrSplit(A_OSVersion, ".")[1] = 6
 
@@ -99,7 +99,7 @@ class useDict {
         FileDelete(Dict.DICT_PATH . "\pinyin.json")
         FileAppend(JSON.stringify(Dict.pinyin), Dict.DICT_PATH . "\pinyin.json", "UTF-8")
 
-        return unToned
+        return useWade == false ? unToned : Dict.pinyinWade[unToned]
     }
 
     /**
@@ -112,20 +112,15 @@ class useDict {
             lastname := Dict.doubleLastName[SubStr(fullname, 1, 2)]
             lastnameLength := 2
         } else {
-            lastname := this.getPinyin(SubStr(fullname, 1, 1))
+            lastname := this.getPinyin(SubStr(fullname, 1, 1), useWade)
             lastnameLength := 1
         }
 
         firstname := StrSplit(SubStr(fullname, lastnameLength + 1), "")
-                     .map(hanzi => this.getPinyin(hanzi))
-                     .join(" ")
+                     .map(hanzi => this.getPinyin(hanzi, useWade))
+                     .join(useWade == false ? " " : "-")
 
-        if (useWade == true) {
-            lastname := StrSplit(lastname, " ").map(p => Dict.pinyinWade[p]).join(" ")
-            firstname := StrSplit(firstname, " ").map(p => Dict.pinyinWade[p]).join("-")
-        }
-
-        return [Trim(firstname), Trim(firstname)]
+        return [Trim(lastname), Trim(firstname)]
     }
 
     /**
