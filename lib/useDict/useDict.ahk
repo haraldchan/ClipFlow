@@ -1,5 +1,6 @@
 class Dict {
     static DICT_PATH := A_ScriptDir . "\lib\useDict\dictionaries"
+    ; static DICT_PATH := "./dictionaries"
 
     static pinyin := JSON.parse(FileRead(this.DICT_PATH . "\pinyin.json", "UTF-8"))
 
@@ -45,14 +46,14 @@ class useDict {
      * @param {string} hanzi A chinese character to convert.
      * @returns {string} 
      */
-    static getPinyin(hanzi) {
+    static getPinyin(hanzi, useWade := false) {
         for pinyin, hanCharacters in Dict.pinyin {
             if (InStr(hanCharacters, hanzi)) {
                 return pinyin
             }
         }
         ; if not found in Dict, fetch from baidu hanyu
-        return this.fetchPinyin(hanzi)
+        return this.fetchPinyin(hanzi, useWade)
     }
 
     /**
