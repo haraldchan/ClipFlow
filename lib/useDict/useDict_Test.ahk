@@ -1,25 +1,24 @@
+#SingleInstance Force
 #Include "./useDict.ahk"
 #Include "../AddReactive/AddReactive.ahk"
 
 UseDictTest() {
     UDT := Gui()
-    Dict.DICT_PATH := "./dictionaries"
-    pinyin := signal("")
+    fullname := signal({last: "", first: ""})
 
     handlePinyinConver(*) {
-        hanChar := UDT.getCtrlByName("hanChar")
-        if (StrLen(hanChar) > 1) {
-            MsgBox("请输入单个汉字！",,"4096 T1")
-        }
+        hanChar := UDT.getCtrlByName("hanChar").Value
+        name := useDict.getFullnamePinyin(hanChar)
 
-        pinyin.set(useDict.getPinyin(hanChar))
+        fullname.set({last: name[1], first: name[2]})
     }
 
     return (
-        UDT.AddText("w200 h30", "请输入单个汉字："),
-        UDT.AddEdit("vhanChar y+10 w40 h30", ""),
-        UDT.AddReactiveText("x+10 w40 h30", "{1}", pinyin),
-        UDT.AddButton("y+10 w100 h40", "转换拼音")
+        UDT.AddText("w200 h30", "请输入全名："),
+        UDT.AddEdit("vhanChar x10 y+10 w100 h25", ""),
+        UDT.AddReactiveText("x+10 w100 h25", "{1} {2}", fullname, ["last", "first"]),
+        UDT.AddButton("x10 y+10 w100 h40", "转换拼音").OnEvent("Click", handlePinyinConver),
+        UDT.Show()
     )
 }
 
