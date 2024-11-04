@@ -126,29 +126,15 @@ class PMN_FillIn {
         parsedInfo["nameAlt"] := currentGuest["guestType"] = "国外旅客" ? " " : currentGuest["name"]
         
         ; last/firstname           
-        isTaiwanese := currentGuest("guestType") == "港澳台旅客" && currentGuest["region"] == "台湾"
+        isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
         if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
             fullname := useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
             parsedInfo["nameLast"] := fullname[1]
             parsedInfo["nameFirst"] := fullname[2]
         } else {
             parsedInfo["nameLast"] := currentGuest["nameLast"]
-            parsedInfo["nameFirst"] := currentGuest["nameLast"]
+            parsedInfo["nameFirst"] := currentGuest["nameFirst"]
         }
-        
-        ; ; last name
-        ; parsedInfo["nameLast"] := currentGuest["guestType"] = "内地旅客"
-        ;     ? useDict.getFullnamePinyin(currentGuest["name"])[1]
-        ;     : currentGuest["nameLast"] = " "
-        ;         ? useDict.getFullnamePinyin(currentGuest["name"], true)[1]
-        ;         : currentGuest["nameLast"]
-        
-        ; ; first name
-        ; parsedInfo["nameFirst"] := currentGuest["guestType"] = "内地旅客"
-        ;     ? useDict.getFullnamePinyin(currentGuest["name"], true)[2]
-        ;     : currentGuest["nameFirst"] = " "
-        ;         ? useDict.getFullnamePinyin(currentGuest["name"])[2]
-        ;         : currentGuest["nameFirst"] 
         
         ; address
         parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客" ? currentGuest["addr"] : " "
