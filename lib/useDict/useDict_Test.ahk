@@ -7,7 +7,7 @@ UseDictTest() {
     fullname := signal({last: "", first: ""})
 
     handlePinyinConver(*) {
-        form := UDT.submit()
+        form := UDT.submit(false)
         name := useDict.getFullnamePinyin(form.hanChar, form.useWG)
 
         fullname.set({last: name[1], first: name[2]})
