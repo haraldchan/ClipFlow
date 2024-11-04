@@ -1,6 +1,5 @@
 class Dict {
-    static DICT_PATH := A_ScriptDir . "\lib\useDict\dictionaries"
-    ; static DICT_PATH := "./dictionaries"
+    static DICT_PATH := A_ScriptName == "useDict_Test.ahk" ? "./dictionaries" : A_ScriptDir . "\lib\useDict\dictionaries"
 
     static pinyin := JSON.parse(FileRead(this.DICT_PATH . "\pinyin.json", "UTF-8"))
 
@@ -44,24 +43,26 @@ class useDict {
     /**
      * Convert a Hanzi character to pinyin.
      * @param {string} hanzi A chinese character to convert.
+     * @param {boolean} useWG Uses Wade-Giles instead of Pinyin.
      * @returns {string} 
      */
-    static getPinyin(hanzi, useWade := false) {
+    static getPinyin(hanzi, useWG := false) {
         for pinyin, hanCharacters in Dict.pinyin {
             if (InStr(hanCharacters, hanzi)) {
-                return useWade == false ? pinyin : Dict.pinyinWade[pinyin]
+                return useWG == false ? pinyin : Dict.pinyinWade[pinyin]
             }
         }
         ; if not found in Dict, fetch from baidu hanyu
-        return this.fetchPinyin(hanzi, useWade)
+        return this.fetchPinyin(hanzi, useWG)
     }
 
     /**
      * Fetching pinyin of certain Hanzi from hanyu.baidu.com
      * @param hanzi A chinese character to convert.
+     * @param {boolean} useWG Uses Wade-Giles instead of Pinyin.
      * @returns {String} 
      */
-    static fetchPinyin(hanzi, useWade := false) {
+    static fetchPinyin(hanzi, useWG := false) {
         url := Format("https://hanyu.baidu.com/zici/s?wd={1}", hanzi)
         isWindows7 := StrSplit(A_OSVersion, ".")[1] = 6
 
@@ -99,26 +100,30 @@ class useDict {
         FileDelete(Dict.DICT_PATH . "\pinyin.json")
         FileAppend(JSON.stringify(Dict.pinyin), Dict.DICT_PATH . "\pinyin.json", "UTF-8")
 
-        return useWade == false ? unToned : Dict.pinyinWade[unToned]
+        return useWG == false ? unToned : Dict.pinyinWade[unToned]
     }
 
     /**
      * Convert the pinyin of last name and first name.
      * @param {string} fullname The name to convert.
+     * @param {boolean} useWG Uses Wade-Giles instead of Pinyin.
      * @returns {array} [last name, first name]
      */
-    static getFullnamePinyin(fullname, useWade := false) {
+    static getFullnamePinyin(fullname, useWG := false) {
         if (Dict.doubleLastName.Has(SubStr(fullname, 1, 2))) {
             lastname := Dict.doubleLastName[SubStr(fullname, 1, 2)]
+            if (useWG == true) {
+                lastname := StrSplit(lastname, " ").map(pinyin => Dict.pinyinWade[pinyin]).join("-")
+            }
             lastnameLength := 2
         } else {
-            lastname := this.getPinyin(SubStr(fullname, 1, 1), useWade)
+            lastname := this.getPinyin(SubStr(fullname, 1, 1), useWG)
             lastnameLength := 1
         }
 
         firstname := StrSplit(SubStr(fullname, lastnameLength + 1), "")
-                     .map(hanzi => this.getPinyin(hanzi, useWade))
-                     .join(useWade == false ? " " : "-")
+                     .map(hanzi => this.getPinyin(hanzi, useWG))
+                     .join(useWG == false ? " " : "-")
 
         return [Trim(lastname), Trim(firstname)]
     }
