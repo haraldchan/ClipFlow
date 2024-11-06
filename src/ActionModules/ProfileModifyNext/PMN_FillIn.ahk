@@ -135,6 +135,15 @@ class PMN_FillIn {
             parsedInfo["nameLast"] := currentGuest["nameLast"]
             parsedInfo["nameFirst"] := currentGuest["nameFirst"]
         }
+
+        ; fallback for incomplete info
+        if (currentGuest["idType"] == "港澳台居民居住证"
+            && parsedInfo["nameLast"] == " "
+            && parsedInfo["nameFirst"] == " ") {
+            fullname := useDict.getFullnamePinyin(currentGuest["name"])
+            parsedInfo["nameLast"] := fullname[1]
+            parsedInfo["nameFirst"] := fullname[2]  
+        }
         
         ; address
         parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客" ? currentGuest["addr"] : " "
