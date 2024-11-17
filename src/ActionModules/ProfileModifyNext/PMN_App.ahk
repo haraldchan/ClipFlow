@@ -68,9 +68,9 @@ PMN_App(App, moduleTitle, db, identifier) {
         handleListContentUpdate()
 
         ; update recent backup
-        if (DateDiff(A_Now, FileGetTime(db.backup . "\recent.json", "C"), "Minutes") > RECENT_BACKUP_INTERVAL) {
-            SetTimer(() => db.createRecentBackup(RECENT_BACKUP_INTERVAL), -1)
-        }
+        ; if (DateDiff(A_Now, FileGetTime(db.backup . "\recent.json", "C"), "Minutes") > RECENT_BACKUP_INTERVAL) {
+            ; SetTimer(() => db.createRecentBackup(RECENT_BACKUP_INTERVAL), -1)
+        ; }
 
         ; restore previous clip to clb
         clipHistory := config.read("clipHistory")
@@ -82,7 +82,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         for guest in recentGuests {
             if (guest["idNum"] = captured["idNum"]) {
                 captured["fileName"] := guest["fileName"]
-                db.updateOne(guest["fileName"], queryFilter.value["date"], JSON.stringify(captured))
+                db.updateOne(JSON.stringify(captured), guest["fileName"], queryFilter.value["date"])
                 return
             }
         }
@@ -107,7 +107,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         try {
-            db.updateOne(matchedGuest.value["fileName"], queryFilter.value["date"], JSON.stringify(matchedGuest.value))
+            db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
         } catch {
             MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
             return
@@ -316,12 +316,12 @@ PMN_App(App, moduleTitle, db, identifier) {
         
         ; search box
         App.AddReactiveEdit("vsearchBox x+5 w100 h25")
-        .OnEvent("Change", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
+           .OnEvent("Change", (ctrl, _) => queryFilter.update("search", Trim(ctrl.Value))),
         
         ; period
         App.AddText("x+10 h25 0x200", "最近"),
         App.AddReactiveEdit("vperiod Number x+1 w30 h25", queryFilter.value["period"])
-        .OnEvent("Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
+           .OnEvent("Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
         App.AddText("x+1 h25 0x200", "分钟"),
         
         ; manual updating btns
