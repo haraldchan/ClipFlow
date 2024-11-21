@@ -2,7 +2,7 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
-        widths: [60, 90, 38, 80, 140, 120]
+        widths: [60, 90, 40, 80, 145, 120]
     }
 
     options := {
@@ -19,7 +19,7 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
     handleUpdateItem(LV, itemIndex) {
         selectedItem := listContent.value[itemIndex]
         selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
-        db.updateOne(selectedItem["fileName"], queryFilter.value["date"], JSON.stringify(selectedItem))
+        db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
     }
 
     showProfileDetails(LV, itemIndex, *) {
