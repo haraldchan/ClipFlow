@@ -5,7 +5,7 @@
 #Include "./PMN_Waterfall.ahk"
 
 PMN_App(App, moduleTitle, db, identifier) {
-    RECENT_BACKUP_INTERVAL := 30
+    ; RECENT_BACKUP_INTERVAL := 30
     fillOverwrite := signal(false)
     listContent := signal(db.load())
     queryFilter := signal({
@@ -69,7 +69,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; update recent backup
         ; if (DateDiff(A_Now, FileGetTime(db.backup . "\recent.json", "C"), "Minutes") > RECENT_BACKUP_INTERVAL) {
-            ; SetTimer(() => db.createRecentBackup(RECENT_BACKUP_INTERVAL), -1)
+        ;     SetTimer(() => db.createRecentBackup(RECENT_BACKUP_INTERVAL), -1)
         ; }
 
         ; restore previous clip to clb
@@ -82,7 +82,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         for guest in recentGuests {
             if (guest["idNum"] = captured["idNum"]) {
                 captured["fileName"] := guest["fileName"]
-                db.updateOne(JSON.stringify(captured), guest["fileName"], queryFilter.value["date"])
+                db.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
                 return
             }
         }
@@ -316,12 +316,12 @@ PMN_App(App, moduleTitle, db, identifier) {
         
         ; search box
         App.AddReactiveEdit("vsearchBox x+5 w100 h25")
-           .OnEvent("Change", (ctrl, _) => queryFilter.update("search", Trim(ctrl.Value))),
+        .OnEvent("Change", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
         
         ; period
         App.AddText("x+10 h25 0x200", "最近"),
         App.AddReactiveEdit("vperiod Number x+1 w30 h25", queryFilter.value["period"])
-           .OnEvent("Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
+        .OnEvent("Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
         App.AddText("x+1 h25 0x200", "分钟"),
         
         ; manual updating btns
