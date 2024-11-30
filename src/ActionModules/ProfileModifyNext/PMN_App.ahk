@@ -247,7 +247,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 selectedGuests.Push(listContent.value[row])
             }
 
-            PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests, fillOverwrite.value)
+            PMN_Waterfall.cascade(StrSplit(Trim(queryFilter.value["search"]), " "), selectedGuests, fillOverwrite.value)
         } else {
             PMN_Fillin.fill(listContent.value[LV.GetNext()], fillOverwrite.value)
         }
