@@ -1,20 +1,21 @@
 OnDayGroups(App, groups, selectedGroup) {
-    monthFolder := Format("\\10.0.2.13\fd\9-ON DAY GROUP DETAILS\{1}\{1}{2}",A_Year, A_MM)
-
+    monthFolder := Format("\\10.0.2.13\fd\9-ON DAY GROUP DETAILS\{1}\{1}{2}", A_Year, A_MM)
     XL_FILE_PATH := ""
+
     loop files monthFolder . "\*.xlsx" {
         if (InStr(A_LoopFileName, FormatTime(A_Now, "yyyyMMdd"))) {
             XL_FILE_PATH := A_LoopFileFullPath
             break
-        } else {
-            MsgBox("未找到 OnDayGroup Excel 文件，请手动添加", popupTitle, "4096 T1")
-            App.Opt("+OwnDialogs")
-            XL_FILE_PATH := FileSelect(3, , "请选择 OnDayGroup Excel 文件")
-            if (XL_FILE_PATH == "") {
-                config.write("moduleSelected", 1)
-                utils.cleanReload(winGroup)
-            } 
-            break
+        }
+    }
+
+    if (XL_FILE_PATH == "") {
+        MsgBox("未找到 OnDayGroup Excel 文件，请手动添加", popupTitle, "4096 T1")
+        App.Opt("+OwnDialogs")
+        XL_FILE_PATH := FileSelect(3, , "请选择 OnDayGroup Excel 文件")
+        if (XL_FILE_PATH == "") {
+            config.write("moduleSelected", 1)
+            utils.cleanReload(winGroup)
         }
     }
 
@@ -48,7 +49,7 @@ OnDayGroups(App, groups, selectedGroup) {
     return (
         App.AddText("w300 h20 0x200", "今日团队").SetFont("bold s11 q4"),
         groups.value.map(group => 
-            App.AddRadio((A_Index = 1 ? "Checked " : "") . "h22 w200 y+10", Format("{1} - {2}", group["blockName"], group["blockCode"]))
+            App.AddRadio((A_Index = 1 ? "Checked " : "") . "h28 w200 y+10", Format("{1} - {2}", group["blockName"], group["blockCode"]))
                .OnEvent("Click", (*) => selectedGroup.set(group))
         )
     )
