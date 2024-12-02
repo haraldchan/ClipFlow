@@ -1,5 +1,3 @@
-#Include "./AddReactive/AddReactive.ahk"
-
 class useDebug {
     static logContent := signal("")
     
