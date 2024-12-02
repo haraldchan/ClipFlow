@@ -135,7 +135,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
     handleSearchByConditions(loadedItems) {
         filteredItems := []
-        searchInput := queryFilter.value["search"]
+        searchInput := Trim(queryFilter.value["search"])
 
         if (searchInput = "") {
             return loadedItems
@@ -186,7 +186,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 }
             }
         } else if (searchBy.value = "waterfall"){
-            roomNums := StrSplit(Trim(queryFilter.value["search"]), " ")
+            roomNums := StrSplit(queryFilter.value["search"], " ")
             ; filtering all entered room numbers
             for roomNum in roomNums {
                 for item in loadedItems {
