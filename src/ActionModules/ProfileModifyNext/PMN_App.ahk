@@ -16,13 +16,14 @@ PMN_App(App, moduleTitle, db, identifier) {
     
     lvIsCheckedAll := signal(true)
     searchBy := signal("nameRoom")
-    searchByMap := Map(
+    searchByMap := OrderedMap(
+        "瀑流模式", "waterfall",
         "姓名/房号", "nameRoom",
         "证件号码", "idNum",
         "地址", "addr",
         "电话", "tel",
         "生日", "birthday",
-        "瀑流模式", "waterfall"
+        "时间戳 ID", "tsId"
     )
     ; handling search conditon changes
     effect(searchBy, new => handleSearchByChange(new))
@@ -185,7 +186,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 }
             }
         } else if (searchBy.value = "waterfall"){
-            roomNums := StrSplit(queryFilter.value["search"], " ")
+            roomNums := StrSplit(Trim(queryFilter.value["search"]), " ")
             ; filtering all entered room numbers
             for roomNum in roomNums {
                 for item in loadedItems {
@@ -247,7 +248,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 selectedGuests.Push(listContent.value[row])
             }
 
-            PMN_Waterfall.cascade(StrSplit(Trim(queryFilter.value["search"]), " "), selectedGuests, fillOverwrite.value)
+            PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests, fillOverwrite.value)
         } else {
             PMN_Fillin.fill(listContent.value[LV.GetNext()], fillOverwrite.value)
         }
@@ -311,7 +312,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         ),
         
         ; search conditions
-        App.AddDropDownList("x+10 w80 Choose2", ["瀑流模式", "姓名/房号", "证件号码", "地址", "电话", "生日"])
+        App.AddDropDownList("x+10 w80 Choose2", searchByMap.keys())
            .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
         
         ; search box
