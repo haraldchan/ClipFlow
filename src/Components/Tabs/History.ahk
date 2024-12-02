@@ -1,4 +1,4 @@
-History(CF) {
+History(App) {
 	clipHistory := signal(config.read("clipHistory"))
 	fillBlank(clipHistory.value)
 
@@ -42,7 +42,5 @@ History(CF) {
 		fillBlank(updatedHistory)
 	}
 
-	return (
-		CF.IndexList("Edit", "x30 h40 w250 y+10 ReadOnly", "{1}", clipHistory)
-	)
+	return clipHistory.value.map(item => App.AREdit("x30 h40 w250 y+10 ReadOnly", "{1}", clipHistory, A_Index))
 }
