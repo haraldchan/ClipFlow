@@ -90,19 +90,6 @@ defineArrayMethods(arr) {
         return result
     }
 
-    arr.Prototype.count := count
-    count(arr, fn) {
-        c := 0
-
-        for item in arr {
-            if (fn(item)) {
-                c++
-            }
-        }
-
-        return c
-    }
-
     arr.Prototype.with := with
     with(arr, index, newValue) {
         if (index > arr.Length) {
@@ -117,8 +104,8 @@ defineArrayMethods(arr) {
         return newArray
     }
 
-    arr.Prototype.concat := concat
-    concat(arr, val) {
+    arr.Prototype.append := append
+    append(arr, val) {
         newArray := arr
 
         if (val is Array) {

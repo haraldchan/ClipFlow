@@ -1,11 +1,13 @@
+; An AddReactive function that helps you binding check status between a CheckBox and a ListView control.
 class shareCheckStatus {
     /**
      * Bind values of CheckBox and ListView for check-all status.
-     * @param ARCheckBox AddReactive CheckBox.
-     * @param ARListView AddReactive Control.
+     * ```
+     * shareCheckStatus(cb, lv, {CheckBox: (*) => {...}, ListView: (*) => {...}, checkStatus: isCheckedSignal})
+     * ```
+     * @param CheckBox AddReactive CheckBox.
+     * @param ListView AddReactive Control.
      * @param {Object} options Additional options.
-     * 
-     * @example shareCheckStatus(cb, lv, {CheckBox: (*) => {...}, ListView: (*) => {...}, checkStatus: isCheckedSignal})
      */
     __New(CheckBox, ListView, options := { CheckBox: (*) => {}, ListView: (*) => {} }) {
         ; param type checking
@@ -42,24 +44,24 @@ class shareCheckStatus {
             ListView.checkStatusDepend := options.checkStatus
             options.checkStatus.addSub(ListView)
 
-            CheckBox.ctrl.OnEvent("Click", (ctrl, _) => this.handleCheckAll(ctrl, ListView.ctrl))
-            ListView.ctrl.OnEvent("ItemCheck", (LV, item, isChecked) => this.handleItemCheck(CheckBox.ctrl, LV, item, isChecked))
+            CheckBox.ctrl.OnEvent("Click", (ctrl, _) => this._handleCheckAll(ctrl, ListView.ctrl))
+            ListView.ctrl.OnEvent("ItemCheck", (LV, item, isChecked) => this._handleItemCheck(CheckBox.ctrl, LV, item, isChecked))
         } else {
-            CheckBox.OnEvent("Click", (ctrl, _) => this.handleCheckAll(CheckBox, ListView))
-            ListView.OnEvent("ItemCheck", (LV, item, isChecked) => this.handleItemCheck(CheckBox, LV, item, isChecked))
+            CheckBox.OnEvent("Click", (ctrl, _) => this._handleCheckAll(CheckBox, ListView))
+            ListView.OnEvent("ItemCheck", (LV, item, isChecked) => this._handleItemCheck(CheckBox, LV, item, isChecked))
         }
     }
 
-    handleCheckAll(CB, LV) {
+    _handleCheckAll(CB, LV) {
         if (this.cb is AddReactiveCheckBox && this.lv is AddReactiveListView) {
             this.checkStatusDepend.set(cur => !cur)
         } else {
             LV.Modify(0, CB.Value = true ? "Check" : "-Check")
         }
-        this.runCustomFn(this.cbFn)
+        this._runCustomFn(this.cbFn)
     }
 
-    handleItemCheck(CB, LV, item, isChecked) {
+    _handleItemCheck(CB, LV, item, isChecked) {
         ; multi-check
         focusedRows := LV.getFocusedRowNumbers()
         for focusedRow in focusedRows {
@@ -72,8 +74,7 @@ class shareCheckStatus {
         } else {
             SetTimer(() => (
                 prevCheckedRows := LV.getCheckedRowNumbers(),
-                this.checkStatusDepend.set(LV.getCheckedRowNumbers().Length = LV.GetCount())
-            ), -1)
+                this.checkStatusDepend.set(LV.getCheckedRowNumbers().Length = LV.GetCount())), -1)
             Sleep 30
             if (isChecked = false) {
                 for row in prevCheckedRows {
@@ -81,11 +82,11 @@ class shareCheckStatus {
                 }
             }
         }
-        this.runCustomFn(this.lvFn)
+        this._runCustomFn(this.lvFn)
     }
 
 
-    runCustomFn(userFunctions) {
+    _runCustomFn(userFunctions) {
         checkType(userFunctions, [Func, Array], "Parameter is not a Function or Array")
 
         if (userFunctions is Func) {
