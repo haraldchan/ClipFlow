@@ -44,8 +44,8 @@ class shareCheckStatus {
             ListView.checkStatusDepend := options.checkStatus
             options.checkStatus.addSub(ListView)
 
-            CheckBox.ctrl.OnEvent("Click", (ctrl, _) => this._handleCheckAll(ctrl, ListView.ctrl))
-            ListView.ctrl.OnEvent("ItemCheck", (LV, item, isChecked) => this._handleItemCheck(CheckBox.ctrl, LV, item, isChecked))
+            CheckBox.ctrl.OnEvent("Click", (arc, ctrl, _) => this._handleCheckAll(ctrl, ListView.ctrl))
+            ListView.ctrl.OnEvent("ItemCheck", (arc, LV, item, isChecked) => this._handleItemCheck(CheckBox.ctrl, LV, item, isChecked))
         } else {
             CheckBox.OnEvent("Click", (ctrl, _) => this._handleCheckAll(CheckBox, ListView))
             ListView.OnEvent("ItemCheck", (LV, item, isChecked) => this._handleItemCheck(CheckBox, LV, item, isChecked))

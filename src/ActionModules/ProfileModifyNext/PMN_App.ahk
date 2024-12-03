@@ -317,12 +317,12 @@ PMN_App(App, moduleTitle, db, identifier) {
         
         ; search box
         App.AddReactiveEdit("vsearchBox x+5 w100 h25")
-        .OnEvent("Change", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
+           .OnEvent("Change", (arc, ctrl, _) => queryFilter.update("search", ctrl.Value)),
         
         ; period
         App.AddText("x+10 h25 0x200", "最近"),
         App.AddReactiveEdit("vperiod Number x+1 w30 h25", queryFilter.value["period"])
-        .OnEvent("Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
+           .OnEvent("Change", (arc, ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
         App.AddText("x+1 h25 0x200", "分钟"),
         
         ; manual updating btns
@@ -330,7 +330,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         App.AddReactiveButton("vfillIn x+5 w80 h25 Default", "填 入")
            .OnEvent(Map(
                 "Click", (*) => fillPmsProfile(),
-                "ContextMenu", (ctrl, *) => (fillOverwrite.set(o => !o), ctrl.Text := fillOverwrite.value ? "覆盖填入" : "填 入")
+                "ContextMenu", (arc, ctrl, *) => (fillOverwrite.set(o => !o), ctrl.Text := fillOverwrite.value ? "覆盖填入" : "填 入")
         )),
 
         ; profile list

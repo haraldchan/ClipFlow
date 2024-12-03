@@ -15,7 +15,7 @@ FlowModes(App) {
 
 	return (
 		App.AddDropDownList("y+10 w250 Choose" . moduleSelected, moduleNames)
-		.OnEvent("Change", (d*) => 
+		   .OnEvent("Change", (d*) => 
 			config.write("moduleSelected", d[1].value)
 			utils.cleanReload(winGroup)
 		),
