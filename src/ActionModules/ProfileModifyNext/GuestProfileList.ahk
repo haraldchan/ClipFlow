@@ -10,19 +10,19 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
         itemOptions: ""
     }
 
-    copyIdNumber(arc, LV, row) {
+    copyIdNumber(LV, row) {
         A_Clipboard := LV.GetText(row, 5)
         key := LV.GetText(row, 2)
         MsgBox(Format("已复制证件号码: `n`n{1} : {2}", key, A_Clipboard), popupTitle, "4096 T1")
     }
 
-    handleUpdateItem(arc, LV, itemIndex) {
+    handleUpdateItem(LV, itemIndex) {
         selectedItem := listContent.value[itemIndex]
         selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
         db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
     }
 
-    showProfileDetails(arc, LV, itemIndex, *) {
+    showProfileDetails(LV, itemIndex, *) {
         if (itemIndex = 0) {
             return
         }
