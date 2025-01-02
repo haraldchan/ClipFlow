@@ -63,29 +63,29 @@ class useDict {
      * @returns {String} 
      */
     static fetchPinyin(hanzi, useWG := false) {
-        url := Format("https://hanyu.baidu.com/zici/s?wd={1}", hanzi)
-        isWindows7 := StrSplit(A_OSVersion, ".")[1] = 6
-
+        ; 360国学 
+        url := Format("https://guoxue.baike.so.com/query/view?type=word&title={1}", hanzi)
+        
         whr := ComObject("WinHttp.WinHttpRequest.5.1")
         html := ComObject("HTMLFile")
 
-        loop {
-            whr.Open("POST", url, false)
-            whr.Send()
-            whr.WaitForResponse()
-            page := whr.ResponseText
-            html.Write(page)
+        whr.Open("POST", url, false)
+        whr.Send()
+        whr.WaitForResponse()
+        page := whr.ResponseText
+        html.Write(page)
 
-            if (html.getElementById("pinyin") = "") {
-                Sleep 500
-                continue
-            } else {
-                toned := StrSplit(html.getElementById("pinyin").InnerText, " ")[1]
+        Sleep 500
+        pinyinSpans := html.getElementsByTagName("span")
+        loop pinyinSpans.Length {
+            pinyinSpans[A_Index].dataFormatAs := "Text"
+            pinyinField := pinyinSpans[A_Index].InnerText
+            if (InStr(pinyinField, "[")) {
+                toned := Trim(StrReplace(StrReplace(pinyinField, "[ "), "]"))
                 break
             }
         }
-
-        unToned := ""
+        
         for tonedChar, char in Dict.tone {
             if (InStr(toned, tonedChar)) {
                 unToned := Trim(StrReplace(toned, tonedChar, char))
