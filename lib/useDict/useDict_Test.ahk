@@ -1,6 +1,6 @@
 #SingleInstance Force
 #Include "./useDict.ahk"
-#Include "../AddReactive/AddReactive.ahk"
+#Include "../AddReactive/useAddReactive.ahk"
 
 UseDictTest() {
     UDT := Gui()
