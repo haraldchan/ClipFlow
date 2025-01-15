@@ -2,15 +2,15 @@ GuestProfileDetails(selectedGuest, fillIn, App) {
     Profile := Gui("+AlwaysOnTop", "Profile Details")
     Profile.SetFont(, "微软雅黑")
 
-    fieldIndex := Map(
-        "addr", "地址",
-        "birthday", "生日",
-        "gender", "性别",
-        "idNum", "证件号码",
-        "idType", "证件类型",
-        "name", "全名",
-        "guestType", "旅客类型",
+    fieldIndex := OrderedMap(
         "roomNum", "房号",
+        "name", "全名",
+        "gender", "性别",
+        "birthday", "生日",
+        "guestType", "旅客类型",
+        "idType", "证件类型",
+        "idNum", "证件号码",
+        "addr", "地址",
         "tel", "联系电话",
         "fileName", "登记时间"
     )
@@ -46,7 +46,7 @@ GuestProfileDetails(selectedGuest, fillIn, App) {
     }
 
     return (
-        Profile.AddListView("vguestProfile LV0x4000 Grid w230 r10", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
+        Profile.AddListView("vguestProfile Grid w230 r10", ["信息字段", "证件信息"]).OnEvent("DoubleClick", copyListField),
         listInitialize(selectedGuest, fieldIndex),
         Profile.AddButton("h30 w110", "关 闭 (&C)").OnEvent("Click", (*) => profile.Destroy()),
         Profile.AddButton("x+10 h30 w110 Default", "填   入").OnEvent("Click", (*) => fillInPms()),
