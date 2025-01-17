@@ -5,6 +5,7 @@
 ; functions
 #Include "./shareCheckStatus.ahk"
 #Include "./useListPlaceholder.ahk"
+#Include "./useProps.ahk"
 
 ; classes
 #Include "./orderedmap.ahk"
