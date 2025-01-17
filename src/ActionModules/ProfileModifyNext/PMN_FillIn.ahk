@@ -2,11 +2,39 @@ class PMN_FillIn {
     static AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
     static FOUND := "0x000080"
     static NOT_FOUND := "0x008080"
+    static isRunning := false
+
+    static start(config := {}) {
+        c := useProps(config, {
+            setOnTop: false,
+            blockInput: false
+        })
+
+        this.isRunning := true
+        HotIf (*) => this.isRunning
+        Hotkey("F12", (*) => this.end(), "On")
+
+        CoordMode "Pixel", "Screen"
+        CoordMode "Mouse", "Screen"
+
+        WinActivate "ahk_class SunAwtFrame"
+        WinSetAlwaysOnTop c.setOnTop, "ahk_class SunAwtFrame"
+
+        BlockInput c.blockInput
+    }
+
+    static end() {
+        this.isRunning := false
+        Hotkey("F12", "Off")
+
+        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        BlockInput false
+    }
 
     static fill(currentGuest, isOverwrite) {
-        WinActivate "ahk_class SunAwtFrame"
+        ; WinActivate "ahk_class SunAwtFrame"
         guest := this.parse(currentGuest)
-        
+
         ; force overwrite
         if (isOverwrite = true) {
             this.fillAction(guest)
@@ -20,7 +48,7 @@ class PMN_FillIn {
         if (currentId = guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
             return
-        } 
+        }
 
         ; matched in database
         if (this.matchHistory(guest) = this.FOUND) {
@@ -48,9 +76,10 @@ class PMN_FillIn {
     }
 
     static getCurrentId() {
-        CoordMode "Pixel", "Screen"
-        CoordMode "Mouse", "Screen"
-        
+        ; CoordMode "Pixel", "Screen"
+        ; CoordMode "Mouse", "Screen"
+        this.start()
+
         prevClip := A_Clipboard
 
         if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
@@ -75,12 +104,14 @@ class PMN_FillIn {
         currentId := (A_Clipboard = prevClip || A_Clipboard = "") ? "" : A_Clipboard
         A_Clipboard := prevClip
 
+        this.end()
         return currentId
     }
 
     static matchHistory(currentGuest) {
-        CoordMode "Pixel", "Screen"
-        CoordMode "Mouse", "Screen"
+        ; CoordMode "Pixel", "Screen"
+        ; CoordMode "Mouse", "Screen"
+        this.start()
 
         loop {
             Sleep 100
@@ -98,25 +129,40 @@ class PMN_FillIn {
             }
         }
 
-        Send "!h" 
+        Send "!h"
         utils.waitLoading()
         Send "{Esc}" ; cancel the "save changes msgbox"
         utils.waitLoading()
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         loop 12 {
             Send "{Tab}"
             Sleep 10
         }
 
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
+
         Send Format("{Text}{1}", currentGuest["idNum"])
         utils.waitLoading()
-        Send "!h" 
+        Send "!h"
         utils.waitLoading()
         Sleep 500
+
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         res := PixelGetColor(x, y)
         utils.waitLoading()
 
+        this.end()
         return res
     }
 
@@ -124,75 +170,76 @@ class PMN_FillIn {
         parsedInfo := Map()
         ; alt Name
         parsedInfo["nameAlt"] := currentGuest["guestType"] = "国外旅客" ? " " : currentGuest["name"]
-        
-        ; last/firstname           
-        isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
-        if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
-            fullname := useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
-            parsedInfo["nameLast"] := fullname[1]
-            parsedInfo["nameFirst"] := fullname[2]
-        } else {
-            parsedInfo["nameLast"] := currentGuest["nameLast"]
-            parsedInfo["nameFirst"] := currentGuest["nameFirst"]
-        }
 
-        ; fallback for incomplete info
-        if (currentGuest["idType"] == "港澳台居民居住证"
-            && parsedInfo["nameLast"] == " "
-            && parsedInfo["nameFirst"] == " ") {
-            fullname := useDict.getFullnamePinyin(currentGuest["name"])
-            parsedInfo["nameLast"] := fullname[1]
-            parsedInfo["nameFirst"] := fullname[2]  
-        }
-        
-        ; address
-        parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客" ? currentGuest["addr"] : " "
-        
-        ; language
-        parsedInfo["language"] := currentGuest["guestType"] = "内地旅客" ? "C" : "E"
-        
-        ; country
-        parsedInfo["country"] := currentGuest["guestType"] = "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
-        
-        ; province(mainland & hk/mo/tw)
-        if (currentGuest["guestType"] = "内地旅客") {
-            parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])
-        } else if (currentGuest["guestType"] = "港澳台旅客") {
-            parsedInfo["province"] := useDict.getProvince(currentGuest["region"])
-        } else {
-            parsedInfo["province"] := " "
-        }
-        
-        ; id number
-        parsedInfo["idNum"] := currentGuest["idNum"]
-        
-        ; id Type
-        parsedInfo["idType"] := useDict.getIdTypeCode(currentGuest["idType"])
-        
-        ; gender
-        parsedInfo["gender"] := currentGuest["gender"] = "男" ? "Mr" : "Ms"
-        
-        ; birthday
-        bd := StrSplit(currentGuest["birthday"], "-")
-        parsedInfo["birthday"] := bd[2] . bd[3] . bd[1]
-        
-        ; tel number
-        tel := currentGuest["tel"]
-        if (StrLen(tel) = 11) {
-            f := SubStr(tel,1, 3)
-            s := SubStr(tel, 4, 4)
-            r := SubStr(tel, 8, 4)
+            ; last/firstname
+            isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
+            if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
+                fullname := useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
+                parsedInfo["nameLast"] := fullname[1]
+                parsedInfo["nameFirst"] := fullname[2]
+            } else {
+                parsedInfo["nameLast"] := currentGuest["nameLast"]
+                parsedInfo["nameFirst"] := currentGuest["nameFirst"]
+            }
 
-            parsedInfo["tel"] := f . "-" . s . "-" . r
-        } else {
-            parsedInfo["tel"] := tel
-        }
+            ; fallback for incomplete info
+            if (currentGuest["idType"] == "港澳台居民居住证"
+                && parsedInfo["nameLast"] == " "
+                && parsedInfo["nameFirst"] == " ") {
+                fullname := useDict.getFullnamePinyin(currentGuest["name"])
+                parsedInfo["nameLast"] := fullname[1]
+                parsedInfo["nameFirst"] := fullname[2]
+            }
 
-        return parsedInfo
+            ; address
+            parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客" ? currentGuest["addr"] : " "
+
+                ; language
+                parsedInfo["language"] := currentGuest["guestType"] = "内地旅客" ? "C" : "E"
+
+                    ; country
+                    parsedInfo["country"] := currentGuest["guestType"] = "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
+
+                        ; province(mainland & hk/mo/tw)
+                        if (currentGuest["guestType"] = "内地旅客") {
+                            parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])
+                        } else if (currentGuest["guestType"] = "港澳台旅客") {
+                            parsedInfo["province"] := useDict.getProvince(currentGuest["region"])
+                        } else {
+                            parsedInfo["province"] := " "
+                        }
+
+                        ; id number
+                        parsedInfo["idNum"] := currentGuest["idNum"]
+
+                        ; id Type
+                        parsedInfo["idType"] := useDict.getIdTypeCode(currentGuest["idType"])
+
+                        ; gender
+                        parsedInfo["gender"] := currentGuest["gender"] = "男" ? "Mr" : "Ms"
+
+                            ; birthday
+                            bd := StrSplit(currentGuest["birthday"], "-")
+                            parsedInfo["birthday"] := bd[2] . bd[3] . bd[1]
+
+                            ; tel number
+                            tel := currentGuest["tel"]
+                            if (StrLen(tel) = 11) {
+                                f := SubStr(tel, 1, 3)
+                                s := SubStr(tel, 4, 4)
+                                r := SubStr(tel, 8, 4)
+
+                                parsedInfo["tel"] := f . "-" . s . "-" . r
+                            } else {
+                                parsedInfo["tel"] := tel
+                            }
+
+                            return parsedInfo
     }
 
     static fillAction(guestProfileMap) {
-        CoordMode "Pixel", "Screen"
+        ; CoordMode "Pixel", "Screen"
+        this.start({ setOnTop: true, blockInput: true })
 
         if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
             anchorX := FoundX - 10
@@ -202,10 +249,10 @@ class PMN_FillIn {
             return
         }
 
-        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        WinActivate "ahk_class SunAwtFrame"
-        CoordMode "Mouse", "Screen"
-        BlockInput "SendAndMouse"
+        ; WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
+        ; WinActivate "ahk_class SunAwtFrame"
+        ; CoordMode "Mouse", "Screen"
+        ; BlockInput true
         ; { fillin common info: nameLast, nameFirst, language, gender, country, birthday, idType, idNum
         MouseMove anchorX, anchorY
         Click 3
@@ -221,6 +268,11 @@ class PMN_FillIn {
         }
         utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["language"])
+
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         Send "{Tab}"
         utils.waitLoading()
@@ -239,6 +291,11 @@ class PMN_FillIn {
         Send "{Tab}"
         utils.waitLoading()
         Send Format("{Text}{1}", guestProfileMap["province"])
+
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         loop 9 {
             Send "{Tab}"
@@ -271,7 +328,11 @@ class PMN_FillIn {
             utils.waitLoading()
         }
 
-        ; }
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
+
         if (guestProfileMap["nameAlt"] != " ") {
             ; { with hanzi name
             ; fillin: nameAlt, gender(in nameAlt window)
@@ -298,7 +359,9 @@ class PMN_FillIn {
             Send "!o"
             utils.waitLoading()
         }
-        BlockInput false
-        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+
+        ; BlockInput false
+        ; WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        this.end()
     }
 }
