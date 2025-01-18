@@ -32,7 +32,6 @@ class PMN_FillIn {
     }
 
     static fill(currentGuest, isOverwrite) {
-        ; WinActivate "ahk_class SunAwtFrame"
         guest := this.parse(currentGuest)
 
         ; force overwrite
@@ -76,8 +75,6 @@ class PMN_FillIn {
     }
 
     static getCurrentId() {
-        ; CoordMode "Pixel", "Screen"
-        ; CoordMode "Mouse", "Screen"
         this.start()
 
         prevClip := A_Clipboard
@@ -109,8 +106,6 @@ class PMN_FillIn {
     }
 
     static matchHistory(currentGuest) {
-        ; CoordMode "Pixel", "Screen"
-        ; CoordMode "Mouse", "Screen"
         this.start()
 
         loop {
@@ -249,11 +244,6 @@ class PMN_FillIn {
             return
         }
 
-        ; WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        ; WinActivate "ahk_class SunAwtFrame"
-        ; CoordMode "Mouse", "Screen"
-        ; BlockInput true
-        ; { fillin common info: nameLast, nameFirst, language, gender, country, birthday, idType, idNum
         MouseMove anchorX, anchorY
         Click 3
         utils.waitLoading()
@@ -360,8 +350,6 @@ class PMN_FillIn {
             utils.waitLoading()
         }
 
-        ; BlockInput false
-        ; WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
         this.end()
     }
 }
