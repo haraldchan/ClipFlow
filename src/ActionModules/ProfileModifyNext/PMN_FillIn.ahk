@@ -32,6 +32,7 @@ class PMN_FillIn {
     }
 
     static fill(currentGuest, isOverwrite) {
+        this.start({ setOnTop: true, blockInput: true })
         guest := this.parse(currentGuest)
 
         ; force overwrite
@@ -77,11 +78,11 @@ class PMN_FillIn {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
             }
         }
+
+        this.end()
     }
 
     static getCurrentId() {
-        this.start()
-
         prevClip := A_Clipboard
 
         if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
@@ -106,13 +107,10 @@ class PMN_FillIn {
         currentId := (A_Clipboard = prevClip || A_Clipboard = "") ? "" : A_Clipboard
         A_Clipboard := prevClip
 
-        this.end()
         return currentId
     }
 
     static matchHistory(currentGuest) {
-        this.start()
-
         loop {
             Sleep 100
             if (A_Index > 30) {
@@ -162,7 +160,6 @@ class PMN_FillIn {
         res := PixelGetColor(x, y)
         utils.waitLoading()
 
-        this.end()
         return res
     }
 
@@ -238,9 +235,6 @@ class PMN_FillIn {
     }
 
     static fillAction(guestProfileMap) {
-        ; CoordMode "Pixel", "Screen"
-        this.start({ setOnTop: true, blockInput: true })
-
         if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
             anchorX := FoundX - 10
             anchorY := FoundY
@@ -355,7 +349,6 @@ class PMN_FillIn {
             utils.waitLoading()
         }
 
-        this.end()
         return true
     }
 }
