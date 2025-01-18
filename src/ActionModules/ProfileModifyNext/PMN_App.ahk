@@ -250,7 +250,11 @@ PMN_App(App, moduleTitle, db, identifier) {
 
             PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests, fillOverwrite.value)
         } else {
-            PMN_Fillin.fill(listContent.value[LV.GetNext()], fillOverwrite.value)
+            targetId := LV.GetText(
+                LV.GetNext(), 
+                LV.arcWrapper.titleKeys.findIndex(key => key == "idNum")
+            )
+            PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), fillOverwrite.value)
         }
     }
 
