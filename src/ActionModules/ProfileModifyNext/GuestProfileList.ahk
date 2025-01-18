@@ -6,7 +6,7 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
     }
 
     options := {
-        lvOptions: "$guestProfileList Grid NoSortHdr -ReadOnly -Multi LV0x4000 w550 r15 xp-470 y+10",
+        lvOptions: "$guestProfileList Grid -ReadOnly -Multi LV0x4000 w550 r15 xp-470 y+10",
         itemOptions: ""
     }
 
@@ -16,17 +16,20 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
         MsgBox(Format("已复制证件号码: `n`n{1} : {2}", key, A_Clipboard), popupTitle, "4096 T1")
     }
 
-    handleUpdateItem(LV, itemIndex) {
-        selectedItem := listContent.value[itemIndex]
-        selectedItem["roomNum"] := LV.GetText(itemIndex, 1)
+    handleUpdateItem(LV, row) {
+        currentId := LV.GetText(row, 5)
+        selectedItem := listContent.value.find(item => item["idNum"] == currentId)
+        selectedItem["roomNum"] := LV.GetText(row, 1)
         db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
     }
 
-    showProfileDetails(LV, itemIndex, *) {
-        if (itemIndex = 0) {
+    showProfileDetails(LV, row, *) {
+        if (row = 0) {
             return
         }
-        selectedItem := listContent.value[itemIndex]
+
+        currentId := LV.GetText(row, 5)
+        selectedItem := listContent.value.find(item => item["idNum"] == currentId)
         GuestProfileDetails(selectedItem, fillPmsProfile, App)
     }
 
