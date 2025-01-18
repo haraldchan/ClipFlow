@@ -35,22 +35,25 @@ class PMN_FillIn {
         guest := this.parse(currentGuest)
 
         ; force overwrite
-        if (isOverwrite = true) {
-            this.fillAction(guest)
+        if (isOverwrite) {
+            success := this.fillAction(guest)
             utils.waitLoading()
-            MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+            if (success){
+                MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+            }
+
             return
         }
 
         currentId := this.getCurrentId()
-        ; on-screen profile matched
+        ; on-screen profile matcheds
         if (currentId = guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
             return
         }
 
         ; matched in database
-        if (this.matchHistory(guest) = this.FOUND) {
+        if (this.matchHistory(guest) == this.FOUND) {
             Send "!o"
             utils.waitLoading()
             MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
@@ -59,18 +62,20 @@ class PMN_FillIn {
             Send "!c"
             utils.waitLoading()
             sleep 100
-            if (currentId = "") {
-                this.fillAction(guest)
+            if (currentId == "") {
+                success := this.fillAction(guest)
             } else {
                 Send "!n"
                 utils.waitLoading()
                 Send "{Esc}"
                 utils.waitLoading()
-                this.fillAction(guest)
+                success := this.fillAction(guest)
             }
 
             utils.waitLoading()
-            MsgBox("已完成 Profile Modify", "Profile Modify Next", "T1 4096")
+            if (success){
+                MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+            }
         }
     }
 
@@ -351,5 +356,6 @@ class PMN_FillIn {
         }
 
         this.end()
+        return true
     }
 }
