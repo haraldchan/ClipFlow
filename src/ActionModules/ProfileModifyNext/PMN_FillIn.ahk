@@ -43,6 +43,7 @@ class PMN_FillIn {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
             }
 
+            this.end()
             return
         }
 
@@ -50,6 +51,8 @@ class PMN_FillIn {
         ; on-screen profile matcheds
         if (currentId = guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
+            
+            this.end()
             return
         }
 
@@ -58,6 +61,8 @@ class PMN_FillIn {
             Send "!o"
             utils.waitLoading()
             MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
+
+            this.end()
             return
         } else {
             Send "!c"
@@ -189,18 +194,18 @@ class PMN_FillIn {
             }
 
             ; address
-            parsedInfo["addr"] := currentGuest["guestType"] = "内地旅客" ? currentGuest["addr"] : " "
+            parsedInfo["addr"] := currentGuest["guestType"] == "内地旅客" ? currentGuest["addr"] : " "
 
                 ; language
-                parsedInfo["language"] := currentGuest["guestType"] = "内地旅客" ? "C" : "E"
+                parsedInfo["language"] := currentGuest["guestType"] == "内地旅客" ? "C" : "E"
 
                     ; country
-                    parsedInfo["country"] := currentGuest["guestType"] = "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
+                    parsedInfo["country"] := currentGuest["guestType"] == "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
 
                         ; province(mainland & hk/mo/tw)
-                        if (currentGuest["guestType"] = "内地旅客") {
+                        if (currentGuest["guestType"] == "内地旅客") {
                             parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])
-                        } else if (currentGuest["guestType"] = "港澳台旅客") {
+                        } else if (currentGuest["guestType"] == "港澳台旅客") {
                             parsedInfo["province"] := useDict.getProvince(currentGuest["region"])
                         } else {
                             parsedInfo["province"] := " "
@@ -213,7 +218,7 @@ class PMN_FillIn {
                         parsedInfo["idType"] := useDict.getIdTypeCode(currentGuest["idType"])
 
                         ; gender
-                        parsedInfo["gender"] := currentGuest["gender"] = "男" ? "Mr" : "Ms"
+                        parsedInfo["gender"] := currentGuest["gender"] == "男" ? "Mr" : "Ms"
 
                             ; birthday
                             bd := StrSplit(currentGuest["birthday"], "-")
@@ -221,7 +226,7 @@ class PMN_FillIn {
 
                             ; tel number
                             tel := currentGuest["tel"]
-                            if (StrLen(tel) = 11) {
+                            if (StrLen(tel) == 11) {
                                 f := SubStr(tel, 1, 3)
                                 s := SubStr(tel, 4, 4)
                                 r := SubStr(tel, 8, 4)
