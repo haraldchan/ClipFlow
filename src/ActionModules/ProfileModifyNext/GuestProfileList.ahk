@@ -10,19 +10,18 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
         itemOptions: ""
     }
 
-    getSelectedId(LV, row) {
-        return LV.GetText(row, columnDetails.keys.findIndex(key => key == "idNum"))
+    getSelectedCell(LV, row, key) {
+        return LV.GetText(row, columnDetails.keys.findIndex(item => item == key))
     }
 
     copyIdNumber(LV, row) {
-        A_Clipboard := getSelectedId(LV, row)
-        key := LV.GetText(row, 2)
-        MsgBox(Format("已复制证件号码: `n`n{1} : {2}", key, A_Clipboard), popupTitle, "4096 T1")
+        A_Clipboard := getSelectedCell(LV, row, "idNum")
+        MsgBox(Format("已复制证件号码: `n`n{1} : {2}", getSelectedCell(LV, row, "name"), A_Clipboard), popupTitle, "4096 T1")
     }
 
     handleUpdateItem(LV, row) {
-        selectedItem := listContent.value.find(item => item["idNum"] == getSelectedId(LV, row))
-        selectedItem["roomNum"] := LV.GetText(row, 1)
+        selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
+        selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
         db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
     }
 
@@ -31,7 +30,7 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
             return
         }
 
-        selectedItem := listContent.value.find(item => item["idNum"] == getSelectedId(LV, row))
+        selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         GuestProfileDetails(selectedItem, fillPmsProfile, App)
     }
 
