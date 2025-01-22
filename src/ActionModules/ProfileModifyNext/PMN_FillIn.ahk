@@ -39,7 +39,7 @@ class PMN_FillIn {
         if (isOverwrite) {
             success := this.fillAction(guest)
             utils.waitLoading()
-            if (success){
+            if (success) {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
             }
 
@@ -51,7 +51,7 @@ class PMN_FillIn {
         ; on-screen profile matcheds
         if (currentId = guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
-            
+
             this.end()
             return
         }
@@ -79,7 +79,7 @@ class PMN_FillIn {
             }
 
             utils.waitLoading()
-            if (success){
+            if (success) {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
             }
         }
@@ -171,74 +171,74 @@ class PMN_FillIn {
     static parse(currentGuest) {
         parsedInfo := Map()
         ; alt Name
-        parsedInfo["nameAlt"] := currentGuest["guestType"] = "国外旅客" ? " " : currentGuest["name"]
+        parsedInfo["nameAlt"] := currentGuest["guestType"] == "国外旅客" ? " " : currentGuest["name"]
 
-            ; last/firstname
-            isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
-            if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
-                fullname := useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
-                parsedInfo["nameLast"] := fullname[1]
-                parsedInfo["nameFirst"] := fullname[2]
-            } else {
-                parsedInfo["nameLast"] := currentGuest["nameLast"]
-                parsedInfo["nameFirst"] := currentGuest["nameFirst"]
-            }
+        ; last/firstname
+        isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
+        if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
+            fullname := useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
+            parsedInfo["nameLast"] := fullname[1]
+            parsedInfo["nameFirst"] := fullname[2]
+        } else {
+            parsedInfo["nameLast"] := currentGuest["nameLast"]
+            parsedInfo["nameFirst"] := currentGuest["nameFirst"]
+        }
 
-            ; fallback for incomplete info
-            if (currentGuest["idType"] == "港澳台居民居住证"
-                && parsedInfo["nameLast"] == " "
-                && parsedInfo["nameFirst"] == " ") {
-                fullname := useDict.getFullnamePinyin(currentGuest["name"])
-                parsedInfo["nameLast"] := fullname[1]
-                parsedInfo["nameFirst"] := fullname[2]
-            }
-
-            ; address
-            parsedInfo["addr"] := currentGuest["guestType"] == "内地旅客" ? currentGuest["addr"] : " "
-
-                ; language
-                parsedInfo["language"] := currentGuest["guestType"] == "内地旅客" ? "C" : "E"
-
-                    ; country
-                    parsedInfo["country"] := currentGuest["guestType"] == "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
-
-                        ; province(mainland & hk/mo/tw)
-                        if (currentGuest["guestType"] == "内地旅客") {
-                            parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])
-                        } else if (currentGuest["guestType"] == "港澳台旅客") {
-                            parsedInfo["province"] := useDict.getProvince(currentGuest["region"])
-                        } else {
-                            parsedInfo["province"] := " "
-                        }
-
-                        ; id number
-                        parsedInfo["idNum"] := currentGuest["idNum"]
-
-                        ; id Type
-                        parsedInfo["idType"] := useDict.getIdTypeCode(currentGuest["idType"])
-
-                        ; gender
-                        parsedInfo["gender"] := currentGuest["gender"] == "男" ? "Mr" : "Ms"
-
-                            ; birthday
-                            bd := StrSplit(currentGuest["birthday"], "-")
-                            parsedInfo["birthday"] := bd[2] . bd[3] . bd[1]
-
-                            ; tel number
-                            tel := currentGuest["tel"]
-                            if (StrLen(tel) == 11) {
-                                f := SubStr(tel, 1, 3)
-                                s := SubStr(tel, 4, 4)
-                                r := SubStr(tel, 8, 4)
-
-                                parsedInfo["tel"] := f . "-" . s . "-" . r
-                            } else {
-                                parsedInfo["tel"] := tel
-                            }
-
-                            return parsedInfo
+        ; fallback for incomplete info
+        if (currentGuest["idType"] == "港澳台居民居住证"
+            && parsedInfo["nameLast"] == " "
+            && parsedInfo["nameFirst"] == " ") {
+            fullname := useDict.getFullnamePinyin(currentGuest["name"])
+            parsedInfo["nameLast"] := fullname[1]
+            parsedInfo["nameFirst"] := fullname[2]
+        }
+            
+        ; address
+        parsedInfo["addr"] := currentGuest["guestType"] == "内地旅客" ? currentGuest["addr"] : " "
+        
+        ; language
+        parsedInfo["language"] := currentGuest["guestType"] == "内地旅客" ? "C" : "E"
+                
+        ; country
+        parsedInfo["country"] := currentGuest["guestType"] == "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
+            
+        ; province(mainland & hk/mo/tw)
+        if (currentGuest["guestType"] == "内地旅客") {
+            parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])
+        } else if (currentGuest["guestType"] == "港澳台旅客") {
+            parsedInfo["province"] := useDict.getProvince(currentGuest["region"])
+        } else {
+            parsedInfo["province"] := " "
+        }
+        
+        ; id number
+        parsedInfo["idNum"] := currentGuest["idNum"]
+        
+        ; id Type
+        parsedInfo["idType"] := useDict.getIdTypeCode(currentGuest["idType"])
+        
+        ; gender
+        parsedInfo["gender"] := currentGuest["gender"] == "男" ? "Mr" : "Ms"
+        
+        ; birthday
+        bd := StrSplit(currentGuest["birthday"], "-")
+        parsedInfo["birthday"] := bd[2] . bd[3] . bd[1]
+        
+        ; tel number
+        tel := currentGuest["tel"]
+        if (StrLen(tel) == 11) {
+            f := SubStr(tel, 1, 3)
+            s := SubStr(tel, 4, 4)
+            r := SubStr(tel, 8, 4)
+            
+            parsedInfo["tel"] := f . "-" . s . "-" . r
+        } else {
+            parsedInfo["tel"] := tel
+        }
+        
+        return parsedInfo
     }
-
+    
     static fillAction(guestProfileMap) {
         if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
             anchorX := FoundX - 10
