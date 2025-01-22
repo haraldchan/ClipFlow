@@ -1,6 +1,7 @@
-OnDayGroups(App, groups, selectedGroup) {
+OnDayGroups(App, selectedGroup) {
     monthFolder := Format("\\10.0.2.13\fd\9-ON DAY GROUP DETAILS\{1}\{1}{2}", A_Year, A_MM)
     XL_FILE_PATH := ""
+    arrvingGroups := signal([])
 
     loop files monthFolder . "\*.xlsx" {
         if (InStr(A_LoopFileName, FormatTime(A_Now, "yyyyMMdd"))) {
@@ -19,7 +20,7 @@ OnDayGroups(App, groups, selectedGroup) {
         }
     }
 
-    groups.set(getBlockInfo(XL_FILE_PATH))
+    arrvingGroups.set(getBlockInfo(XL_FILE_PATH))
     getBlockInfo(fileName) {
         blockInfo := []
 
@@ -47,8 +48,12 @@ OnDayGroups(App, groups, selectedGroup) {
     }
 
     return (
-        App.AddText("w300 h20 0x200", "今日团队").SetFont("bold s11 q4"),
-        groups.value.map(group => 
+        App.ARText("w300 h20 0x200", "今日团队")
+           .OnEvent("Click", (*) => Run(XL_FILE_PATH))
+           .SetFont("bold s11 q4"),
+        
+        ; group selector radios
+        arrvingGroups.value.map(group => 
             App.AddRadio((A_Index = 1 ? "Checked " : "") . "h28 w200 y+10", Format("{1} - {2}", group["blockName"], group["blockCode"]))
                .OnEvent("Click", (*) => selectedGroup.set(group))
         )
