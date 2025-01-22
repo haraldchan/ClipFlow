@@ -46,7 +46,7 @@ class useFileDB {
 	}
 
 	load(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
-		if (queryDate = FormatTime(A_Now, "yyyyMMdd")) {
+		if (queryDate == FormatTime(A_Now, "yyyyMMdd")) {
 			return this.loadOneDay(db, queryDate, queryPeriodInput)
 		} else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
 			return this.loadArchiveOneDay(queryDate)
@@ -69,7 +69,7 @@ class useFileDB {
 
 	updateOne(newJsonString, queryDate, fileName) {
 		loop files, (this.main . "\" . queryDate . "\*.json") {
-			if (fileName . ".json" = A_LoopFileName) {
+			if (fileName . ".json" == A_LoopFileName) {
 				FileDelete(A_LoopFileFullPath)
 				FileAppend(newJsonString, this.main . "\" . queryDate . "\" . filename . ".json", "UTF-8")
 			}
@@ -90,12 +90,18 @@ class useFileDB {
 		archiveData := JSON.stringify(this.loadOneDay(, archiveDate, 60 * 24 * this.cleanPeriod))
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
 		FileAppend(archiveData, archiveFullPath, "UTF-8")
+		return archiveFullPath
 	}
 
 	loadArchiveOneDay(archiveDate) {
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
-		archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
-		return archivedData
+		try {
+			JSON.parse(FileRead(archiveFullPath, "UTF-8"))
+		} catch {
+			FileDelete(archiveFullPath)
+			this.createArchive(archiveDate)
+		}
+		return JSON.parse(FileRead(archiveFullPath, "UTF-8"))
 	}
 
 	createRecentBackup(period := 60) {
