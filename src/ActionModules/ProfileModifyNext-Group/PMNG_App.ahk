@@ -5,17 +5,21 @@
 #Include "./PMNG_Execute.ahk"
 
 PMNG_App(App, popupTitle, db) {
-    groups := signal([])
     selectedGroup := signal(Map())
-
     currentGroupRooms := signal([])
     fetchPeriod := signal(5)
-    rateCode := signal("TGDA")
     loadedGuests := signal([])
 
-    effect(selectedGroup, () => loadedGuests.set([]))
+    effect(selectedGroup, cur => handleGroupSelect(cur))
+    handleGroupSelect(curSelectedGroup) {
+        if (!FileExist(A_MyDocuments . "\" . selectedGroup.value["blockCode"] . ".XML")) {
+            MsgBox("未有团队信息，请先点击 获取旅客。", popupTitle, "4096 T1")
+        }
 
-    handleListInitialize() {
+        handleListInitialize()
+    }
+
+    handleListInitialize(*) {
         if (!FileExist(A_MyDocuments . "\" . selectedGroup.value["blockCode"] . ".XML")) {
             PMNG_Data.reportFiling(selectedGroup.value["blockCode"])
         }
@@ -29,7 +33,7 @@ PMNG_App(App, popupTitle, db) {
         loadedGuests.set(guestInfo)
     }
 
-    performModify() {
+    performModify(*) {
         checkedRows := App.getCtrlByType("ListView").getCheckedRowNumbers()
         selectedGuests := []
         for row in checkedRows {
@@ -39,17 +43,15 @@ PMNG_App(App, popupTitle, db) {
         PMNG_Execute.startModify(currentGroupRooms.value, selectedGuests)
     }
 
-    helpInfo := ""
-
     return (
         App.AddGroupBox("R16 y+20 w550", " "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
-        .OnEvent("Click", (*) => PMNG_Settings(fetchPeriod)),
+           .OnEvent("Click", (*) => PMNG_Settings(fetchPeriod)),
 
         ; shows due in groups
-        OnDayGroups(App, groups, selectedGroup),
-        App.AddButton("x40 y470 w115 h35", "获取旅客").OnEvent("Click", (*) => handleListInitialize()),
-        App.AddButton("x+15 w115 h35", "开始录入").OnEvent("Click", (*) => performModify()),
+        OnDayGroups(App, selectedGroup),
+        App.AddButton("x40 y470 w115 h35", "获取旅客").OnEvent("Click", handleListInitialize),
+        App.AddButton("x+15 w115 h35", "开始录入").OnEvent("Click", performModify),
 
         ; matching guests
         GroupGuestList(App, loadedGuests)
