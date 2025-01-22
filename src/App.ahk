@@ -1,7 +1,7 @@
 ﻿#Include "../lib/LibIndex.ahk"
 #Include "./Components/Tabs.ahk"
 
-App(CF) {
+App(App) {
 	onTop := signal(false)
 
 	keepOnTop(*){
@@ -10,7 +10,7 @@ App(CF) {
 	}
 
 	clearList(*) {
-		try {
+		if (FileExist(config.path)) {
 			FileDelete(config.path)
 		}
 		config.createLocal()
@@ -18,11 +18,10 @@ App(CF) {
 	}
 
 	return (
+		App.AddCheckbox("h20 x15", "保持 ClipFlow 置顶    / 停止脚本: F12")
+		   .OnEvent("Click", keepOnTop),
 
-		onTopCheckBox := CF.AddCheckbox("h20 x15", "保持 ClipFlow 置顶    / 停止脚本: F11"),
-		onTopCheckBox.OnEvent("Click", keepOnTop),
-
-		Tabs(CF, onTop, onTopCheckBox),
+		Tabs(App),
 
 		ClipFlow.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
 		ClipFlow.AddButton("h30 w130 x+20", "Refresh").OnEvent("Click", (*) => utils.cleanReload(winGroup))

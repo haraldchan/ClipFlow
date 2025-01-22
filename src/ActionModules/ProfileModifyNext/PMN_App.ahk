@@ -5,7 +5,6 @@
 #Include "./PMN_Waterfall.ahk"
 
 PMN_App(App, moduleTitle, db, identifier) {
-    ; RECENT_BACKUP_INTERVAL := 30
     fillOverwrite := signal(false)
     listContent := signal(db.load())
     queryFilter := signal({
@@ -44,16 +43,16 @@ PMN_App(App, moduleTitle, db, identifier) {
         incomingGuest := JSON.parse(A_Clipboard)
 
         ; updating from add guest modal
-        if (currentGuest.value["idNum"] = incomingGuest["idNum"]
-            && incomingGuest["isMod"] = false
+        if (currentGuest.value["idNum"] == incomingGuest["idNum"]
+            && incomingGuest["isMod"] == false
         ) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
         ; updating from saved guest modal
-        } else if (incomingGuest["isMod"] = true) {
+        } else if (incomingGuest["isMod"] == true) {
             updatedGuest := handleGuestInfoUpdateFromMod(incomingGuest)
-            if (updatedGuest = "") {
+            if (updatedGuest == "") {
                 return
             }
             MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), popupTitle, "T1.5")
@@ -67,11 +66,6 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         currentGuest.set(JSON.parse(A_Clipboard))
         handleListContentUpdate()
-
-        ; update recent backup
-        ; if (DateDiff(A_Now, FileGetTime(db.backup . "\recent.json", "C"), "Minutes") > RECENT_BACKUP_INTERVAL) {
-        ;     SetTimer(() => db.createRecentBackup(RECENT_BACKUP_INTERVAL), -1)
-        ; }
 
         ; restore previous clip to clb
         clipHistory := config.read("clipHistory")
@@ -118,13 +112,13 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleListContentUpdate() {
-        colTitles := ["roomNum","name", "gender", "idType", "idNum", "addr"]
+        colTitles := App.getCtrlByType("ListView").arcWrapper.titleKeys
         useListPlaceholder(listContent, colTitles, "Loading...")
 
         App.getCtrlByName("period").Enabled := (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd"))
 
         loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
-        if (loadedItems.Length = 0) {
+        if (loadedItems.Length == 0) {
             useListPlaceholder(listContent, colTitles, "No Data")
             return
         }
@@ -141,7 +135,7 @@ PMN_App(App, moduleTitle, db, identifier) {
             return loadedItems
         }
 
-        if (searchBy.value = "nameRoom") {
+        if (searchBy.value == "nameRoom") {
                 typeConvert(content) {
                 converted := ""
                 try {
@@ -162,12 +156,12 @@ PMN_App(App, moduleTitle, db, identifier) {
             } else {
                 ; searching by name fragment
                 for item in loadedItems {
-                    if (item["guestType"] = "内地旅客") {
+                    if (item["guestType"] == "内地旅客") {
                         ; from mainland
                         if (InStr(item["name"], searchInput)) {
                             filteredItems.InsertAt(1, item)
                         }
-                    } else if (item["guestType"] = "港澳台旅客") {
+                    } else if (item["guestType"] == "港澳台旅客") {
                         ; from HK/MO/TW
                         if (InStr(item["name"], searchInput) ||
                             InStr(item["nameLast"], searchInput, "Off") ||
@@ -185,7 +179,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                     }
                 }
             }
-        } else if (searchBy.value = "waterfall"){
+        } else if (searchBy.value == "waterfall"){
             roomNums := StrSplit(queryFilter.value["search"], " ")
             ; filtering all entered room numbers
             for roomNum in roomNums {
@@ -196,7 +190,7 @@ PMN_App(App, moduleTitle, db, identifier) {
                 }
             }
 
-        } else if (searchBy.value = "birthday") {
+        } else if (searchBy.value == "birthday") {
             bd := StrLen(searchInput) = 8
                 ? SubStr(searchInput, 1, 4) . "-" . SubStr(searchInput, 5, 2) . "-" . SubStr(searchInput, 7, 2)
                     : searchInput
