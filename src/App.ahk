@@ -21,8 +21,10 @@ App(App) {
 		App.AddCheckbox("h20 x15", "保持 ClipFlow 置顶    / 停止脚本: F12")
 		   .OnEvent("Click", keepOnTop),
 
+		; tabs
 		Tabs(App),
 
+		; btns
 		App.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
 		App.AddButton("h30 w130 x+20", "Refresh").OnEvent("Click", (*) => utils.cleanReload(winGroup))
 	)
