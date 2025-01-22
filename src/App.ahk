@@ -23,7 +23,7 @@ App(App) {
 
 		Tabs(App),
 
-		ClipFlow.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
-		ClipFlow.AddButton("h30 w130 x+20", "Refresh").OnEvent("Click", (*) => utils.cleanReload(winGroup))
+		App.AddButton("h30 w130", "Clear").OnEvent("Click", clearList),
+		App.AddButton("h30 w130 x+20", "Refresh").OnEvent("Click", (*) => utils.cleanReload(winGroup))
 	)
 }
