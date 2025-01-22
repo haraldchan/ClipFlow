@@ -4,13 +4,11 @@
     "tabPos":1
   },
   "clipHistory":[" "," "],
-  "profileModify":"",
   "profileModifyNext": {
     "centralPath": "",
     "localPath" : ""
   },
   "resvHandler":{
     "JSON":{}
-  },
-  "invoiceWechat": ""
+  }
 }
