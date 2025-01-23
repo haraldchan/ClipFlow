@@ -12,15 +12,16 @@ PMNG_App(App, popupTitle, db) {
 
     effect(selectedGroup, cur => handleGroupSelect(cur))
     handleGroupSelect(curSelectedGroup) {
-        if (!FileExist(A_MyDocuments . "\" . selectedGroup.value["blockCode"] . ".XML")) {
-            MsgBox("未有团队信息，请先点击 获取旅客。", popupTitle, "4096 T1")
+        if (!FileExist(A_MyDocuments . "\" . curSelectedGroup["blockCode"] . ".XML")) {
+            useListPlaceholder(loadedGuests, ["roomNum", "name"], "No Data")
+            return
         }
 
         handleListInitialize()
     }
 
-    handleListInitialize(*) {
-        if (!FileExist(A_MyDocuments . "\" . selectedGroup.value["blockCode"] . ".XML")) {
+    handleListInitialize(args*) {
+        if (args.Length > 0) {
             PMNG_Data.reportFiling(selectedGroup.value["blockCode"])
         }
 
