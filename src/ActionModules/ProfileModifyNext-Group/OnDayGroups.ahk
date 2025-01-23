@@ -12,7 +12,7 @@ OnDayGroups(App, selectedGroup) {
 
     if (XL_FILE_PATH == "") {
         MsgBox("未找到 OnDayGroup Excel 文件，请手动添加", popupTitle, "4096 T1")
-        App.Opt("+OwnDialogs")
+        App.Opt("+OwnDialogs") 
         XL_FILE_PATH := FileSelect(3, , "请选择 OnDayGroup Excel 文件")
         if (XL_FILE_PATH == "") {
             config.write("moduleSelected", 1)
@@ -46,11 +46,8 @@ OnDayGroups(App, selectedGroup) {
         selectedGroup.set(blockInfo[1])
         return blockInfo
     }
-
     return (
-        App.ARText("w300 h20 0x200", "今日团队")
-           .OnEvent("Click", (*) => Run(XL_FILE_PATH))
-           .SetFont("bold s11 q4"),
+        App.AddLink("w100 h20 0x200", '<a href="' . XL_FILE_PATH . '"> 今日团队 </a>').SetFont("bold s11 q4"),
         
         ; group selector radios
         arrvingGroups.value.map(group => 
