@@ -11,7 +11,7 @@ GroupGuestList(App, loadedGuests) {
     }
 
     return (
-        App.AddCheckBox("vcheckAll Checked h20 x310 y155", " 全选").SetFont("bold s10"),
+        App.AddCheckBox("vcheckAll Checked h20 x310 y150", " 全选").SetFont("bold s10"),
         App.AddReactiveListView(options, columnDetails, loadedGuests),
         ; link check all status
         shareCheckStatus(
