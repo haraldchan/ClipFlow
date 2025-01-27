@@ -318,6 +318,14 @@ class AddReactive {
         this.ctrl.SetFont(options, fontName)
         return this
     }
+
+    /**
+     * Sets keyboard focus to the control.
+     */
+    Focus(){
+        this.ctrl.Focus()
+        return this
+    }
 }
 
 Gui.Prototype.AddReactive := AddReactive
