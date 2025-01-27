@@ -59,7 +59,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; adding guest
         } else {
-            incomingGuest["fileName"] := A_Now . A_MSec
+            ; incomingGuest["fileName"] := A_Now . A_MSec
             db.add(JSON.stringify(incomingGuest))
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
@@ -75,9 +75,10 @@ PMN_App(App, moduleTitle, db, identifier) {
     handleGuestInfoUpdateFromAdd(captured) {
         recentGuests := db.load()
         for guest in recentGuests {
-            if (guest["idNum"] = captured["idNum"]) {
-                captured["fileName"] := guest["fileName"]
-                db.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
+            ; if (guest["idNum"] = captured["idNum"]) {
+            if (guest["tsId"] = captured["tsId"]) {
+                ; captured["fileName"] := guest["fileName"]
+                db.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["tsId"])
                 return
             }
         }
@@ -89,7 +90,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         items := updater.keys()
 
         for guest in recentGuests {
-            if (guest["tsId"] = updater["tsId"]) {
+            if (guest["tsId"] == updater["tsId"]) {
                 for item in items {
                     if (InStr(updater[item], "*")) {
                         continue
@@ -102,7 +103,8 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         try {
-            db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
+            ; db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
+            db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["tsId"])
         } catch {
             MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
             return

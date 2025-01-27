@@ -22,7 +22,8 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
     handleUpdateItem(LV, row) {
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
-        db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
+        ; db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
+        db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["tsId"])
     }
 
     showProfileDetails(LV, row, *) {
