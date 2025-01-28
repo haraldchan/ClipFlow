@@ -64,13 +64,13 @@ class useJsonDB {
 		collection := Format("{1}\{2}.json", this.main, date)
 		backup := this.backup . "\" . SubStr(date, 1, 6) . "\" . date . "_backup.json"
 		if (date != FormatTime(A_Now, "yyyyMMdd")) {
-			range := 60 * 24 * DateDiff(A_Now, date, "Days")
+			range := 60 * 24 * (DateDiff(A_Now, date, "Days") + 1)
 		}
 
 		if (!FileExist(collection) && !FileExist(backup)) {
 			FileAppend("[]", collection, "UTF-8")
 		} else if (!FileExist(collection) && FileExist(backup)) {
-			FileAppend(FileRead(backup, "UTF-8"), collection, "UTF-8")
+			this.restoreBackup(date)
 		}
 
 		data := JSON.parse(FileRead(collection, "UTF-8")).filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
