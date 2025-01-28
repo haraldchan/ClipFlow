@@ -61,6 +61,10 @@ class useJsonDB {
 	 * @returns {Array}
 	 */
 	load(db := this.main, date := FormatTime(A_Now, "yyyyMMdd"), range := 60) {
+		if (DateDiff(A_Now, date, "Days") < 0) {
+			return []
+		}
+		
 		collection := Format("{1}\{2}.json", this.main, date)
 		backup := this.backup . "\" . SubStr(date, 1, 6) . "\" . date . "_backup.json"
 		if (date != FormatTime(A_Now, "yyyyMMdd")) {
