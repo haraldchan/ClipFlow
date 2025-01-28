@@ -60,6 +60,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         ; adding guest
         } else {
             ; incomingGuest["fileName"] := A_Now . A_MSec
+            incomingGuest["regTime"] := A_Now
             db.add(JSON.stringify(incomingGuest))
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
