@@ -12,7 +12,8 @@ GuestProfileDetails(selectedGuest, fillIn, App) {
         "idNum", "证件号码",
         "addr", "地址",
         "tel", "联系电话",
-        "fileName", "登记时间"
+        ; "fileName", "登记时间"
+        "regTime", "登记时间"
     )
 
     listInitialize(selectedGuest, fieldIndex) {
