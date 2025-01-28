@@ -11,6 +11,11 @@ class useJsonDB {
 		this.cleanPeriod := s.cleanPeriod
 	}
 
+	/**
+	 * Adds a new record to a certain date file.
+	 * @param {String} jsonString new record in JSON format.
+	 * @param {String} date a date string in "yyyyMMdd" format.
+	 */
 	add(jsonString, date := FormatTime(A_Now, "yyyyMMdd")) {
 		SetTimer(() => this.addSync(jsonString, date, true), 1000)
 	}
@@ -42,9 +47,19 @@ class useJsonDB {
 		}
 	}
 
+	/**
+	 * Loads data in base on date/minute filter.
+	 * @param {String} db database folder dir.
+	 * @param {String} date a date string in "yyyyMMdd" format.
+	 * @param {Integer} range a filter of range in minutes.
+	 * @returns {Array}
+	 */
 	load(db := this.main, date := FormatTime(A_Now, "yyyyMMdd"), range := 60) {
 		collection := Format("{1}\{2}.json", this.main, date)
 		backup := this.backup . "\" . SubStr(date, 1, 6) . "\" . date . "_backup.json"
+		if (date != FormatTime(A_Now, "yyyyMMdd")) {
+			range := 60 * 24 * DateDiff(A_Now, date, "Days")
+		}
 
 		if (!FileExist(collection) && !FileExist(backup)) {
 			FileAppend("[]", collection, "UTF-8")
@@ -52,9 +67,17 @@ class useJsonDB {
 			FileAppend(FileRead(backup, "UTF-8"), collection, "UTF-8")
 		}
 
-		return JSON.parse(FileRead(collection, "UTF-8"))
+		data := JSON.parse(FileRead(collection, "UTF-8")).filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
+
+		return data
 	}
 
+	/**
+	 * Updates a single record in database main and backup.
+	 * @param {String} newJsonString new record.
+	 * @param {String} date date("yyyyMMdd") of the original record.
+	 * @param {Integer} tsId tsId of the original record.
+	 */
 	updateOne(newJsonString, date, tsId) {
 		SetTimer(() => this.updateOneSync(newJsonString, date, tsId, true))
 	}
@@ -84,6 +107,10 @@ class useJsonDB {
 		}
 	}
 
+	/**
+	 * Creates a backup copy to backup foler.
+	 * @param {String} date date("yyyyMMdd") to be backup.
+	 */
 	createBackup(date) {
 		collection := Format("{1}\{2}.json", this.main, date)
 		monthFolder := "\" . SubStr(date, 1, 6)
@@ -99,6 +126,10 @@ class useJsonDB {
 		FileCopy(collection, this.backup . monthFolder . "\" . date . "_backup.json", true)
 	}
 
+	/**
+	 * Restores database json of a certain date from backup.
+	 * @param {String} date date date("yyyyMMdd") to be restore.
+	 */
 	restoreBackup(date) {
 		collection := Format("{1}\{2}.json", this.main, date)
 		monthFolder := "\" . SubStr(date, 1, 6)
