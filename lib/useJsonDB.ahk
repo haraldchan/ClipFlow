@@ -21,28 +21,34 @@ class useJsonDB {
 	}
 
 	addSync(jsonString, date := FormatTime(A_Now, "yyyyMMdd"), isAsync := false) {
+		err := false
 		collection := Format("{1}\{2}.json", this.main, date)
-		if (!FileExist(collection)) {
-			FileAppend("[]", collection, "UTF-8")
+
+		try {
+			if (!FileExist(collection)) {
+				FileAppend("[]", collection, "UTF-8")
+			}
+			; hidden while writing
+			if (InStr(FileGetAttrib(collection), "H")) {
+				return
+			}
+
+			; add H attribute indicate that it is writing
+			f := FileOpen(collection, "w", "UTF-8")
+			FileSetAttrib("+H", collection)
+
+			data := JSON.parse(FileRead(collection, "UTF-8"))
+			data.Push(JSON.parse(jsonString))
+
+			f.Write(JSON.stringify(data))
+			f.Close()
+
+			FileSetAttrib(collection, "-H")
+		} catch Error as e {
+			err := e
 		}
-		; hidden while writing
-		if (InStr(FileGetAttrib(collection), "H")) {
-			return
-		}
 
-		; add H attribute indicate that it is writing
-		f := FileOpen(collection, "w", "UTF-8")
-		FileSetAttrib("+H", collection)
-
-		data := JSON.parse(FileRead(collection, "UTF-8"))
-		data.Push(JSON.parse(jsonString))
-
-		f.Write(JSON.stringify(data))
-		f.Close()
-
-		FileSetAttrib(collection, "-H")
-
-		if (isAsync) {
+		if (isAsync && !err) {
 			SetTimer(, 0)
 		}
 	}
@@ -83,26 +89,31 @@ class useJsonDB {
 	}
 
 	updateOneSync(newJsonString, date, tsId, isAsync := false) {
+		err := false
 		collection := Format("{1}\{2}.json", this.main, date)
 
-		if (InStr(FileGetAttrib(collection), "H")) {
-			return
+		try {
+			if (InStr(FileGetAttrib(collection), "H")) {
+				return
+			}
+
+			f := FileOpen(collection, "w", "UTF-8")
+			FileSetAttrib("+H", collection)
+
+			data := JSON.parse(FileRead(collection, "UTF-8"))
+			data[data.findIndex(item => item["tsId"] == tsId)] := JSON.parse(newJsonString)
+
+			f.Write(JSON.stringify(data))
+			f.Close()
+
+			FileSetAttrib(collection, "-H")
+
+			this.createBackup(date)
+		} catch Error as e {
+			err := e
 		}
 
-		f := FileOpen(collection, "w", "UTF-8")
-		FileSetAttrib("+H", collection)
-
-		data := JSON.parse(FileRead(collection, "UTF-8"))
-		data[data.findIndex(item => item["tsId"] == tsId)] := JSON.parse(newJsonString)
-
-		f.Write(JSON.stringify(data))
-		f.Close()
-
-		FileSetAttrib(collection, "-H")
-
-		this.createBackup(date)
-
-		if (isAsync) {
+		if (isAsync && !err) {
 			SetTimer(, 0)
 		}
 	}
