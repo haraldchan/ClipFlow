@@ -28,16 +28,17 @@ class useJsonDB {
 			if (!FileExist(collection)) {
 				FileAppend("[]", collection, "UTF-8")
 			}
-			; hidden while hidden
+
 			if (InStr(FileGetAttrib(collection), "H")) {
 				return
+			} else {
+				FileSetAttrib("+H", collection)
 			}
 
 			data := JSON.parse(FileRead(collection, "UTF-8"))
 			data.Push(JSON.parse(jsonString))
 
 			f := FileOpen(collection, "w", "UTF-8")
-			FileSetAttrib("+H", collection)
 			f.Write(JSON.stringify(data))
 			f.Close()
 			FileSetAttrib("-H", collection)
@@ -97,20 +98,20 @@ class useJsonDB {
 		try {
 			if (InStr(FileGetAttrib(collection), "H")) {
 				return
+			} else {
+				FileSetAttrib("+H", collection)
 			}
-
-			f := FileOpen(collection, "w", "UTF-8")
-			FileSetAttrib("+H", collection)
 
 			data := JSON.parse(FileRead(collection, "UTF-8"))
 			data[data.findIndex(item => item["tsId"] == tsId)] := JSON.parse(newJsonString)
-
+			
+			f := FileOpen(collection, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-
-			FileSetAttrib(collection, "-H")
+			FileSetAttrib("-H", collection, )
 
 			this.createBackup(date)
+			
 		} catch Error as e {
 			err := e
 		}
