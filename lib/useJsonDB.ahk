@@ -23,27 +23,25 @@ class useJsonDB {
 	addSync(jsonString, date := FormatTime(A_Now, "yyyyMMdd"), isAsync := false) {
 		err := false
 		collection := Format("{1}\{2}.json", this.main, date)
-
+		
 		try {
 			if (!FileExist(collection)) {
 				FileAppend("[]", collection, "UTF-8")
 			}
-			; hidden while writing
+			; hidden while hidden
 			if (InStr(FileGetAttrib(collection), "H")) {
 				return
 			}
 
-			; add H attribute indicate that it is writing
-			f := FileOpen(collection, "w", "UTF-8")
-			FileSetAttrib("+H", collection)
-
 			data := JSON.parse(FileRead(collection, "UTF-8"))
 			data.Push(JSON.parse(jsonString))
 
+			f := FileOpen(collection, "w", "UTF-8")
+			FileSetAttrib("+H", collection)
 			f.Write(JSON.stringify(data))
 			f.Close()
+			FileSetAttrib("-H", collection)
 
-			FileSetAttrib(collection, "-H")
 		} catch Error as e {
 			err := e
 		}
