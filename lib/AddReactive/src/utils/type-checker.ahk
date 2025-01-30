@@ -15,6 +15,10 @@ checkType(val, typeChecking, errMsg := 0) {
                 if (isPlainObject(val)) {
                     return
                 }
+            } else if (t is Func && t.name == "IsTime") {
+                if (IsTime(val)) {
+                    return
+                }
             } else if (val is t) {
                 return
             } else {
@@ -30,9 +34,17 @@ checkType(val, typeChecking, errMsg := 0) {
         if (!isPlainObject(val)) {
             throw TypeError(errMsg != 0
                 ? Format("{1}; `n`nCurrent Type: {2}", errMsg, Type(val))
-                : Format("Expect Type: {1}. Current Type: {2}", "plain ", Type(val))
+                : Format("Expect Type: {1}. Current Type: {2}", "Plain Object", Type(val))
             )    
         }
+    } else if (typeChecking is Func && typeChecking.name == "IsTime") {
+        if (!IsTime(val)) {
+            throw ValueError(errMsg != 0
+                ? Format("{1}; `n`nCurrent Type: {2}", errMsg, Type(val))
+                : Format("Invalid date-time stamp.")
+            )    
+        }
+
     } else if (!(val is typeChecking)) {
         throw TypeError(errMsg != 0
             ? Format("{1}; `n`nCurrent Type: {2}", errMsg, Type(val))
