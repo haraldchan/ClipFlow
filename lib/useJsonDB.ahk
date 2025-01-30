@@ -9,6 +9,9 @@ class useJsonDB {
 		this.main := s.main
 		this.backup := s.backup
 		this.cleanPeriod := s.cleanPeriod
+
+		(!DirExist(this.main) && DirCreate(this.main))
+		(this.backup != "" && !DirExist(this.backup) && DirCreate(this.backup))
 	}
 
 	/**
