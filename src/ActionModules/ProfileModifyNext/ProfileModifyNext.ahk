@@ -10,7 +10,7 @@ class ProfileModifyNext {
         backup: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\GuestProfilesBackup",
     }
     ; static db := useFileDB(this.dbSetting)
-    static db := useJsonDB(this.dbSetting)
+    static db := useDateBase(this.dbSetting)
 
     static USE(App) {
         today := Format(A_Now, "yyyyMMdd")
