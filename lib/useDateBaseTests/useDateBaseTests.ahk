@@ -57,13 +57,14 @@ UpdateTest() {
 ; TODO: test can it load correctly when add is executing.
 ; TODO: test loading using real data during Spring Fes
 LoadTest() {
-    date := FormatTime(A_Now, "yyyyMMdd")
-    range := 99999999999999999999999
-
     LT := Gui(, A_ThisFunc)
     LT.OnEvent("Close", (*) => LT.Destroy())
 
+    date := signal(FormatTime(A_Now, "yyyyMMdd"))
+    range := 99999999999999999999999
     data := signal(db.load(, date, range))
+
+    effect(date, curDate => data.set(db.load(, curDate, range)))
 
     columnDetails := {
         keys: ["roomNum", "name", "gender", "idType", "idNum", "addr"],
@@ -78,6 +79,7 @@ LoadTest() {
 
     return (
         LT.ARListView(options, columnDetails, data),
+        LT.AddDateTime().OnEvent("Change", (ctrl, _) => date.set(ctrl.value)),
         LT.Show()
     )
 }
