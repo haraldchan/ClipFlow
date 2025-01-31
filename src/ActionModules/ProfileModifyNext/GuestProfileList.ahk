@@ -1,4 +1,4 @@
-GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
+GuestProfileList(App, db, db2, listContent, queryFilter, fillPmsProfile) {
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
@@ -22,8 +22,8 @@ GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile) {
     handleUpdateItem(LV, row) {
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
-        ; db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
-        db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["tsId"])
+        db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
+        db2.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
     }
 
     showProfileDetails(LV, row, *) {

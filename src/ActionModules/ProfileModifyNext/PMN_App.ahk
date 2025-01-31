@@ -4,9 +4,9 @@
 #Include "./PMN_FillIn.ahk"
 #Include "./PMN_Waterfall.ahk"
 
-PMN_App(App, moduleTitle, db, identifier) {
+PMN_App(App, moduleTitle, db, db2, identifier) {
     fillOverwrite := signal(false)
-    listContent := signal(db.load())
+    listContent := signal(db2.load())
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
         search: "",
@@ -59,9 +59,12 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         ; adding guest
         } else {
-            ; incomingGuest["fileName"] := A_Now . A_MSec
-            incomingGuest["regTime"] := A_Now
+            incomingGuest["fileName"] := A_Now . A_MSec
             db.add(JSON.stringify(incomingGuest))
+            
+            incomingGuest["regTime"] := A_Now
+            db2.add(JSON.stringify(incomingGuest))
+
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
 
@@ -74,19 +77,22 @@ PMN_App(App, moduleTitle, db, identifier) {
     }
 
     handleGuestInfoUpdateFromAdd(captured) {
-        recentGuests := db.load()
+        recentGuests := db2.load()
         for guest in recentGuests {
             ; if (guest["idNum"] = captured["idNum"]) {
-            if (guest["tsId"] = captured["tsId"]) {
-                ; captured["fileName"] := guest["fileName"]
+            if (guest["tsId"] == captured["tsId"]) {
+                captured["fileName"] := guest["fileName"]
                 db.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["tsId"])
+                
+                captured["regTime"] := guest["regTime"]
+                db2.updateOne(JSON.stringify(captured), queryFilter.value["date"], item => item["tsId"] == guest["tsId"])
                 return
             }
         }
     }
 
     handleGuestInfoUpdateFromMod(updater) {
-        recentGuests := db.load(, , 480) ; load guests within 8hrs(a shift)
+        recentGuests := db2.load(, , 480) ; load guests within 8hrs(a shift)
         matchedGuest := signal(Map())
         items := updater.keys()
 
@@ -104,8 +110,14 @@ PMN_App(App, moduleTitle, db, identifier) {
         }
 
         try {
-            ; db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
-            db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["tsId"])
+            db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
+        } catch {
+            MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
+            return
+        }
+
+        try {
+            db2.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], item => item["tsId"] == matchedGuest.value["tsId"])
         } catch {
             MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
             return
@@ -120,7 +132,7 @@ PMN_App(App, moduleTitle, db, identifier) {
 
         App.getCtrlByName("period").Enabled := (queryFilter.value["date"] = FormatTime(A_Now, "yyyyMMdd"))
 
-        loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["period"])
+        loadedItems := db2.load(, queryFilter.value["date"], queryFilter.value["period"])
         if (loadedItems.Length == 0) {
             useListPlaceholder(listContent, colTitles, "No Data")
             return
@@ -335,7 +347,7 @@ PMN_App(App, moduleTitle, db, identifier) {
         )),
 
         ; profile list
-        GuestProfileList(App, db, listContent, queryFilter, fillPmsProfile),
+        GuestProfileList(App, db, db2, listContent, queryFilter, fillPmsProfile),
 
         ; select all button
         App.AddReactiveCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+3", "全选"),
