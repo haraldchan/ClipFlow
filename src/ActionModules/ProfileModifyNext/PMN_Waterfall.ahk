@@ -2,7 +2,7 @@ class PMN_Waterfall {
     static cascade(rooms, selectedGuests, isOverwrite) {
         WinMaximize "ahk_class SunAwtFrame"
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput "SendAndMouse"
+        BlockInput true
 
         curRoom := signal(0)
         index := 1
@@ -17,6 +17,10 @@ class PMN_Waterfall {
                     this.search(room, index)
                     utils.waitLoading()
                     this.modify(guest, isOverwrite)
+                    if (!PMN_FillIn.isRunning) {
+                        return
+                    }
+
                     guest["roomNum"] := ""
                     index := (remaining = 1) ? 1 : index + 1
 
