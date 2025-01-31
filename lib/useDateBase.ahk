@@ -10,8 +10,13 @@ class useDateBase {
 		this.backup := s.backup
 		this.cleanPeriod := s.cleanPeriod
 
-		(!DirExist(this.main) && DirCreate(this.main))
-		(this.backup != "" && !DirExist(this.backup) && DirCreate(this.backup))
+		if (!DirExist(this.main)) {
+			DirCreate(this.main)
+		}
+
+		if (this.backup != "" && !DirExist(this.backup)) {
+			DirCreate(this.backup)
+		}
 	}
 
 	/**
@@ -19,21 +24,18 @@ class useDateBase {
 	 * @param {String} jsonString new record in JSON format.
 	 * @param {String} date a date string in "yyyyMMdd" format.
 	 */
-	add(jsonString, date := FormatTime(A_Now, "yyyyMMdd")) {
-		checkType(jsonString, String)
-		checkType(date, IsTime)
-
+	add(jsonString, date := A_Now) {
 		SetTimer(() => this.addSync(jsonString, date, true), 1000)
 	}
 
-	addSync(jsonString, date := FormatTime(A_Now, "yyyyMMdd"), isAsync := false) {
+	addSync(jsonString, date := A_Now, isAsync := false) {
 		checkType(jsonString, String)
 		checkType(date, IsTime)
-
+		date := FormatTime(date, "yyyyMMdd")
 
 		err := false
 		collection := Format("{1}\{2}.json", this.main, date)
-		
+
 		try {
 			if (!FileExist(collection)) {
 				FileAppend("[]", collection, "UTF-8")
@@ -69,14 +71,15 @@ class useDateBase {
 	 * @param {Integer} range a filter of range in minutes.
 	 * @returns {Array}
 	 */
-	load(db := this.main, date := FormatTime(A_Now, "yyyyMMdd"), range := 60) {
+	load(db := this.main, date := A_Now, range := 60) {
 		checkType(date, IsTime)
 		checkType(range, Integer)
+		date := FormatTime(date, "yyyyMMdd")
 
 		if (DateDiff(A_Now, date, "Days") < 0) {
 			return []
 		}
-		
+
 		collection := Format("{1}\{2}.json", this.main, date)
 		backup := this.backup . "\" . SubStr(date, 1, 6) . "\" . date . "_backup.json"
 		if (date != FormatTime(A_Now, "yyyyMMdd")) {
@@ -90,7 +93,7 @@ class useDateBase {
 		}
 
 		data := JSON.parse(FileRead(collection, "UTF-8"))
-					.filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
+		            .filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
 
 		return data
 	}
@@ -102,10 +105,6 @@ class useDateBase {
 	 * @param {Func} matchingFn  callback function.
 	 */
 	updateOne(newJsonString, date, matchingFn) {
-		checkType(newJsonString, String)
-		checkType(date, IsTime)
-		checkType(matchingFn, Func)
-
 		SetTimer(() => this.updateOneSync(newJsonString, date, matchingFn, true))
 	}
 
@@ -113,6 +112,7 @@ class useDateBase {
 		checkType(newJsonString, String)
 		checkType(date, IsTime)
 		checkType(matchingFn, Func)
+		date := FormatTime(date, "yyyyMMdd")
 
 		err := false
 		collection := Format("{1}\{2}.json", this.main, date)
@@ -126,14 +126,16 @@ class useDateBase {
 
 			data := JSON.parse(FileRead(collection, "UTF-8"))
 			data[data.findIndex(item => matchingFn(item))] := JSON.parse(newJsonString)
-			
+
 			f := FileOpen(collection, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			FileSetAttrib("-T", collection, )
+			FileSetAttrib("-T", collection,)
 
-			this.createBackup(date)
-			
+			if (this.backup != "") {
+				this.createBackup(date)
+			}
+
 		} catch Error as e {
 			err := e
 		}
@@ -149,6 +151,7 @@ class useDateBase {
 	 */
 	createBackup(date) {
 		checkType(date, IsTime)
+		date := FormatTime(date, "yyyyMMdd")
 
 		collection := Format("{1}\{2}.json", this.main, date)
 		monthFolder := "\" . SubStr(date, 1, 6)
@@ -170,6 +173,7 @@ class useDateBase {
 	 */
 	restoreBackup(date) {
 		checkType(date, IsTime)
+		date := FormatTime(date, "yyyyMMdd")
 
 		collection := Format("{1}\{2}.json", this.main, date)
 		monthFolder := "\" . SubStr(date, 1, 6)
