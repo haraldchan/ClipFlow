@@ -43,8 +43,7 @@ class PMN_FillIn {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
             }
 
-            this.end()
-            return
+            return this.end()
         }
 
         currentId := this.getCurrentId()
@@ -52,8 +51,7 @@ class PMN_FillIn {
         if (currentId = guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
 
-            this.end()
-            return
+            return this.end()
         }
 
         ; matched in database
@@ -62,8 +60,7 @@ class PMN_FillIn {
             utils.waitLoading()
             MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
 
-            this.end()
-            return
+            return this.end()
         } else {
             Send "!c"
             utils.waitLoading()
@@ -84,7 +81,7 @@ class PMN_FillIn {
             }
         }
 
-        this.end()
+        return this.end()
     }
 
     static getCurrentId() {
