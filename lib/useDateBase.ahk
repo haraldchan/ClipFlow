@@ -39,10 +39,10 @@ class useDateBase {
 				FileAppend("[]", collection, "UTF-8")
 			}
 
-			if (InStr(FileGetAttrib(collection), "H")) {
+			if (InStr(FileGetAttrib(collection), "T")) {
 				return
 			} else {
-				FileSetAttrib("+H", collection)
+				FileSetAttrib("+T", collection)
 			}
 
 			data := JSON.parse(FileRead(collection, "UTF-8"))
@@ -51,7 +51,7 @@ class useDateBase {
 			f := FileOpen(collection, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			FileSetAttrib("-H", collection)
+			FileSetAttrib("-T", collection)
 
 		} catch Error as e {
 			err := e
@@ -118,20 +118,19 @@ class useDateBase {
 		collection := Format("{1}\{2}.json", this.main, date)
 
 		try {
-			if (InStr(FileGetAttrib(collection), "H")) {
+			if (InStr(FileGetAttrib(collection), "T")) {
 				return
 			} else {
-				FileSetAttrib("+H", collection)
+				FileSetAttrib("+T", collection)
 			}
 
 			data := JSON.parse(FileRead(collection, "UTF-8"))
 			data[data.findIndex(item => matchingFn(item))] := JSON.parse(newJsonString)
-			index := data.findIndex(item => )
 			
 			f := FileOpen(collection, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			FileSetAttrib("-H", collection, )
+			FileSetAttrib("-T", collection, )
 
 			this.createBackup(date)
 			
