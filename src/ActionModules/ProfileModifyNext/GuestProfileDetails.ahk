@@ -21,15 +21,18 @@ GuestProfileDetails(selectedGuest, fillIn, App) {
 
         for key, field in fieldIndex {
             val := selectedGuest.has(key) ? selectedGuest[key] : ""
+            
             ; if (key = "fileName") {
-            if (key == "regTime") {
-                ; y := SubStr(val, 1, 4)
-                ; m := SubStr(val, 5, 2)
-                ; d := SubStr(val, 7, 2)
-                ; h := SubStr(val, 9, 2)
-                ; min := SubStr(val, 11, 2)
+            ;     y := SubStr(val, 1, 4)
+            ;     m := SubStr(val, 5, 2)
+            ;     d := SubStr(val, 7, 2)
+            ;     h := SubStr(val, 9, 2)
+            ;     min := SubStr(val, 11, 2)
+                
+            ;     val := Format("{1}/{2}/{3} {4}:{5}", y, m, d, h, min)
+            ; }
 
-                ; val := Format("{1}/{2}/{3} {4}:{5}", y, m, d, h, min)
+            if (key == "regTime") {
                 val := FormatTime(val, "yyyy/MM/dd HH:mm")
             }
 
