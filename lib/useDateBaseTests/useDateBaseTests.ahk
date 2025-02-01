@@ -1,3 +1,4 @@
+#SingleInstance Force
 #Include "../AddReactive/useAddReactive.ahk"
 #Include "../useDateBase.ahk"
 
@@ -61,10 +62,11 @@ LoadTest() {
     LT.OnEvent("Close", (*) => LT.Destroy())
 
     date := signal(FormatTime(A_Now, "yyyyMMdd"))
-    range := 99999999999999999999999
-    data := signal(db.load(, date, range))
+    range := signal(60)
+    data := signal(db.load(, date.value, range.value))
 
-    effect(date, curDate => data.set(db.load(, curDate, range)))
+    effect(date, curDate => data.set(db.load(, curDate, range.value)))
+    effect(range, curRange => data.set(db.load(, date.value, curRange)))
 
     columnDetails := {
         keys: ["roomNum", "name", "gender", "idType", "idNum", "addr"],
@@ -79,7 +81,8 @@ LoadTest() {
 
     return (
         LT.ARListView(options, columnDetails, data),
-        LT.AddDateTime().OnEvent("Change", (ctrl, _) => date.set(ctrl.value)),
+        LT.AddDateTime().OnEvent("Change", (ctrl, _) => date.set(ctrl.Value)),
+        LT.AddEdit("x+10 w60", range.value).OnEvent("LoseFocus", (ctrl, _) => range.set(Integer(ctrl.Value))),
         LT.Show()
     )
 }
