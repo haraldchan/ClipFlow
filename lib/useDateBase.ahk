@@ -86,14 +86,15 @@ class useDateBase {
 			range := 60 * 24 * (DateDiff(A_Now, date, "Days") + 1)
 		}
 
-		if (!FileExist(collection) && !FileExist(backup)) {
+		if (!FileExist(collection) && !FileExist(backup) && !(DateDiff(A_Now, date, "Days") > 0)) {
 			FileAppend("[]", collection, "UTF-8")
 		} else if (!FileExist(collection) && FileExist(backup)) {
 			this.restoreBackup(date)
-		}
-
+		} 
+ 
 		data := JSON.parse(FileRead(collection, "UTF-8"))
 		            .filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
+		            ; .filter(item => DateDiff(A_Now, SubStr(item["fileName"], 1, 12) , "Minutes") <= range)
 
 		return data
 	}
