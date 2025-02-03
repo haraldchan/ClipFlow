@@ -70,12 +70,18 @@ class signal {
 
         ; run all effects
         for effect in this.effects {
-            if (effect.MaxParams = 1) {
-                effect(this.value)
-            } else if (effect.MaxParams = 2) {
-                effect(this.value, prevValue)
-            } else {
-                effect()
+            if (effect.depend is signal) {
+                e := effect.effectFn
+                if (effect.effectFn.MaxParams == 1) {
+                    e(this.value)
+                } else if (effect.effectFn.MaxParams == 2) {
+                    e(this.value, prevValue)
+                } else {
+                    e()
+                }
+            } else if (effect.depend is Array) {
+                e := effect.effectFn
+                e(effect.depend.map(dep => dep.value)*)
             }
         }
     }
@@ -88,6 +94,9 @@ class signal {
     update(key, newValue) {
         if (!(this.value is Object)) {
             throw TypeError(Format("update can only handle Array/Object/Map; `n`nCurrent Type: {2}", Type(newValue)))
+        }
+        if (newValue is Func) {
+            newValue := newValue(this.value)
         }
 
         updater := this._mapify(this.value)
