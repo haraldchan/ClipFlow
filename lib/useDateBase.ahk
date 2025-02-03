@@ -66,12 +66,11 @@ class useDateBase {
 
 	/**
 	 * Loads data in base on date/minute filter.
-	 * @param {String} db database folder dir.
 	 * @param {String} date a date string in "yyyyMMdd" format.
 	 * @param {Integer} range a filter of range in minutes.
 	 * @returns {Array}
 	 */
-	load(db := this.main, date := A_Now, range := 60) {
+	load(date := A_Now, range := 60) {
 		checkType(date, IsTime)
 		checkType(range, Integer)
 		date := FormatTime(date, "yyyyMMdd")
