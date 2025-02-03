@@ -61,12 +61,11 @@ LoadTest() {
     LT := Gui(, A_ThisFunc)
     LT.OnEvent("Close", (*) => LT.Destroy())
 
-    date := signal(FormatTime(A_Now, "yyyyMMdd"))
+    date := signal(A_Now)
     range := signal(60)
-    data := signal(db.load(, date.value, range.value))
-
-    effect(date, curDate => data.set(db.load(, curDate, range.value)))
-    effect(range, curRange => data.set(db.load(, date.value, curRange)))
+    data := signal(db.load(date.value, range.value))
+    
+    effect([date, range], (curDate, curRange) => data.set(db.load(curDate, curRange)))
 
     columnDetails := {
         keys: ["roomNum", "name", "gender", "idType", "idNum", "addr"],
