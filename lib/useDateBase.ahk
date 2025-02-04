@@ -4,11 +4,13 @@ class useDateBase {
 			main: dbSetting.main,
 			backup: "",
 			cleanPeriod: 0,
+			splitDays: 20
 		})
 
 		this.main := s.main
 		this.backup := s.backup
 		this.cleanPeriod := s.cleanPeriod
+		this.splitDays := s.splitDays
 
 		if (!DirExist(this.main)) {
 			DirCreate(this.main)
@@ -17,6 +19,52 @@ class useDateBase {
 		if (this.backup != "" && !DirExist(this.backup)) {
 			DirCreate(this.backup)
 		}
+	}
+
+	/**
+	 * Returns an Object with target partition filepath and filename.
+	 * @param {String} date query date
+	 * @param {String} dir query db (main/backup)
+	 * @returns {Object} 
+	 */
+	getPartition(date := A_Now, dir := this.main) {
+		checkType(date, IsTime)
+		checkType(dir, String)
+
+		dateLoop := date
+		loop this.splitDays - 1 {
+			targetPartitonPath := Format("{1}\{2}{3}.json", dir, dateLoop, dir == this.main ? "" : "_backup")
+			
+			if (FileExist(targetPartitonPath)) {
+				if (dir == this.main) {
+					return {
+						path: targetPartitonPath,
+						filename: dateLoop
+					}
+				} else if (dir == this.backup) {
+					return this.restoreBackup(date)
+				}
+			}
+
+			dateLoop := DateAdd(dateLoop, "Days", -1)
+		}
+
+		; if loop finished and not found,
+		; try finding it in backup
+		if (dir == this.main) {
+			newPartition := this.getPartition(date, this.backup)
+		}
+
+		; if still not found, create a new one
+		if (dir == this.backup) {
+			newPartition := {
+				path:  Format("{1}\{2}.json", this.main, date),
+				filename: date
+			}
+			FileAppend(JSON.stringify(Map(date, [])), newPartition.path, "UTF-8")
+		}
+
+		return newPartition
 	}
 
 	/**
@@ -31,29 +79,27 @@ class useDateBase {
 	addSync(jsonString, date := A_Now, isAsync := false) {
 		checkType(jsonString, String)
 		checkType(date, IsTime)
+		
 		date := FormatTime(date, "yyyyMMdd")
-
 		err := false
-		collection := Format("{1}\{2}.json", this.main, date)
+		partition := this.getPartition(date)
 
 		try {
-			if (!FileExist(collection)) {
-				FileAppend("[]", collection, "UTF-8")
-			}
-
-			if (InStr(FileGetAttrib(collection), "T")) {
+			; check is writing flag "T"
+			if (InStr(FileGetAttrib(partition.path), "T")) {
 				return
 			} else {
-				FileSetAttrib("+T", collection)
+				FileSetAttrib("+T", partition.path)
 			}
 
-			data := JSON.parse(FileRead(collection, "UTF-8"))
-			data.Push(JSON.parse(jsonString))
+			; retrive and insert new data
+			data := JSON.parse(FileRead(partition.path, "UTF-8"))
+			data[date].InsertAt(1, jsonString)
 
-			f := FileOpen(collection, "w", "UTF-8")
+			f := FileOpen(partition.path, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			FileSetAttrib("-T", collection)
+			FileSetAttrib("-T", partition.path)
 
 		} catch Error as e {
 			err := e
@@ -68,30 +114,22 @@ class useDateBase {
 	 * Loads data in base on date/minute filter.
 	 * @param {String} date a date string in "yyyyMMdd" format.
 	 * @param {Integer} range a filter of range in minutes.
-	 * @returns {Array}
+	 * @returns {Map}
 	 */
 	load(date := A_Now, range := 60) {
 		checkType(date, IsTime)
 		checkType(range, Integer)
-		date := FormatTime(date, "yyyyMMdd")
-
 		if (DateDiff(A_Now, date, "Days") < 0) {
 			return []
 		}
 
-		collection := Format("{1}\{2}.json", this.main, date)
-		backup := this.backup . "\" . SubStr(date, 1, 6) . "\" . date . "_backup.json"
+		date := FormatTime(date, "yyyyMMdd")
 		if (date != FormatTime(A_Now, "yyyyMMdd")) {
 			range := 60 * 24 * (DateDiff(A_Now, date, "Days") + 1)
 		}
 
-		if (!FileExist(collection) && !FileExist(backup) && !(DateDiff(A_Now, date, "Days") > 0)) {
-			FileAppend("[]", collection, "UTF-8")
-		} else if (!FileExist(collection) && FileExist(backup)) {
-			this.restoreBackup(date)
-		} 
- 
-		data := JSON.parse(FileRead(collection, "UTF-8"))
+		partition := this.getPartition(date)
+		data := JSON.parse(FileRead(partition.path, "UTF-8"))[date]
 		            .filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
 		            ; .filter(item => DateDiff(A_Now, SubStr(item["fileName"], 1, 12) , "Minutes") <= range)
 
@@ -112,28 +150,29 @@ class useDateBase {
 		checkType(newJsonString, String)
 		checkType(date, IsTime)
 		checkType(matchingFn, Func)
-		date := FormatTime(date, "yyyyMMdd")
 
 		err := false
-		collection := Format("{1}\{2}.json", this.main, date)
+		date := FormatTime(date, "yyyyMMdd")
+		partition := this.getPartition(date)
 
 		try {
-			if (InStr(FileGetAttrib(collection), "T")) {
+			if (InStr(FileGetAttrib(partition.path), "T")) {
 				return
 			} else {
-				FileSetAttrib("+T", collection)
+				FileSetAttrib("+T", partition.path)
 			}
 
-			data := JSON.parse(FileRead(collection, "UTF-8"))
-			data[data.findIndex(item => matchingFn(item))] := JSON.parse(newJsonString)
+			data := JSON.parse(FileRead(partition.path, "UTF-8"))
+			index := data[date].findIndex(item => matchingFn(item))
+			data[date][index] := JSON.parse(newJsonString)
 
-			f := FileOpen(collection, "w", "UTF-8")
+			f := FileOpen(partition.path, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			FileSetAttrib("-T", collection,)
+			FileSetAttrib("-T", partition.path)
 
 			if (this.backup != "") {
-				this.createBackup(date)
+				this.createBackup(partition)
 			}
 
 		} catch Error as e {
@@ -145,43 +184,29 @@ class useDateBase {
 		}
 	}
 
-	/**
-	 * Creates a backup copy to backup foler.
-	 * @param {String} date date("yyyyMMdd") to be backup.
-	 */
-	createBackup(date) {
-		checkType(date, IsTime)
-		date := FormatTime(date, "yyyyMMdd")
+	createBackup(partition) {
+		checkType(partition.filename, IsTime)
 
-		collection := Format("{1}\{2}.json", this.main, date)
-		monthFolder := "\" . SubStr(date, 1, 6)
-
-		if (!FileExist(collection)) {
+		if (!FileExist(partition.path)) {
 			return
 		}
 
-		if (!DirExist(this.backup . monthFolder)) {
-			DirCreate(this.backup . monthFolder)
-		}
-
-		FileCopy(collection, this.backup . monthFolder . "\" . date . "_backup.json", true)
+		FileCopy(partition.path, this.backup . "\" . partition.filename . "_backup.json", true)
 	}
 
-	/**
-	 * Restores database json of a certain date from backup.
-	 * @param {String} date date date("yyyyMMdd") to be restore.
-	 */
 	restoreBackup(date) {
 		checkType(date, IsTime)
-		date := FormatTime(date, "yyyyMMdd")
 
-		collection := Format("{1}\{2}.json", this.main, date)
-		monthFolder := "\" . SubStr(date, 1, 6)
+		backupPartition := this.getPartition(date, this.backup)
 
-		if (!DirExist(this.backup . monthFolder)) {
-			DirCreate(this.backup . monthFolder)
+		backupPath := Format("{1}\{2}_backup.json", this.backup, backupPartition.path)
+		partitionPath := Format("{1}\{2}.json", this.main, backupPartition.filename)
+
+		FileCopy(backupPath, partitionPath, true)
+		
+		return {
+			path: partitionPath,
+			filename: backupPartition.filename
 		}
-
-		FileCopy(this.backup . monthFolder . "\" . date . "_backup.json", collection, true)
 	}
 }
