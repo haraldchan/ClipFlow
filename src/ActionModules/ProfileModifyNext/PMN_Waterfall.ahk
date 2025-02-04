@@ -1,8 +1,6 @@
 class PMN_Waterfall {
     static cascade(rooms, selectedGuests, isOverwrite) {
-        WinMaximize "ahk_class SunAwtFrame"
-        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput true
+        PMN_FillIn.start()
 
         curRoom := signal(0)
         index := 1
@@ -15,6 +13,9 @@ class PMN_Waterfall {
 
                 if (guest["roomNum"] = curRoom.value) {
                     this.search(room, index)
+                    if (!PMN_FillIn.isRunning) {
+                        return
+                    }
                     utils.waitLoading()
                     this.modify(guest, isOverwrite)
                     if (!PMN_FillIn.isRunning) {
@@ -31,8 +32,7 @@ class PMN_Waterfall {
             }
         }
 
-        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-        BlockInput false
+        PMN_FillIn.end()
         MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
     }
 
@@ -42,12 +42,18 @@ class PMN_Waterfall {
         MouseMove 329, 196 ; room number field
         Click 3
         utils.waitLoading()
-        
+        if (!PMN_FillIn.isRunning) {
+            return
+        }
+
         Send formattedRoom
         utils.waitLoading()
 
         Send "!h" ; alt+h => search
         utils.waitLoading()
+        if (!PMN_FillIn.isRunning) {
+            return
+        }
 
         ; sort by Prs.
         Click 838, 378, "Right" 
@@ -56,6 +62,9 @@ class PMN_Waterfall {
         utils.waitLoading()
         Send "{Enter}"
         utils.waitLoading() 
+        if (!PMN_FillIn.isRunning) {
+            return
+        }
 
         ; choose resv
         loop (index - 1) {
