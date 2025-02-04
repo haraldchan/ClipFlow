@@ -1,3 +1,20 @@
+/**
+ * Test todos:
+ * 1. getPartition method:
+ *  - find closest partition correctly;
+ *  - restore backup if partition is not found;
+ *  - create new partition if no backup either.
+ * 
+ * 2. partition related:
+ *  - how big is a 20-day partition;
+ *  - how fast is load method in this way;
+ *  - what's the bottleneck capacity(maximum splitDays).
+ * 
+ * 3. possible updates:
+ *  - introduce a yyyy/mm/ dir structure for better grouping?
+ *  - set maximum splitDays for better performance?
+*/
+
 #SingleInstance Force
 #Include "../AddReactive/useAddReactive.ahk"
 #Include "../useDateBase.ahk"
@@ -20,10 +37,9 @@ CreateBackupTest() {
 ; CreateBackupTest()
 
 
-; TODO: test if add works as expected when file attrib is set to "H"(hidden)
 AddTest() {
     jsonString := FileRead("./20240826002540557.json", "UTF-8")
-    date := FormatTime(A_Now, "yyyyMMdd") 
+    date := FormatTime(A_Now, "yyyyMMdd")
 
     db.add(jsonString, date)
 }
@@ -32,7 +48,7 @@ AddTest() {
 
 AddConcurrentTest() {
     jsonStrings := FileRead("./20240926 - archive.json", "UTF-8")
-    date:= FormatTime(A_Now, "yyyyMMdd")
+    date := FormatTime(A_Now, "yyyyMMdd")
 
     for item in JSON.parse(jsonStrings) {
         db.add(JSON.stringify(item), date)
@@ -41,7 +57,6 @@ AddConcurrentTest() {
 ; AddConcurrentTest()
 
 
-; TODO: test if add works as expected when file attrib is set to "H"(hidden)
 UpdateTest() {
     newJsonString := JSON.stringify({ update: "updated again!!", tsId: 1725464875817 })
     date := FormatTime(A_Now, "yyyyMMdd")
@@ -55,8 +70,6 @@ UpdateTest() {
 ; UpdateTest()
 
 
-; TODO: test can it load correctly when add is executing.
-; TODO: test loading using real data during Spring Fes
 LoadTest() {
     LT := Gui(, A_ThisFunc)
     LT.OnEvent("Close", (*) => LT.Destroy())
@@ -64,7 +77,7 @@ LoadTest() {
     date := signal(A_Now)
     range := signal(60)
     data := signal(db.load(date.value, range.value))
-    
+
     effect([date, range], (curDate, curRange) => data.set(db.load(curDate, curRange)))
 
     columnDetails := {
