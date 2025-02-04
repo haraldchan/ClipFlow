@@ -1,4 +1,4 @@
-GuestProfileList(App, db, db2, listContent, queryFilter, fillPmsProfile) {
+GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile) {
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
@@ -22,8 +22,10 @@ GuestProfileList(App, db, db2, listContent, queryFilter, fillPmsProfile) {
     handleUpdateItem(LV, row) {
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
-        db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
-        db2.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
+        ; FileDB
+        fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
+        ; DateDase
+        db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
     }
 
     showProfileDetails(LV, row, *) {
@@ -37,10 +39,10 @@ GuestProfileList(App, db, db2, listContent, queryFilter, fillPmsProfile) {
 
     return (    
         App.AddReactiveListView(options, columnDetails, listContent)
-           .OnEvent(Map(
+           .OnEvent(
                 "DoubleClick", copyIdNumber,
                 "ItemEdit", handleUpdateItem,
                 "ContextMenu", showProfileDetails
-            ))
+            )
     )
 }
