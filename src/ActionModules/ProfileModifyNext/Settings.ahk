@@ -1,4 +1,4 @@
-PMN_Settings(fillOverwrite) {
+PMN_Settings(settingSignal) {
     if (WinExist("PMN Settings")) {
         return
     }
@@ -29,8 +29,15 @@ PMN_Settings(fillOverwrite) {
 
     return (
         Settings.AddText("x10 w260", helpInfo),
-        Settings.AddCheckbox((fillOverwrite.value = true ? "Checked" : "") . " x10 w260", "默认覆盖填入（直接在原 Profile 修改）")
-                .OnEvent("Click", (ctrl, _) => fillOverwrite.set(ctrl.value))
+        
+        ; overwrite fill-in
+        Settings.AddCheckbox((settingSignal.value["fillOverwrite"] == true ? "Checked" : "") . " x10 w260", "默认覆盖填入（直接在原 Profile 修改）")
+                .OnEvent("Click", (ctrl, _) => settingSignal.update("fillOverwrite", ctrl.value)),
+        
+                ; load from FileDB/DateBase
+        Settings.AddText("x10 w260", "Profile 来源数据库"),
+        Settings.AddRadio("x10 w120", "FileDB").OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
+        Settings.AddRadio("Checked x+10 w120", "DateBase").OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
 
         Settings.Show()
     )
