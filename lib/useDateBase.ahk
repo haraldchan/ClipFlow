@@ -133,11 +133,16 @@ class useDateBase {
 		}
 
 		partition := this.getPartition(date)
-		data := JSON.parse(FileRead(partition.path, "UTF-8"))[date]
-		            ; .filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
-		            .filter(item => DateDiff(A_Now, SubStr(item["fileName"], 1, 12) , "Minutes") <= range)
+		
+		data := JSON.parse(FileRead(partition.path, "UTF-8"))
 
-		return data
+		if (!data.has(date)) {
+			return []
+		} else {
+			return data[date]
+				   ; .filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
+		           .filter(item => DateDiff(A_Now, SubStr(item["fileName"], 1, 12) , "Minutes") <= range)
+		}
 	}
 
 	/**
