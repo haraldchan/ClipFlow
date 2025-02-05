@@ -47,10 +47,11 @@ AddTest() {
 
 
 AddConcurrentTest() {
-    jsonStrings := FileRead("./20240926 - archive.json", "UTF-8")
+    jsonStrings := FileRead("./20250203 - archive.json", "UTF-8")
     date := FormatTime(A_Now, "yyyyMMdd")
 
     for item in JSON.parse(jsonStrings) {
+        sleep 500
         db.add(JSON.stringify(item), date)
     }
 }
@@ -58,11 +59,11 @@ AddConcurrentTest() {
 
 
 UpdateTest() {
-    newJsonString := JSON.stringify({ update: "updated again!!", tsId: 1725464875817 })
+    newJsonString := FileRead("./20240826002540557.json", "UTF-8")
     date := FormatTime(A_Now, "yyyyMMdd")
 
     updateFn(item) {
-        return item["roomNum"] == "2612" && item["gender"] == "男"
+        return item["tsId"] == "1738584552100"
     }
 
     db.updateOne(newJsonString, date, updateFn)
@@ -75,7 +76,7 @@ LoadTest() {
     LT.OnEvent("Close", (*) => LT.Destroy())
 
     date := signal(A_Now)
-    range := signal(60)
+    range := signal(999)
     data := signal(db.load(date.value, range.value))
 
     effect([date, range], (curDate, curRange) => data.set(db.load(curDate, curRange)))
