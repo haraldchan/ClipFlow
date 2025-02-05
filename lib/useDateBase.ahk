@@ -30,11 +30,12 @@ class useDateBase {
 	getPartition(date := A_Now, dir := this.main) {
 		checkType(date, IsTime)
 		checkType(dir, String)
+		date := FormatTime(date, "yyyyMMdd")
 
 		dateLoop := date
 		loop this.splitDays - 1 {
 			targetPartitonPath := Format("{1}\{2}{3}.json", dir, dateLoop, dir == this.main ? "" : "_backup")
-			
+
 			if (FileExist(targetPartitonPath)) {
 				if (dir == this.main) {
 					return {
@@ -46,13 +47,13 @@ class useDateBase {
 				}
 			}
 
-			dateLoop := DateAdd(dateLoop, "Days", -1)
+			dateLoop := FormatTime(DateAdd(dateLoop, -1, "Days"), "yyyyMMdd")
 		}
 
 		; if loop finished and not found,
 		; try finding it in backup
 		if (dir == this.main) {
-			newPartition := this.getPartition(date, this.backup)
+			return this.getPartition(date, this.backup)
 		}
 
 		; if still not found, create a new one
@@ -62,9 +63,8 @@ class useDateBase {
 				filename: date
 			}
 			FileAppend(JSON.stringify(Map(date, [])), newPartition.path, "UTF-8")
+			return newPartition
 		}
-
-		return newPartition
 	}
 
 	/**
@@ -80,8 +80,9 @@ class useDateBase {
 		checkType(jsonString, String)
 		checkType(date, IsTime)
 		
-		date := FormatTime(date, "yyyyMMdd")
 		err := false
+		date := FormatTime(date, "yyyyMMdd")
+		newRecord := JSON.parse(jsonString)
 		partition := this.getPartition(date)
 
 		try {
@@ -91,10 +92,13 @@ class useDateBase {
 			} else {
 				FileSetAttrib("+T", partition.path)
 			}
-
 			; retrive and insert new data
 			data := JSON.parse(FileRead(partition.path, "UTF-8"))
-			data[date].InsertAt(1, jsonString)
+			if (data.has(date)) {
+				data[date].InsertAt(1, newRecord)
+			} else {
+				data[date] := [newRecord]
+			}
 
 			f := FileOpen(partition.path, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
@@ -130,8 +134,8 @@ class useDateBase {
 
 		partition := this.getPartition(date)
 		data := JSON.parse(FileRead(partition.path, "UTF-8"))[date]
-		            .filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
-		            ; .filter(item => DateDiff(A_Now, SubStr(item["fileName"], 1, 12) , "Minutes") <= range)
+		            ; .filter(item => DateDiff(A_Now, item["regTime"], "Minutes") <= range)
+		            .filter(item => DateDiff(A_Now, SubStr(item["fileName"], 1, 12) , "Minutes") <= range)
 
 		return data
 	}
@@ -154,6 +158,7 @@ class useDateBase {
 		err := false
 		date := FormatTime(date, "yyyyMMdd")
 		partition := this.getPartition(date)
+		newRecord := JSON.parse(newJsonString)
 
 		try {
 			if (InStr(FileGetAttrib(partition.path), "T")) {
@@ -164,7 +169,7 @@ class useDateBase {
 
 			data := JSON.parse(FileRead(partition.path, "UTF-8"))
 			index := data[date].findIndex(item => matchingFn(item))
-			data[date][index] := JSON.parse(newJsonString)
+			data[date][index] := newRecord
 
 			f := FileOpen(partition.path, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
