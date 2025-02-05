@@ -77,6 +77,12 @@ class useDateBase {
 	}
 
 	addSync(jsonString, date := A_Now, isAsync := false) {
+		if (InStr(FileGetAttrib(this.main), "T")) {
+			return
+		} else {
+			FileSetAttrib("+T", this.main)
+		}
+
 		checkType(jsonString, String)
 		checkType(date, IsTime)
 		
@@ -87,11 +93,11 @@ class useDateBase {
 
 		try {
 			; check is writing flag "T"
-			if (InStr(FileGetAttrib(partition.path), "T")) {
-				return
-			} else {
-				FileSetAttrib("+T", partition.path)
-			}
+			; if (InStr(FileGetAttrib(partition.path), "T")) {
+				; return
+			; } else {
+				; FileSetAttrib("+T", partition.path)
+			; }
 			; retrive and insert new data
 			data := JSON.parse(FileRead(partition.path, "UTF-8"))
 			if (data.has(date)) {
@@ -103,7 +109,8 @@ class useDateBase {
 			f := FileOpen(partition.path, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			FileSetAttrib("-T", partition.path)
+			; FileSetAttrib("-T", partition.path)
+			FileSetAttrib("-T", this.main)
 
 		} catch Error as e {
 			err := e
@@ -156,6 +163,12 @@ class useDateBase {
 	}
 
 	updateOneSync(newJsonString, date, matchingFn, isAsync := false) {
+		if (InStr(FileGetAttrib(this.main), "T")) {
+			return
+		} else {
+			FileSetAttrib("+T", this.main)
+		}
+		
 		checkType(newJsonString, String)
 		checkType(date, IsTime)
 		checkType(matchingFn, Func)
@@ -166,11 +179,11 @@ class useDateBase {
 		newRecord := JSON.parse(newJsonString)
 
 		try {
-			if (InStr(FileGetAttrib(partition.path), "T")) {
-				return
-			} else {
-				FileSetAttrib("+T", partition.path)
-			}
+			; if (InStr(FileGetAttrib(partition.path), "T")) {
+				; return
+			; } else {
+				; FileSetAttrib("+T", partition.path)
+			; }
 
 			data := JSON.parse(FileRead(partition.path, "UTF-8"))
 			index := data[date].findIndex(item => matchingFn(item))
@@ -179,7 +192,8 @@ class useDateBase {
 			f := FileOpen(partition.path, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			FileSetAttrib("-T", partition.path)
+			; FileSetAttrib("-T", partition.path)
+			FileSetAttrib("-T", this.main)
 
 			if (this.backup != "") {
 				this.createBackup(partition)
