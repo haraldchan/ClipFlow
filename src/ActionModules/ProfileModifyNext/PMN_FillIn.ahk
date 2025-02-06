@@ -41,17 +41,21 @@ class PMN_FillIn {
             utils.waitLoading()
             if (success) {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+                Send "!o"
             }
 
-            return this.end()
+            this.end()
+            return
         }
 
         currentId := this.getCurrentId()
         ; on-screen profile matcheds
         if (currentId = guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
+            Send "!o"
 
-            return this.end()
+            this.end()
+            return
         }
 
         ; matched in database
@@ -59,8 +63,10 @@ class PMN_FillIn {
             Send "!o"
             utils.waitLoading()
             MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
+            Send "!o"
 
-            return this.end()
+            this.end()
+            return
         } else {
             Send "!c"
             utils.waitLoading()
@@ -78,10 +84,11 @@ class PMN_FillIn {
             utils.waitLoading()
             if (success) {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+                Send "!o"
             }
         }
 
-        return this.end()
+        this.end()
     }
 
     static getCurrentId() {
