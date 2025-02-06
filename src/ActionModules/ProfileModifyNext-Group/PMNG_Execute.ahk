@@ -4,9 +4,7 @@ class PMNG_Execute {
     static operaLogo := A_ScriptDir . "\src\Assets\opera-logo.PNG"
 
     static startModify(inhRooms, groupGuests) {
-        WinMaximize "ahk_class SunAwtFrame"
-        WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
-        BlockInput "SendAndMouse"
+        PMN_FillIn.start()
 
         if (utils.checkClearWin(popupTitle, this.operaLogo) = "Cancel"){
             utils.cleanReload(winGroup)
@@ -23,28 +21,39 @@ class PMNG_Execute {
             for guest in groupGuests {
                 remaining := groupGuests.filter(g => g["roomNum"] = curRoom.value).Length
 
-                if (index > inhRooms.filter(r => r = curRoom.value).Length && remaining > 0) {
+                if (index > inhRooms.filter(r => r == curRoom.value).Length && remaining > 0) {
                     this.search(room, 1) ; find main resv and make share on it
+                    if (!PMN_FillIn.isRunning) {
+                        msgbox("脚本已终止", popupTitle, "4096 T1")
+                        return
+                    }
                     this.makeShare()
+                    if (!PMN_FillIn.isRunning) {
+                        msgbox("脚本已终止", popupTitle, "4096 T1")
+                        return
+                    }
                     Send "!r" ; clear
                 }
 
-                if (guest["roomNum"] = room) {
+                if (guest["roomNum"] == room) {
                     this.search(room, index)
                     utils.waitLoading()
                     this.modify(guest)
+                    if (!PMN_FillIn.isRunning) {
+                        msgbox("脚本已终止", popupTitle, "4096 T1")
+                        return
+                    }
                     guest["roomNum"] := ""
                     index := (remaining = 1) ? 1 : index + 1
                 }
 
-                if (remaining = 1) {
+                if (remaining == 1) {
                     break
                 }
             }
         }
 
-        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
-        BlockInput false
+        PMN_FillIn.end()
         Sleep 1000
         MsgBox("Group Modify 已完成。")
     }
@@ -70,6 +79,10 @@ class PMNG_Execute {
 
         Send "!h" ; alt+h => search
         utils.waitLoading()
+        if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         ; sort by Prs.
         Click 838, 378, "Right" 
@@ -78,6 +91,10 @@ class PMNG_Execute {
         utils.waitLoading()
         Send "{Enter}"
         utils.waitLoading() 
+        if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         ; choose resv
         loop (index - 1) {
@@ -115,6 +132,10 @@ class PMNG_Execute {
             Send "{Tab}"
             utils.waitLoading()
         }
+        if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
         Send "{Text}0"
         utils.waitLoading()
         Send "{Tab}"
@@ -123,6 +144,10 @@ class PMNG_Execute {
         utils.waitLoading()
         Send "{Text}6"
         utils.waitLoading()
+        if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         ; TODO: change the flow, keep no post
 
@@ -142,6 +167,11 @@ class PMNG_Execute {
         Send "!c"
         MouseMove initX - 625, initY - 92 ; 324, 507
         utils.waitLoading()
+        if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
+
         Click "Down"
         MouseMove initX - 737, initY - 79 ; 212, 520
         utils.waitLoading()
@@ -151,6 +181,11 @@ class PMNG_Execute {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
+        if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
+
         loop 4 {
             Send "{Esc}"
             utils.waitLoading()
@@ -162,6 +197,11 @@ class PMNG_Execute {
             Send "{Esc}"
             utils.waitLoading()
         }
+        if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
+
         utils.waitLoading()
         Send "{Space}"
         utils.waitLoading()
