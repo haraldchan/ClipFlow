@@ -108,7 +108,7 @@ class PMNG_Execute {
         utils.waitLoading()
         sleep 1000
 
-        PMN_FillIn.fill(guest, true)
+        PMN_FillIn.fill(guest, false, true)
         Sleep 1000
         Send "!o" ; ok
 

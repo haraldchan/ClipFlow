@@ -31,7 +31,7 @@ class PMN_FillIn {
         BlockInput false
     }
 
-    static fill(currentGuest, isOverwrite) {
+    static fill(currentGuest, isOverwrite := false, keepGoing := false) {
         this.start({ setOnTop: true, blockInput: true })
         guest := this.parse(currentGuest)
 
@@ -44,7 +44,7 @@ class PMN_FillIn {
                 Send "!o"
             }
 
-            this.end()
+            ( !keepGoing && this.end() )
             return
         }
 
@@ -53,8 +53,7 @@ class PMN_FillIn {
         if (currentId = guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
             Send "!o"
-
-            this.end()
+            ( !keepGoing && this.end() )
             return
         }
 
@@ -65,7 +64,7 @@ class PMN_FillIn {
             MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
             Send "!o"
 
-            this.end()
+            ( !keepGoing && this.end() )
             return
         } else {
             Send "!c"
@@ -88,7 +87,7 @@ class PMN_FillIn {
             }
         }
 
-        this.end()
+        ( !keepGoing && this.end() )
     }
 
     static getCurrentId() {
@@ -187,25 +186,25 @@ class PMN_FillIn {
             parsedInfo["nameLast"] := currentGuest["nameLast"]
             parsedInfo["nameFirst"] := currentGuest["nameFirst"]
         }
-
+        
         ; fallback for incomplete info
         if (currentGuest["idType"] == "港澳台居民居住证"
             && parsedInfo["nameLast"] == " "
-            && parsedInfo["nameFirst"] == " ") {
+        && parsedInfo["nameFirst"] == " ") {
             fullname := useDict.getFullnamePinyin(currentGuest["name"])
             parsedInfo["nameLast"] := fullname[1]
             parsedInfo["nameFirst"] := fullname[2]
         }
-            
+        
         ; address
         parsedInfo["addr"] := currentGuest["guestType"] == "内地旅客" ? currentGuest["addr"] : " "
         
         ; language
         parsedInfo["language"] := currentGuest["guestType"] == "内地旅客" ? "C" : "E"
-                
+        
         ; country
         parsedInfo["country"] := currentGuest["guestType"] == "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
-            
+        
         ; province(mainland & hk/mo/tw)
         if (currentGuest["guestType"] == "内地旅客") {
             parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])

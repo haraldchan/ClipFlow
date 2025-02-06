@@ -11,7 +11,7 @@ class PMN_Waterfall {
             for guest in selectedGuests {
                 remaining := selectedGuests.filter(g => g["roomNum"] = curRoom.value).Length
 
-                if (guest["roomNum"] = curRoom.value) {
+                if (guest["roomNum"] == curRoom.value) {
                     this.search(room, index)
                     if (!PMN_FillIn.isRunning) {
                         msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -25,9 +25,9 @@ class PMN_Waterfall {
                     }
 
                     guest["roomNum"] := ""
-                    index := (remaining = 1) ? 1 : index + 1
+                    index := (remaining == 1) ? 1 : index + 1
 
-                    if (remaining = 1) {
+                    if (remaining == 1) {
                         break
                     }
                 }
@@ -82,12 +82,12 @@ class PMN_Waterfall {
         Send "!p" ; open profile
         utils.waitLoading()
         
-        PMN_FillIn.fill(guest, isOverwrite)
+        PMN_FillIn.fill(guest, isOverwrite, true)
         utils.waitLoading()
-        Sleep 1000
+        ; Sleep 1000
 
         Send "!o" ; ok
         utils.waitLoading()
-        sleep 1000
+        ; sleep 1000
     }
 }
