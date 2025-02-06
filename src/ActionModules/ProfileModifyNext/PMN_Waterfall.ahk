@@ -14,11 +14,13 @@ class PMN_Waterfall {
                 if (guest["roomNum"] = curRoom.value) {
                     this.search(room, index)
                     if (!PMN_FillIn.isRunning) {
+                        msgbox("脚本已终止", popupTitle, "4096 T1")
                         return
                     }
                     utils.waitLoading()
                     this.modify(guest, isOverwrite)
                     if (!PMN_FillIn.isRunning) {
+                        msgbox("脚本已终止", popupTitle, "4096 T1")
                         return
                     }
 
@@ -43,6 +45,7 @@ class PMN_Waterfall {
         Click 3
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
             return
         }
 
@@ -52,6 +55,7 @@ class PMN_Waterfall {
         Send "!h" ; alt+h => search
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
             return
         }
 
@@ -63,6 +67,7 @@ class PMN_Waterfall {
         Send "{Enter}"
         utils.waitLoading() 
         if (!PMN_FillIn.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
             return
         }
 
