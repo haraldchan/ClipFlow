@@ -24,17 +24,19 @@ db := useDateBase({
     backup: A_ScriptDir . "\backup"
 })
 
+
 CreateBackupTest() {
-    date := FormatTime(A_Now, "yyyyMMdd")
-
-    ; yesterday := FormatTime(DateAdd(Format(A_Now, "yyyyMMdd"), -1, "Days"), "yyyyMMdd")
-    ; if (!FileExist(db.backup . "\" . SubStr(date, 1, 6) . "\" . date . "_backup.json")) {
-
-    if (!FileExist(db.backup . "\" . SubStr(date, 1, 6) . "\" . date . "_backup.json")) {
-        db.createBackup(date)
-    }
+    partition := db.getPartition()
+    db.createBackup(partition)
 }
 ; CreateBackupTest()
+
+
+RestoreBackupTest() {
+    partition := db.getPartition(, db.backup)
+    db.restoreBackup(partition)
+}
+; RestoreBackupTest()
 
 
 AddTest() {
@@ -50,8 +52,8 @@ AddConcurrentTest() {
     jsonStrings := FileRead("./20250203 - archive.json", "UTF-8")
     date := FormatTime(A_Now, "yyyyMMdd")
 
-    for item in JSON.parse(jsonStrings) {
-        sleep 500
+    for item in JSON.parse(jsonStrings)["20250204"] {
+        ; msgbox json.stringify(item)
         db.add(JSON.stringify(item), date)
     }
 }
@@ -76,7 +78,7 @@ LoadTest() {
     LT.OnEvent("Close", (*) => LT.Destroy())
 
     date := signal(A_Now)
-    range := signal(999)
+    range := signal(99999999)
     data := signal(db.load(date.value, range.value))
 
     effect([date, range], (curDate, curRange) => data.set(db.load(curDate, curRange)))
