@@ -220,8 +220,8 @@ class useDateBase {
 			return
 		}
 
-		bakcupPath := this.backup . "\" . partition.filename . "_backup.json"
-		FileCopy(partition.path, bakcupPath, true)
+		backupPath := this.backup . "\" . partition.filename . "_backup.json"
+		FileCopy(partition.path, backupPath, true)
 
 		return {
 			path: backupPath,
@@ -234,7 +234,7 @@ class useDateBase {
 		checkType(backupPartition.filename, IsTime)
 
 		restoredPartitionPath := Format("{1}\{2}.json", this.main, backupPartition.filename)
-		FileCopy(backupPartition.path, partitionPath, true)
+		FileCopy(backupPartition.path, restoredPartitionPath, true)
 		
 		return {
 			path: restoredPartitionPath,
