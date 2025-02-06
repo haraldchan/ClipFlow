@@ -43,7 +43,11 @@ class useDateBase {
 						filename: dateLoop
 					}
 				} else if (dir == this.backup) {
-					return this.restoreBackup(date)
+					this.restoreBackup({ 
+						path: targetPartitonPath,
+						filename: dateLoop
+					})
+					return
 				}
 			}
 
@@ -77,10 +81,10 @@ class useDateBase {
 	}
 
 	addSync(jsonString, date := A_Now, isAsync := false) {
-		if (InStr(FileGetAttrib(this.main), "T")) {
+		if (InStr(FileGetAttrib(this.main), "A")) {
 			return
 		} else {
-			FileSetAttrib("+T", this.main)
+			FileSetAttrib("+A", this.main)
 		}
 
 		checkType(jsonString, String)
@@ -93,24 +97,25 @@ class useDateBase {
 
 		try {
 			; check is writing flag "T"
-			; if (InStr(FileGetAttrib(partition.path), "T")) {
-				; return
-			; } else {
-				; FileSetAttrib("+T", partition.path)
-			; }
+			if (InStr(FileGetAttrib(partition.path), "T")) {
+				return
+			} else {
+				FileSetAttrib("+T", partition.path)
+			}
 			; retrive and insert new data
 			data := JSON.parse(FileRead(partition.path, "UTF-8"))
 			if (data.has(date)) {
 				data[date].InsertAt(1, newRecord)
 			} else {
 				data[date] := [newRecord]
+
 			}
 
 			f := FileOpen(partition.path, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			; FileSetAttrib("-T", partition.path)
-			FileSetAttrib("-T", this.main)
+			FileSetAttrib("-T", partition.path)
+			FileSetAttrib("-A", this.main)
 
 		} catch Error as e {
 			err := e
@@ -140,7 +145,6 @@ class useDateBase {
 		}
 
 		partition := this.getPartition(date)
-		
 		data := JSON.parse(FileRead(partition.path, "UTF-8"))
 
 		if (!data.has(date)) {
@@ -163,12 +167,12 @@ class useDateBase {
 	}
 
 	updateOneSync(newJsonString, date, matchingFn, isAsync := false) {
-		if (InStr(FileGetAttrib(this.main), "T")) {
+		if (InStr(FileGetAttrib(this.main), "A")) {
 			return
 		} else {
-			FileSetAttrib("+T", this.main)
+			FileSetAttrib("+A", this.main)
 		}
-		
+
 		checkType(newJsonString, String)
 		checkType(date, IsTime)
 		checkType(matchingFn, Func)
@@ -179,11 +183,11 @@ class useDateBase {
 		newRecord := JSON.parse(newJsonString)
 
 		try {
-			; if (InStr(FileGetAttrib(partition.path), "T")) {
-				; return
-			; } else {
-				; FileSetAttrib("+T", partition.path)
-			; }
+			if (InStr(FileGetAttrib(partition.path), "T")) {
+				return
+			} else {
+				FileSetAttrib("+T", partition.path)
+			}
 
 			data := JSON.parse(FileRead(partition.path, "UTF-8"))
 			index := data[date].findIndex(item => matchingFn(item))
@@ -192,8 +196,8 @@ class useDateBase {
 			f := FileOpen(partition.path, "w", "UTF-8")
 			f.Write(JSON.stringify(data))
 			f.Close()
-			; FileSetAttrib("-T", partition.path)
-			FileSetAttrib("-T", this.main)
+			FileSetAttrib("-T", partition.path)
+			FileSetAttrib("-A", this.main)
 
 			if (this.backup != "") {
 				this.createBackup(partition)
@@ -209,27 +213,31 @@ class useDateBase {
 	}
 
 	createBackup(partition) {
+		checkType(partition.path, String)
 		checkType(partition.filename, IsTime)
 
 		if (!FileExist(partition.path)) {
 			return
 		}
 
-		FileCopy(partition.path, this.backup . "\" . partition.filename . "_backup.json", true)
+		bakcupPath := this.backup . "\" . partition.filename . "_backup.json"
+		FileCopy(partition.path, bakcupPath, true)
+
+		return {
+			path: backupPath,
+			filename: partition.filename
+		}
 	}
 
-	restoreBackup(date) {
-		checkType(date, IsTime)
+	restoreBackup(backupPartition) {
+		checkType(backupPartition.path, String)
+		checkType(backupPartition.filename, IsTime)
 
-		backupPartition := this.getPartition(date, this.backup)
-
-		backupPath := Format("{1}\{2}_backup.json", this.backup, backupPartition.path)
-		partitionPath := Format("{1}\{2}.json", this.main, backupPartition.filename)
-
-		FileCopy(backupPath, partitionPath, true)
+		restoredPartitionPath := Format("{1}\{2}.json", this.main, backupPartition.filename)
+		FileCopy(backupPartition.path, partitionPath, true)
 		
 		return {
-			path: partitionPath,
+			path: restoredPartitionPath,
 			filename: backupPartition.filename
 		}
 	}
