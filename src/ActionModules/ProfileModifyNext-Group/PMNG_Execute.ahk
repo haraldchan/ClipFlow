@@ -20,6 +20,7 @@ class PMNG_Execute {
 
             for guest in groupGuests {
                 remaining := groupGuests.filter(g => g["roomNum"] = curRoom.value).Length
+                isNewShare := false
 
                 if (index > inhRooms.filter(r => r == curRoom.value).Length && remaining > 0) {
                     this.search(room, 1) ; find main resv and make share on it
@@ -28,6 +29,7 @@ class PMNG_Execute {
                         return
                     }
                     this.makeShare()
+                    isNewShare := true
                     if (!PMN_FillIn.isRunning) {
                         msgbox("脚本已终止", popupTitle, "4096 T1")
                         return
@@ -36,7 +38,7 @@ class PMNG_Execute {
                 }
 
                 if (guest["roomNum"] == room) {
-                    this.search(room, index)
+                    this.search(room, index, isNewShare)
                     utils.waitLoading()
                     this.modify(guest)
                     if (!PMN_FillIn.isRunning) {
@@ -67,7 +69,7 @@ class PMNG_Execute {
         Sleep 500
     }
 
-    static search(roomNum, index) {
+    static search(roomNum, index, isNewShare) {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
         MouseMove 329, 196 ; room number field
@@ -76,6 +78,13 @@ class PMNG_Execute {
         
         Send formattedRoom
         utils.waitLoading()
+
+        if (isNewShare) {
+            Send "{Tab}"
+            utils.waitLoading()
+            Send "{Text}1"
+            utils.waitLoading()
+        }
 
         Send "!h" ; alt+h => search
         utils.waitLoading()
@@ -106,14 +115,14 @@ class PMNG_Execute {
     static modify(guest) {
         Send "!p" ; open profile
         utils.waitLoading()
-        sleep 1000
+        ; sleep 1000
 
         PMN_FillIn.fill(guest, false, true)
-        Sleep 1000
+        Sleep 1100
         Send "!o" ; ok
 
         utils.waitLoading()
-        sleep 1000
+        ; sleep 1000
         Send "!r" ; clear
     }
 
