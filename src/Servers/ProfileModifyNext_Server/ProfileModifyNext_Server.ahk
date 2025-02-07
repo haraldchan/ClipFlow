@@ -62,10 +62,10 @@ class useServer {
     /**
      * <server> Handle posts
      */
-    HANDLE() {
+    HANDLE(method := "POST") {
         posts := []
         loop files (this.pool . "\*.json") {
-            if (InStr(A_LoopFileFullPath, "POST")) {
+            if (InStr(A_LoopFileFullPath, method)) {
                 posts.Push(JSON.stringify(FileRead(A_LoopFileFullPath, "UTF-8")))
             }
         }
@@ -81,8 +81,9 @@ class useServer {
                     PMNG_Execute.startModify(c["rooms"], c["profile"])
             }
 
+            ; rename file (change flag status)
             FileMove(
-                Format("{1}\{2}-{3}-{4}.json", this.pool, "POST", post.sender, post.id),
+                Format("{1}\{2}-{3}-{4}.json", this.pool, method, post.sender, post.id),
                 Format("{1}\{2}-{3}-{4}.json", this.pool, "MODIFIED", post.sender, post.id),
             )
         }
