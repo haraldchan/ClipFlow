@@ -23,7 +23,7 @@ class PMNG_Execute {
                 isNewShare := false
 
                 if (index > inhRooms.filter(r => r == curRoom.value).Length && remaining > 0) {
-                    this.search(room, 1) ; find main resv and make share on it
+                    this.search(room, 1, isNewShare) ; find main resv and make share on it
                     if (!PMN_FillIn.isRunning) {
                         msgbox("脚本已终止", popupTitle, "4096 T1")
                         return
