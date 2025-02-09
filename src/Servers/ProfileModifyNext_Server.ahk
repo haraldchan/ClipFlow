@@ -11,7 +11,7 @@ class ProfileModifyNext_Client extends useServerAgent {
             profile:   [],       ; json object in single, array in waterfall/group
         })
 
-        this.POST(c)
+        this.POST(c.toObject())
     }
 }
 
@@ -21,7 +21,10 @@ class ProfileModifyNext_Agent extends useServerAgent {
         effect(this.isListening, cur => this.listen(cur)) 
         ; delete expired posts
         ; this.cleanup()
+
+        ; binding methods timer methods
         this.res := ObjBindMethod(this, "RESPONSE")
+        this.mod := ObjBindMethod(this, "modifyPostedProfiles")
     }
 
     cleanup() {
@@ -38,7 +41,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
 
     listen(status := "在线") {
         SetTimer(this.res, status == "在线" ? this.interval : 0)
-        ; SetTimer(this.modifyPostedProfiles, status == "在线" ? this.interval : 0)
+        SetTimer(this.mod, status == "在线" ? this.interval : 0)
     }
 
     modifyPostedProfiles() {
@@ -69,8 +72,8 @@ class ProfileModifyNext_Agent extends useServerAgent {
 
             ; rename file (change flag status)
             FileMove(
-                Format("{1}\{2}-{3}-{4}.json", this.pool, method, post.sender, post.id),
-                Format("{1}\{2}-{3}-{4}.json", this.pool, "MODIFIED", post.sender, post.id),
+                Format("{1}\{2}=={3}=={4}.json", this.pool, method, post["sender"], post["id"]),
+                Format("{1}\{2}=={3}=={4}.json", this.pool, "MODIFIED", A_ComputerName, post["id"]),
             )
         }
     }
