@@ -13,24 +13,21 @@ class ProfileModifyNext_Client extends useServerAgent {
 
         this.POST(c)
     }
-
-    checkConnection(){
-        return this.PING()
-    }
 }
 
 class ProfileModifyNext_Agent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)     
-        this.isListening := signal(false)   
+        effect(this.isListening, cur => this.listen(cur)) 
         ; delete expired posts
-        this.cleanup()
+        ; this.cleanup()
+        this.res := ObjBindMethod(this, "RESPONSE")
     }
 
     cleanup() {
-        exp := super.expiration
+        exp := this.expiration
         loop files (this.pool "\*.json") {
-            header := StrSplit(A_LoopFileName, "-")
+            header := StrSplit(A_LoopFileName, "==")
             method := header[1]
             date := SubStr(header[3], 1, 14)
             if (DateDiff(A_Now, date, "Days") > exp) {
@@ -39,23 +36,22 @@ class ProfileModifyNext_Agent extends useServerAgent {
         }
     }
 
-    listen(isListening := true) {
-        this.isListening.set(isListening)
-        SetTimer(this.RESPONSE, isListening ? this.interval : 0)
-        SetTimer(this.modifyPostedProfiles, isListening ? this.interval : 0)
+    listen(status := "在线") {
+        SetTimer(this.res, status == "在线" ? this.interval : 0)
+        ; SetTimer(this.modifyPostedProfiles, status == "在线" ? this.interval : 0)
     }
 
     modifyPostedProfiles() {
-        this.isListening.set(false)
+        this.isListening.set("处理中...")
         posts := this.COLLECT("PENDING")
         
         if (posts.Length == 0) {
-            this.isListening.set(true)
+            this.isListening.set("在线")
             return 
         }
 
         this.postHandler("PENDING", posts)
-        this.isListening.set(true)
+        this.isListening.set("在线")
     }
 
     postHandler(method, posts) {
