@@ -21,6 +21,7 @@ class useServerAgent {
         ; send
         message := { method: "PING", sender: A_ComputerName, id: A_Now . A_MSec . Random(1, 100) }
         filename := Format("{1}\{2}=={3}=={4}.json", this.pool, message.method, message.sender, message.id)
+        resMatcher := this.pool . "\*" . message.id . "*.json"
         FileAppend(JSON.stringify(message), filename, "UTF-8")
 
         ; wait for response
@@ -29,9 +30,16 @@ class useServerAgent {
         }
 
         loop {
-            if (FileExist(StrReplace(filename, "PING", "ONLINE"))) {
-                FileDelete(StrReplace(filename, "PING", "ONLINE"))
-                return message
+            loop files, this.pool . "\*.json" {
+                if (InStr(A_LoopFileName, message.id) && InStr(A_LoopFileName, "ONLINE")) {
+                    responsedHeader := StrSplit(A_LoopFileName, "==")
+                    FileDelete(A_LoopFileFullPath)
+                    return {
+                        method: responsedHeader[1],
+                        sender: responsedHeader[2],
+                        id: responsedHeader[3]
+                    }
+                } 
             }
 
             Sleep 1000
