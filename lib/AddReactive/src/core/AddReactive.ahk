@@ -320,6 +320,16 @@ class AddReactive {
     }
 
     /**
+     * Sets the font reactively with depend signal and option map.
+     * @param {Map} optionMap 
+     * @param {Signal} [depend] 
+     */
+    SetFontStyles(optionMap, depend := this.depend) {
+        effect(depend, cur => this.ctrl.SetFont(optionMap.has(cur) ? optionMap[cur] : optionMap["default"]))
+        return this
+    }
+
+    /**
      * Sets keyboard focus to the control.
      */
     Focus() {
