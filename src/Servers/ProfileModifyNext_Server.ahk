@@ -1,20 +1,3 @@
-class ProfileModifyNext_Client extends useServerAgent {
-    __New(serverSettings) {
-        super.__New(serverSettings)
-    }
-
-    delegate(content) {
-        c := useProps(content, {
-            mode:      "single", ; single/waterfall/group
-            overwrite: false,    ; isOverwrite value
-            rooms:     [],       ; waterfall/group room numbers
-            profile:   [],       ; json object in single, array in waterfall/group
-        })
-
-        this.POST(c.toObject())
-    }
-}
-
 class ProfileModifyNext_Agent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)     
@@ -39,42 +22,48 @@ class ProfileModifyNext_Agent extends useServerAgent {
         }
     }
 
+    delegate(content) {
+        c := useProps(content, {
+            mode:      "single", ; single/waterfall/group
+            overwrite: false,    ; isOverwrite value
+            rooms:     [],       ; waterfall/group room numbers
+            profiles:  [],      ; json object in single, array in waterfall/group
+        })
+
+        this.POST(c.toObject())
+    }
+
     listen(status := "在线") {
         SetTimer(this.res, status == "在线" ? this.interval : 0)
         SetTimer(this.mod, status == "在线" ? this.interval : 0)
     }
 
     modifyPostedProfiles() {
-        this.isListening.set("处理中...")
         posts := this.COLLECT("PENDING")
-        
         if (posts.Length == 0) {
-            this.isListening.set("在线")
             return 
         }
 
         this.postHandler("PENDING", posts)
-        this.isListening.set("在线")
     }
 
     postHandler(method, posts) {
+        this.isListening.set("处理中...")
+
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
         for post in unboxedPosts {
             c := post["content"]
-            switch post["content"]["mode"] {
-                case "single":
-                    PMN_FillIn.fill(c["profile"], c["overwrite"])
-                case "waterfall":
-                    PMN_Waterfall.cascade(c["rooms"], c["profile"], c["overwrite"])
-                case "group":
-                    PMNG_Execute.startModify(c["rooms"], c["profile"])
+            if (c["mode"] == "waterfall" || c["mode"] == "single") {
+                PMN_Waterfall.cascade(c["rooms"], c["profiles"], c["overwrite"])
             }
 
-            ; rename file (change flag status)
+            ; rename file (change flag status & sender)
             FileMove(
                 Format("{1}\{2}=={3}=={4}.json", this.pool, method, post["sender"], post["id"]),
                 Format("{1}\{2}=={3}=={4}.json", this.pool, "MODIFIED", A_ComputerName, post["id"]),
             )
         }
+
+        this.isListening.set("在线")
     }
 }
