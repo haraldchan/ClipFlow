@@ -17,7 +17,7 @@ class useServerAgent {
 		}
     }
 
-    PING(status := 0) {
+    PING() {
         ; send
         message := { method: "PING", sender: A_ComputerName, id: A_Now . A_MSec . Random(1, 100) }
         filename := Format("{1}\{2}=={3}=={4}.json", this.pool, message.method, message.sender, message.id)
@@ -25,10 +25,6 @@ class useServerAgent {
         FileAppend(JSON.stringify(message), filename, "UTF-8")
 
         ; wait for response
-        if (status) {
-            status.set("连接中...")  
-        }
-
         loop {
             loop files, this.pool . "\*.json" {
                 if (InStr(A_LoopFileName, message.id) && InStr(A_LoopFileName, "ONLINE")) {
@@ -43,7 +39,7 @@ class useServerAgent {
             }
 
             Sleep 1000
-            
+            ; response timeout
             if(A_Index > (this.interval / 1000 * 3)) {
                 FileDelete(filename)
                 return false
@@ -87,7 +83,9 @@ class useServerAgent {
     }
 
     /**
-     * <server> Handle posts
+     * <server> Collect posts
+     * @param {String} method 
+     * @returns {string[]} post filepaths array
      */
     COLLECT(method) {
         posts := []
