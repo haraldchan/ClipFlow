@@ -27,15 +27,29 @@ class ProfileModifyNext_Agent extends useServerAgent {
             mode:      "single", ; single/waterfall/group
             overwrite: false,    ; isOverwrite value
             rooms:     [],       ; waterfall/group room numbers
-            profiles:  [],      ; json object in single, array in waterfall/group
+            ; TODO: PMN_Waterfall needs to update to work with this
+            party:     "",       ; optional party number for confinement 
+            profiles:  [],       ; json object in single, array in waterfall/group
         })
 
         this.POST(c.toObject())
     }
 
-    listen(status := "在线") {
+    listen(status) {
         SetTimer(this.res, status == "在线" ? this.interval : 0)
         SetTimer(this.mod, status == "在线" ? this.interval : 0)
+    }
+
+    listenSync(status) {
+        if (status != "在线") {
+            return
+        }
+
+        loop {
+            this.RESPONSE()
+            this.modifyPostedProfiles()
+            Sleep this.interval
+        }
     }
 
     modifyPostedProfiles() {
