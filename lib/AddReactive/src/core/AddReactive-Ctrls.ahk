@@ -183,12 +183,23 @@ class AddReactiveListView extends AddReactive {
     }
 
     setColumndDetails(newColumnDetails, columnOptions := "") {
+        colDiff := newColumnDetails.keys.Length - this.titleKeys.Length
+        if (colDiff > 0) {
+            loop colDiff {
+                this.ctrl.InsertCol()
+            }
+        } else if (colDiff < 0) {
+            loop Abs(colDiff) {
+                this.ctrl.DeleteCol(this.titleKeys.Length - A_Index)
+            }
+        }
+
         this.titleKeys := newColumnDetails.keys
         this.content := newColumnDetails.HasOwnProp("titles") ? newColumnDetails.titles : this.titleKeys
         this.colWidths := newColumnDetails.HasOwnProp("widths") ? newColumnDetails.widths : this.titleKeys.map(item => "AutoHdr")
 
         for title in this.content {
-            this.ctrl.ModifyCol(A_Index, columnOptions, title)
+            this.ctrl.ModifyCol(A_Index, this.colWidths[A_Index], title)
         }
     }
 }
