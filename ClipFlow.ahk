@@ -5,7 +5,7 @@ CoordMode "Mouse", "Screen"
 TraySetIcon A_ScriptDir . "\src\Assets\CFTray.ico"
 
 ; Initializing configuration
-version := "1.4.2"
+version := "1.5.0"
 popupTitle := "ClipFlow " . version
 winGroup := ["ahk_class SunAwtFrame"]
 config := useConfigJSON(
@@ -25,5 +25,12 @@ ClipFlow.Show()
 ; hotkeys setup
 Pause:: ClipFlow.Show()
 F11:: utils.cleanReload(winGroup)
+^F11:: {
+	if (FileExist(config.path)) {
+		FileDelete(config.path)
+	}
+	config.createLocal()
+	utils.cleanReload(winGroup)
+}
 #Hotif WinActive(popupTitle)
 Esc:: ClipFlow.Hide()
