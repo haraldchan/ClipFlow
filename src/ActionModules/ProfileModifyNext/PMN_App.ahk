@@ -3,13 +3,20 @@
 #Include "./Settings.ahk"
 #Include "./PMN_FillIn.ahk"
 #Include "./PMN_Waterfall.ahk"
+#include "../../Servers/ProfileModifyNext_Server.ahk"
 
 PMN_App(App, moduleTitle, fdb, db, identifier) {
+    ; server agent
+    agent := ProfileModifyNext_Agent({ pool: A_ScriptDir . "\src\Servers\pmn-pool" })
+    delegate := signal(false)
+    
     ; setting state
     settings := signal({ fillOverwrite: false, loadFrom: "FileDB" })
-    effect(settings, curSetting => handleFillInBtnTextUpdate(curSetting["fillOverwrite"]))
-    handleFillInBtnTextUpdate(isOverwrite) {
-        App.getCtrlByName("fillIn").Text := isOverwrite ? "覆盖填入" : "填 入"
+    fillBtnText := computed([delegate, settings], (curDelegate, curSettings) => handleFillInBtnTextUpdate(curDelegate, curSettings["fillOverwrite"]))
+    handleFillInBtnTextUpdate(curDelegate, curOverwrite) {
+        return curDelegate 
+            ? (curOverwrite ? "覆盖代行" : "代 行") 
+            : (curOverwrite ? "覆盖填入" : "填 入")
     }
 
     ; data states
@@ -17,7 +24,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     queryFilter := signal({
         date: FormatTime(A_Now, "yyyyMMdd"),
         search: "",
-        period: 60
+        range: 60
     })
 
     ; list UI states/effect
@@ -138,21 +145,21 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         colTitles := App.getCtrlByType("ListView").arcWrapper.titleKeys
         useListPlaceholder(listContent, colTitles, "Loading...")
 
-        App.getCtrlByName("period").Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
+        App.getCtrlByName("range").Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
 
         loadedItems := settings.value["loadFrom"] 
-            ? fdb.load(, queryFilter.value["date"], queryFilter.value["period"]) 
-            : db.load(queryFilter.value["date", queryFilter.value["period"]])
+            ? fdb.load(, queryFilter.value["date"], queryFilter.value["range"]) 
+            : db.load(queryFilter.value["date", queryFilter.value["range"]])
         if (loadedItems.Length == 0) {
             useListPlaceholder(listContent, colTitles, "No Data")
             return
         }
 
-        listContent.set(handleSearchByConditions(loadedItems))
+        listContent.set(handleSearchResultFilter(loadedItems))
         lvIsCheckedAll.set(false)
     }
 
-    handleSearchByConditions(loadedItems) {
+    handleSearchResultFilter(loadedItems) {
         filteredItems := []
         searchInput := Trim(queryFilter.value["search"])
 
@@ -262,12 +269,33 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                 selectedGuests.Push(listContent.value[row])
             }
 
+            if (delegate.value) {
+                SetTimer(() => agent.delegate({
+                    mode: "waterfall",
+                    overwrite: settings.value["fillOverwrite"],
+                    rooms: StrSplit(queryFilter.value["search"], " "),
+                    profiles: selectedGuests
+                }), -250)
+                return
+            }
+
             PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests, settings.value["fillOverwrite"])
         } else {
             targetId := LV.GetText(
                 LV.GetNext(), 
                 LV.arcWrapper.titleKeys.findIndex(key => key == "idNum")
             )
+
+            if (delegate.value) {
+                SetTimer(() => agent.delegate({
+                    mode: "waterfall",
+                    overwrite: settings.value["fillOverwrite"],
+                    rooms: StrSplit(queryFilter.value["search"], " "),
+                    profiles: selectedGuests
+                }), -250)
+                return
+            }
+
             PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), settings.value["fillOverwrite"])
         }
     }
@@ -291,18 +319,18 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         }
 
         togglePeriod(direction) {
-            p := App.getCtrlByName("period")
+            p := App.getCtrlByName("range")
             if (p.value = "") {
                 p.value := 0
             }
-            newPeriod := direction = "-" ? p.value - 10 : p.value + 10
+            newRange := direction = "-" ? p.value - 10 : p.value + 10
 
-            if (newPeriod <= 0) {
+            if (newRange <= 0) {
                 return
             }
 
-            p.value := newPeriod
-            queryFilter.update("period", newPeriod)
+            p.value := newRange
+            queryFilter.update("range", newRange)
             ; handleListContentUpdate()
         }
 
@@ -317,8 +345,10 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
     return (
         App.AddGroupBox("R17 w580 y+20", " "),
-        App.AddText("xp15 ", moduleTitle . " ⓘ ")
-           .OnEvent("Click", (*) => PMN_Settings(settings)),
+        App.AddText("xp15 ", moduleTitle . " ⓘ ").OnEvent("Click", (*) => PMN_Settings(settings)),
+        
+        ; agent mode
+        App.AddCheckBox("x+10 w150", "后台代行").OnEvent("Click", (ctrl, _) => delegate.set(ctrl.Value)),
         
         ; datetime
         App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
@@ -332,31 +362,28 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
            .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
         
         ; search box
-        App.AddReactiveEdit("vsearchBox x+5 w100 h25")
+        App.AREdit("vsearchBox x+5 w100 h25")
            .OnEvent("Change", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
         
-        ; period
+        ; range
         App.AddText("x+10 h25 0x200", "最近"),
-        App.AddReactiveEdit("vperiod Number x+1 w30 h25", queryFilter.value["period"])
-           .OnEvent("Change", (ctrl, _) => queryFilter.update("period", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
+        App.AREdit("vrange Number x+1 w30 h25", queryFilter.value["range"])
+           .OnEvent("Change", (ctrl, _) => queryFilter.update("range", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
         App.AddText("x+1 h25 0x200", "分钟"),
         
         ; manual updating btns
-        App.AddButton("vupdate x+10 w80 h25", "刷 新(&R)").OnEvent("Click", handleListContentUpdate),
-        App.AddReactiveButton("vfillIn x+5 w80 h25 Default", "填 入")
+        App.AddButton("x+10 w80 h25", "刷 新(&R)").OnEvent("Click", handleListContentUpdate),
+        App.ARButton("vfillIn x+5 w80 h25 Default", "{1}", )
            .OnEvent(
                 "Click", fillPmsProfile,
-                "ContextMenu", (ctrl, *) => (
-                    settings.update("fillOverwrite", o => !o),
-                    ctrl.Text := settings.value["fillOverwrite"] ? "覆盖填入" : "填 入"
-                )
+                "ContextMenu", (*) => settings.update("fillOverwrite", o => !o)
         ),
 
         ; profile list
         GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile),
 
         ; select all button
-        App.AddReactiveCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+3", "全选"),
+        App.ARCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+3", "全选"),
         shareCheckStatus(
             App.getCtrlByName("$selectAllBtn"), 
             App.getCtrlByName("$guestProfileList"), 
