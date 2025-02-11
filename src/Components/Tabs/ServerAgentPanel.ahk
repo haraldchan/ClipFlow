@@ -8,20 +8,20 @@ ServerAgentPanel(App) {
         expiration: 1,
         isListening: isListening
     })
-
+    
     return (
         App.AddText("x30 y75 h40 w580", "ProfileModifyNext Server").SetFont("s15 q5"),
 
         ; server-side options
-        ServerAgentPanel_Agent(App, agent, isListening),
+        ServerAgentPanel_Agent(App, config.read("agentEnabled"), agent, isListening),
         
         ; client-side options
-        ServerAgentPanel_Client(App, agent)
+        ServerAgentPanel_Client(App, config.read("clientEnabled"), agent)
     )
 }
 
 
-ServerAgentPanel_Agent(App, agent, isListening) {
+ServerAgentPanel_Agent(App, enabled, agent, isListening) {
     comp := Component(App, A_ThisFunc)
 
     onlineTextStyles := Map(
@@ -40,7 +40,7 @@ ServerAgentPanel_Agent(App, agent, isListening) {
 
     comp.render := this => this.Add(
         App.AddGroupBox("Section x30 y110 w380 r5"),
-        App.AddCheckBox("Checked xs10 yp ", "服务端（后台）选项")
+        App.AddCheckBox(enabled ? "Check" : "" . " xs10 yp ", "服务端（后台）选项")
            .OnEvent("Click", (ctrl, _) => comp.disable(!ctrl.Value)),
         
         ; service activation
@@ -59,11 +59,11 @@ ServerAgentPanel_Agent(App, agent, isListening) {
         App.AddText("x+5 h30 0x200", "毫秒"),
     )
 
-    return comp.render()
+    return (comp.disable(!enabled), comp.render())
 }
 
 
-ServerAgentPanel_Client(App, agent) {
+ServerAgentPanel_Client(App, enabled, agent) {
     comp := Component(App, A_ThisFunc)
 
     connection := signal("未连接")
@@ -88,7 +88,7 @@ ServerAgentPanel_Client(App, agent) {
 
     comp.render := this => this.Add(
         App.AddGroupBox("Section x30 y260 w380 r5"),
-        App.AddCheckBox("Checked xs10 yp", "客户端（前台）选项")
+        App.AddCheckBox(enabled ? "Check" : "" . " xs10 yp", "客户端（前台）选项")
            .OnEvent("Click", (ctrl, _) => comp.disable(!ctrl.Value)),
         
         ; test connection
@@ -97,5 +97,5 @@ ServerAgentPanel_Client(App, agent) {
         App.ARText("vstatusText w200 h30 x+1 0x200", "{1}", connection).SetFontStyles(statusTextStyle)
     )
 
-    return comp.render()
+    return (comp.disable(!enabled), comp.render())
 }

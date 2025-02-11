@@ -10,5 +10,9 @@
   },
   "resvHandler":{
     "JSON":{}
+  },
+  "serverAgent": {
+    "agentEnabled": false,
+    "clientEnabled": false
   }
 }
