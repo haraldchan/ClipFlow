@@ -52,7 +52,9 @@ class PMN_FillIn {
         ; on-screen profile matcheds
         if (currentId = guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
+            Sleep 100
             Send "!o"
+
             ( !keepGoing && this.end() )
             return
         }
@@ -62,6 +64,7 @@ class PMN_FillIn {
             Send "!o"
             utils.waitLoading()
             MsgBox("已匹配原有 Profile", "Profile Modify Next", "T1 4096")
+            Sleep 100
             Send "!o"
 
             ( !keepGoing && this.end() )
@@ -83,6 +86,7 @@ class PMN_FillIn {
             utils.waitLoading()
             if (success) {
                 MsgBox("已完成 Profile Modify！", "Profile Modify Next", "T1 4096")
+                Sleep 100
                 Send "!o"
             }
         }
