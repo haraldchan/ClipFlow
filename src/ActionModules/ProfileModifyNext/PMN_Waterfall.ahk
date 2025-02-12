@@ -1,5 +1,5 @@
 class PMN_Waterfall {
-    static cascade(rooms, selectedGuests, isOverwrite) {
+    static cascade(rooms, selectedGuests, isOverwrite, party := 0) {
         PMN_FillIn.start()
 
         curRoom := signal(0)
@@ -12,7 +12,7 @@ class PMN_Waterfall {
                 remaining := selectedGuests.filter(g => g["roomNum"] = curRoom.value).Length
 
                 if (guest["roomNum"] == curRoom.value) {
-                    this.search(room, index)
+                    this.search(room, index, party)
                     if (!PMN_FillIn.isRunning) {
                         msgbox("脚本已终止", popupTitle, "4096 T1")
                         return
@@ -38,7 +38,7 @@ class PMN_Waterfall {
         MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
     }
 
-    static search(roomNum, index) {
+    static search(roomNum, index, party := 0) {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
         MouseMove 329, 196 ; room number field
@@ -51,6 +51,10 @@ class PMN_Waterfall {
 
         Send formattedRoom
         utils.waitLoading()
+
+        if (party) {
+            ; TODO: move to party and enter it if with party
+        }
 
         Send "!h" ; alt+h => search
         utils.waitLoading()
