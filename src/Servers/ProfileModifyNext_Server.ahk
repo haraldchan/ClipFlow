@@ -74,10 +74,10 @@ class ProfileModifyNext_Agent extends useServerAgent {
             return 
         }
 
-        this.postHandler("PENDING", posts)
+        this.postHandler(posts)
     }
 
-    postHandler(method, posts) {
+    postHandler(posts) {
         this.isListening.set("处理中...")
 
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
@@ -89,7 +89,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
 
             ; rename file (change flag status & sender)
             FileMove(
-                Format("{1}\{2}=={3}=={4}.json", this.pool, method, post["sender"], post["id"]),
+                posts[A_Index],
                 Format("{1}\{2}=={3}=={4}.json", this.pool, "MODIFIED", A_ComputerName, post["id"]),
             )
         }
