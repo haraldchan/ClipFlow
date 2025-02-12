@@ -27,18 +27,33 @@ PMN_Settings(settingSignal) {
         =========== 设置选项 ===========
     )"
 
+    onLoad() {
+        Settings.getCtrlByName("ow").Value := settingSignal.value["fillOverwrite"]
+        btns := [Settings.getCtrlByName("fdb"), Settings.getCtrlByName("ddb")]
+        for btn in btns {
+            if (btn.Text == settingSignal.value["loadFrom"]) {
+                btn.Value := true
+            }
+        }
+    }
+
+
+
     return (
         Settings.AddText("x10 w260", helpInfo),
         
         ; overwrite fill-in
-        Settings.AddCheckbox((settingSignal.value["fillOverwrite"] == true ? "Checked" : "") . " x10 w260", "默认覆盖填入（直接在原 Profile 修改）")
+        Settings.AddCheckbox("vow x10 w260", "默认覆盖填入（直接在原 Profile 修改）")
                 .OnEvent("Click", (ctrl, _) => settingSignal.update("fillOverwrite", ctrl.value)),
         
-                ; load from FileDB/DateBase
-        Settings.AddText("x10 w260", "Profile 来源数据库"),
-        Settings.AddRadio("x10 w120", "FileDB").OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
-        Settings.AddRadio("Checked x+10 w120", "DateBase").OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
+        ; load from FileDB/DateBase
+        Settings.AddText("x10", "来源数据库"),
+        Settings.AddRadio("vfdb x+10 Checked", "FileDB")
+                .OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
+        Settings.AddRadio("vddb x+10", "DateBase")
+                .OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
 
+        onLoad(),
         Settings.Show()
     )
 }
