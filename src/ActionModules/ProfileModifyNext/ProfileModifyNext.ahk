@@ -7,6 +7,7 @@ class ProfileModifyNext {
     static identifier := "04047fce826f48f751891b4721f7ac70" ; MD5 hash: ProfileModifyNext
     static dbSetting := {
         main: A_ScriptDir . "\src\ActionModules\ProfileModifyNext\GuestProfiles",
+        archive: A_ScriptDir . "\src\ActionModules\ProfileModifyNext\GuestProfilesArchive",
         backup: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\GuestProfilesBackup",
     }
     static fdb := useFileDB(this.dbSetting)
@@ -16,13 +17,16 @@ class ProfileModifyNext {
         today := Format(A_Now, "yyyyMMdd")
         yesterday := FormatTime(DateAdd(today, -1, "Days"), "yyyyMMdd")
 
-        if (!FileExist(this.db.archive . "\" . yesterday . " - archive.json")) {
+        if (!FileExist(this.fdb.archive . "\" . yesterday . " - archive.json")) {
             this.fdb.createArchive(yesterday)
             this.fdb.createArchiveBackup(yesterday)
         }
 
         if (!FileExist(this.db.backup . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . "_backup.json")) {
-            this.db.createBackup(yesterday)
+            this.db.createBackup({ 
+                path: this.db.main . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . ".json",
+                filename: yesterday
+            })
         }
         
         PMN_App(App, this.title, this.fdb, this.db, this.identifier)
