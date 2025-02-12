@@ -13,6 +13,6 @@
   },
   "serverAgent": {
     "agentEnabled": false,
-    "clientEnabled": false
+    "clientEnabled": true
   }
 }
