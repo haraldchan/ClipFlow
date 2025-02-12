@@ -8,7 +8,6 @@
 PMN_App(App, moduleTitle, fdb, db, identifier) {
     ; server agent
     agent := ProfileModifyNext_Agent({ pool: A_ScriptDir . "\src\Servers\pmn-pool" })
-    dlabel:=signal("")
     delegate := signal(false)
     
     ; setting state
@@ -18,7 +17,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         (curDelegate, curSettings) => handleFillInBtnTextUpdate(curDelegate, curSettings)
     )
     handleFillInBtnTextUpdate(curDelegate, curSettings) {
-        ; MsgBox(JSON.stringify(curSettings))
         curOverwrite := curSettings["fillOverwrite"]
         return (curDelegate ? (curOverwrite ? "覆盖代行" : "代 行") : (curOverwrite ? "覆盖填入" : "填 入"))
     }
@@ -43,11 +41,13 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         "生日", "birthday",
         "时间戳 ID", "tsId"
     )
-    effect([searchBy, queryFilter], (new, newQf) => handleSearchByChange(new))
+    effect([searchBy, queryFilter], (curSearchBy, curQueryFilter) => handleSearchByChange(curSearchBy))
     handleSearchByChange(cur) {
         App.getCtrlByType("ListView").Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
         App.getCtrlByName("delegateCheckBox").Enabled := cur == "waterfall"
         App.getCtrlByName("$selectAllBtn").ctrl.visible := cur == "waterfall"
+        App.getCtrlByText("Party: ").Visible := cur == "waterfall"
+        App.getCtrlByName("vpartyNum").Visible := cur == "waterfall"
         if (cur != "waterfall") {
             App.getCtrlByName("delegateCheckBox").Value := false
             delegate.set(false)
@@ -71,7 +71,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
         ; updating from saved guest modal
-        } else if (incomingGuest["isMod"] == true) {
+        } else if (incomingGuest["isMod"]) {
             updatedGuest := handleGuestInfoUpdateFromMod(incomingGuest)
             if (updatedGuest == "") {
                 return
@@ -282,31 +282,23 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             }
 
             if (delegate.value) {
+                rooms := StrSplit(queryFilter.value["search"], " ")
+                party := App.getCtrlByName("partyNum").Text
+                App.getCtrlByName("partyNum").Text := ""
+
                 SetTimer(() => agent.delegate({
                     mode: "waterfall",
                     overwrite: settings.value["fillOverwrite"],
-                    rooms: StrSplit(queryFilter.value["search"], " "),
+                    rooms: rooms,
+                    party: party,
                     profiles: selectedGuests
                 }), -250)
             } else {
-                PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests, settings.value["fillOverwrite"])
+                PMN_Waterfall.cascade(rooms, selectedGuests, settings.value["fillOverwrite"], party)
             }
         } else {
-            targetId := LV.GetText(
-                LV.GetNext(), 
-                LV.arcWrapper.titleKeys.findIndex(key => key == "idNum")
-            )
-
-            if (delegate.value) {
-                SetTimer(() => agent.delegate({
-                    mode: "waterfall",
-                    overwrite: settings.value["fillOverwrite"],
-                    rooms: StrSplit(queryFilter.value["search"], " "),
-                    profiles: selectedGuests
-                }), -250)
-            } else {
-                PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), settings.value["fillOverwrite"])
-            }
+            targetId := LV.GetText(LV.GetNext(), LV.arcWrapper.titleKeys.findIndex(key => key == "idNum"))
+            PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), settings.value["fillOverwrite"])
         }
     }
 
@@ -390,13 +382,16 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         ; profile list
         GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile),
 
-        ; select all button
+        ; waterfall controls
         App.ARCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+3", "全选"),
         shareCheckStatus(
             App.getCtrlByName("$selectAllBtn"), 
             App.getCtrlByName("$guestProfileList"), 
             { checkStatus: lvIsCheckedAll }
         ),
+        App.AddText("Hidden x+10", "Party: "),
+        App.AddEdit("vpartyNum Hidden x+1 w100 h20", ""),
+
         ; hotkey setup
         setHotkeys()
     )
