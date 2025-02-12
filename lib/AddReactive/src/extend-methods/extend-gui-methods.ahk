@@ -70,6 +70,18 @@ defineGuiMethods(gui) {
         throw TypeError(Format("Component({1}) not found.", componentName))
     }
 
+    gui.Prototype.getCtrlByText := getCtrlByText
+    getCtrlByText(gui, text) {
+        for ctrl in gui {
+            if (ctrl.Text == text) {
+                return ctrl
+            }
+        }
+
+        throw ValueError(Format("Control with Text ({1}) not found.", text))
+    }
+
+
     gui.ListView.Prototype.getCheckedRowNumbers := getCheckedRows
     /**
      * Returns an array of checked row numbers of a ListView
