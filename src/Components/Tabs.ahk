@@ -15,7 +15,7 @@ Tabs(App) {
 		History(App),
 
 		Tab3.UseTab(3),
-		ServerAgentPanel(App)		
+		ServerAgentPanel(App),
 
 		Tab3.UseTab()
 	)
