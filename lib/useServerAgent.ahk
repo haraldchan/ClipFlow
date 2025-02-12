@@ -91,7 +91,11 @@ class useServerAgent {
         posts := []
         loop files (this.pool . "\*.json") {
             if (InStr(A_LoopFileFullPath, method)) {
-                posts.Push(A_LoopFileFullPath)
+                FileMove(
+                    A_LoopFileFullPath,
+                    StrReplace(A_LoopFileFullPath, method, "COLLECTED")
+                )
+                posts.Push(StrReplace(A_LoopFileFullPath, method, "COLLECTED"))
             }
         }
 
