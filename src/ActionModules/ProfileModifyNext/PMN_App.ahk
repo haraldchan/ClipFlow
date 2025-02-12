@@ -8,15 +8,19 @@
 PMN_App(App, moduleTitle, fdb, db, identifier) {
     ; server agent
     agent := ProfileModifyNext_Agent({ pool: A_ScriptDir . "\src\Servers\pmn-pool" })
+    dlabel:=signal("")
     delegate := signal(false)
     
     ; setting state
     settings := signal({ fillOverwrite: false, loadFrom: "FileDB" })
-    fillBtnText := computed([delegate, settings], (curDelegate, curSettings) => handleFillInBtnTextUpdate(curDelegate, curSettings["fillOverwrite"]))
-    handleFillInBtnTextUpdate(curDelegate, curOverwrite) {
-        return curDelegate 
-            ? (curOverwrite ? "覆盖代行" : "代 行") 
-            : (curOverwrite ? "覆盖填入" : "填 入")
+    fillBtnText := computed(
+        [delegate, settings], 
+        (curDelegate, curSettings) => handleFillInBtnTextUpdate(curDelegate, curSettings)
+    )
+    handleFillInBtnTextUpdate(curDelegate, curSettings) {
+        ; MsgBox(JSON.stringify(curSettings))
+        curOverwrite := curSettings["fillOverwrite"]
+        return (curDelegate ? (curOverwrite ? "覆盖代行" : "代 行") : (curOverwrite ? "覆盖填入" : "填 入"))
     }
 
     ; data states
@@ -39,11 +43,16 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         "生日", "birthday",
         "时间戳 ID", "tsId"
     )
-    effect([searchBy, queryFilter], new => handleSearchByChange(new))
+    effect([searchBy, queryFilter], (new, newQf) => handleSearchByChange(new))
     handleSearchByChange(cur) {
-        LV := App.getCtrlByType("ListView")
-        LV.Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
-        App.getCtrlByName("$selectAllBtn").ctrl.visible := cur == "waterfall" ? true : false
+        App.getCtrlByType("ListView").Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
+        App.getCtrlByName("delegateCheckBox").Enabled := cur == "waterfall"
+        App.getCtrlByName("$selectAllBtn").ctrl.visible := cur == "waterfall"
+        if (cur != "waterfall") {
+            App.getCtrlByName("delegateCheckBox").Value := false
+            delegate.set(false)
+        }
+
         handleListContentUpdate()
     }
     
@@ -76,7 +85,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             incomingGuest["regTime"] := A_Now
             fdb.add(JSON.stringify(incomingGuest))
             ; DateBase
-            db.add(JSON.stringify(incomingGuest))
+            ; db.add(JSON.stringify(incomingGuest))
 
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
@@ -93,12 +102,12 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         recentGuests := settings.value["loadFrom"] == "FileDB" ? fdb.load() : db.load()
         for guest in recentGuests {
             if (guest["idNum"] == captured["idNum"]) {
-                ; FileDB
+                captured["regTime"] := guest["regTime"]
                 captured["fileName"] := guest["fileName"]
+                ; FileDB
                 fdb.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["tsId"])
                 ; DateBase
-                captured["regTime"] := guest["regTime"]
-                db.updateOne(JSON.stringify(captured), queryFilter.value["date"], item => item["tsId"] == guest["tsId"])
+                ; db.updateOne(JSON.stringify(captured), queryFilter.value["date"], item => item["tsId"] == guest["tsId"])
                 return
             }
         }
@@ -130,13 +139,13 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             return
         }
 
-        try {
+        ; try {
             ; DateBase
-            db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], item => item["tsId"] == matchedGuest.value["tsId"])
-        } catch {
-            MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
-            return
-        }
+            ; db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], item => item["tsId"] == matchedGuest.value["tsId"])
+        ; } catch {
+            ; MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
+            ; return
+        ; }
 
         return matchedGuest.value
     }
@@ -147,9 +156,12 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
         App.getCtrlByName("range").Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
 
-        loadedItems := settings.value["loadFrom"] 
-            ? fdb.load(, queryFilter.value["date"], queryFilter.value["range"]) 
-            : db.load(queryFilter.value["date", queryFilter.value["range"]])
+        if (settings.value["loadFrom"] == "FileDB") {
+            loadedItems := fdb.load(, queryFilter.value["date"], queryFilter.value["range"]) 
+        } else {
+            loadedItems := db.load(queryFilter.value["date"], queryFilter.value["range"]) 
+        }
+
         if (loadedItems.Length == 0) {
             useListPlaceholder(listContent, colTitles, "No Data")
             return
@@ -276,10 +288,9 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                     rooms: StrSplit(queryFilter.value["search"], " "),
                     profiles: selectedGuests
                 }), -250)
-                return
+            } else {
+                PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests, settings.value["fillOverwrite"])
             }
-
-            PMN_Waterfall.cascade(StrSplit(queryFilter.value["search"], " "), selectedGuests, settings.value["fillOverwrite"])
         } else {
             targetId := LV.GetText(
                 LV.GetNext(), 
@@ -293,10 +304,9 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                     rooms: StrSplit(queryFilter.value["search"], " "),
                     profiles: selectedGuests
                 }), -250)
-                return
+            } else {
+                PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), settings.value["fillOverwrite"])
             }
-
-            PMN_Fillin.fill(listContent.value.find(item => item["idNum"] == targetId), settings.value["fillOverwrite"])
         }
     }
 
@@ -315,7 +325,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             dt := App.getCtrlByType("DateTime")
             dt.Value := DateAdd(dt.Value, diff, "Days")
             queryFilter.update("date", FormatTime(dt.Value, "yyyyMMdd"))
-            ; handleListContentUpdate()
         }
 
         togglePeriod(direction) {
@@ -331,7 +340,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
             p.value := newRange
             queryFilter.update("range", newRange)
-            ; handleListContentUpdate()
         }
 
         toggleSelectAll() {
@@ -344,14 +352,14 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     }
 
     return (
-        App.AddGroupBox("R17 w580 y+20", " "),
-        App.AddText("xp15 ", moduleTitle . " ⓘ ").OnEvent("Click", (*) => PMN_Settings(settings)),
+        App.AddGroupBox("Section R17 w580 y+20", ""),
+        App.AddText("xp15", moduleTitle . " ⓘ ").OnEvent("Click", (*) => PMN_Settings(settings)),
         
         ; agent mode
-        App.AddCheckBox("x+10 w150", "后台代行").OnEvent("Click", (ctrl, _) => delegate.set(ctrl.Value)),
+        App.AddCheckBox("vdelegateCheckBox x+10 Disabled", "后台代行").OnEvent("Click", (ctrl, _) => delegate.set(ctrl.Value)),
         
         ; datetime
-        App.AddDateTime("vdate xp yp+25 w90 h25 Choose" . queryFilter.value["date"])
+        App.AddDateTime("vdate xs15 yp+25 w90 h25 Choose" . queryFilter.value["date"])
            .OnEvent("Change", (ctrl, _) =>
             queryFilter.update("date", FormatTime(ctrl.Value, "yyyyMMdd"))
             handleListContentUpdate()
@@ -363,7 +371,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         
         ; search box
         App.AREdit("vsearchBox x+5 w100 h25")
-           .OnEvent("Change", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
+           .OnEvent("LoseFocus", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
         
         ; range
         App.AddText("x+10 h25 0x200", "最近"),
@@ -373,7 +381,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         
         ; manual updating btns
         App.AddButton("x+10 w80 h25", "刷 新(&R)").OnEvent("Click", handleListContentUpdate),
-        App.ARButton("vfillIn x+5 w80 h25 Default", "{1}", )
+        App.ARButton("vfillIn x+5 w80 h25 Default", "{1}", fillBtnText)
            .OnEvent(
                 "Click", fillPmsProfile,
                 "ContextMenu", (*) => settings.update("fillOverwrite", o => !o)
