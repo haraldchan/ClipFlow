@@ -23,7 +23,7 @@ class useServerAgent {
         filename := Format("{1}\{2}=={3}=={4}.json", this.pool, message.method, message.sender, message.id)
         resMatcher := this.pool . "\*" . message.id . "*.json"
         FileAppend(JSON.stringify(message), filename, "UTF-8")
-
+        
         ; wait for response
         loop {
             loop files, this.pool . "\*.json" {
@@ -73,7 +73,7 @@ class useServerAgent {
 
         message := {
             id: A_Now . A_MSec . Random(1, 100),
-            method: A_ThisFunc,
+            method: "POST",
             sender: A_ComputerName,
             content: content
         }
