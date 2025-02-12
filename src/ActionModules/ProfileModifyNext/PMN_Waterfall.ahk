@@ -1,5 +1,5 @@
 class PMN_Waterfall {
-    static cascade(rooms, selectedGuests, isOverwrite, party := 0) {
+    static cascade(rooms, selectedGuests, isOverwrite, party := "") {
         PMN_FillIn.start()
 
         curRoom := signal(0)
@@ -38,7 +38,7 @@ class PMN_Waterfall {
         MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
     }
 
-    static search(roomNum, index, party := 0) {
+    static search(roomNum, index, party := "") {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
         MouseMove 329, 196 ; room number field
@@ -52,7 +52,7 @@ class PMN_Waterfall {
         Send formattedRoom
         utils.waitLoading()
 
-        if (party) {
+        if (party != "") {
             ; TODO: move to party and enter it if with party
         }
 
