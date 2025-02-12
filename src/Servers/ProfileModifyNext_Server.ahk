@@ -44,7 +44,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
             BlockInput true
             Hotkey("{Esc}", (*) => BlockInput(false), "On")
             if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Esc 解锁键鼠`n2.点击确定停止服务", popupTitle, "4096") == "OK") {
-                isListening.set("离线")
+                this.isListening.set("离线")
                 BlockInput false
                 Hotkey("{Esc}","Off")
             }
@@ -64,6 +64,11 @@ class ProfileModifyNext_Agent extends useServerAgent {
     }
 
     modifyPostedProfiles() {
+        if (!WinExist("ahk_class SunAwtFrame")) {
+            MsgBox("后台 Opera PMS 不在线。", popupTitle, "4096 T1")
+            this.isListening.set("离线")   
+            return
+        }
         posts := this.COLLECT("PENDING")
         if (posts.Length == 0) {
             return 
