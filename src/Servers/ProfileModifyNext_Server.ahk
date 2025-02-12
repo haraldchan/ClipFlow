@@ -28,7 +28,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
             overwrite: false,    ; isOverwrite value
             rooms:     [],       ; waterfall/group room numbers
             ; TODO: PMN_Waterfall needs to update to work with this
-            party:     0,       ; optional party number for confinement 
+            party:     "",       ; optional party number for confinement 
             profiles:  [],       ; json object in single, array in waterfall/group
         })
 
