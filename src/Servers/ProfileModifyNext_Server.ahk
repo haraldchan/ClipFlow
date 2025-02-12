@@ -43,7 +43,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
         if (status == "在线") {
             BlockInput true
             Hotkey("{Esc}", (*) => BlockInput(false), "On")
-            if (MsgBox("Profile Modify 代行服务运行中...`n`n按下 Esc 接触锁定`n点击确定停止服务", popupTitle, "4096") == "OK") {
+            if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Esc 解锁键鼠`n2.点击确定停止服务", popupTitle, "4096") == "OK") {
                 isListening.set("离线")
                 BlockInput false
                 Hotkey("{Esc}","Off")
