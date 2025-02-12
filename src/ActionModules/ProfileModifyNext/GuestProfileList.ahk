@@ -25,7 +25,7 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile) {
         ; FileDB
         fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
         ; DateDase
-        db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
+        ; db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
     }
 
     showProfileDetails(LV, row, *) {
