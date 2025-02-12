@@ -79,7 +79,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
         for post in unboxedPosts {
             c := post["content"]
             if (c["mode"] == "waterfall" || c["mode"] == "single") {
-                PMN_Waterfall.cascade(c["rooms"], c["profiles"], c["overwrite"])
+                PMN_Waterfall.cascade(c["rooms"], c["profiles"], c["overwrite"], c["party"])
             }
 
             ; rename file (change flag status & sender)
