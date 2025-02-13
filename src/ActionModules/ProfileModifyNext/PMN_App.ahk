@@ -47,7 +47,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         App.getCtrlByName("delegateCheckBox").Enabled := cur == "waterfall"
         App.getCtrlByName("$selectAllBtn").ctrl.visible := cur == "waterfall"
         App.getCtrlByText("Party: ").Visible := cur == "waterfall"
-        App.getCtrlByName("vpartyNum").Visible := cur == "waterfall"
+        App.getCtrlByName("partyNum").Visible := cur == "waterfall"
         if (cur != "waterfall") {
             App.getCtrlByName("delegateCheckBox").Value := false
             delegate.set(false)
@@ -105,7 +105,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                 captured["regTime"] := guest["regTime"]
                 captured["fileName"] := guest["fileName"]
                 ; FileDB
-                fdb.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["tsId"])
+                fdb.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
                 ; DateBase
                 ; db.updateOne(JSON.stringify(captured), queryFilter.value["date"], item => item["tsId"] == guest["tsId"])
                 return
@@ -270,6 +270,10 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                 return
             }
 
+            rooms := StrSplit(queryFilter.value["search"], " ")
+            party := App.getCtrlByName("partyNum").Text
+            App.getCtrlByName("partyNum").Text := ""
+
             selectedGuests := []
             ; pick selected guests
             for row in LV.getCheckedRowNumbers() {
@@ -282,10 +286,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             }
 
             if (delegate.value) {
-                rooms := StrSplit(queryFilter.value["search"], " ")
-                party := App.getCtrlByName("partyNum").Text
-                App.getCtrlByName("partyNum").Text := ""
-
                 SetTimer(() => agent.delegate({
                     mode: "waterfall",
                     overwrite: settings.value["fillOverwrite"],
@@ -389,7 +389,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             App.getCtrlByName("$guestProfileList"), 
             { checkStatus: lvIsCheckedAll }
         ),
-        App.AddText("Hidden x+10", "Party: "),
+        App.AddText("Hidden h20 x+10 0x200", "Party: "),
         App.AddEdit("vpartyNum Hidden x+1 w100 h20", ""),
 
         ; hotkey setup
