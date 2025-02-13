@@ -2,10 +2,11 @@
 
 ServerAgentPanel(App) {
     isListening := signal("离线")
-    agent := ProfileModifyNext_Agent({
+    global agent := ProfileModifyNext_Agent({
         pool: A_ScriptDir . "\src\Servers\pmn-pool",
         interval: 3000,
         expiration: 1,
+        safePost: false,
         isListening: isListening
     })
     
