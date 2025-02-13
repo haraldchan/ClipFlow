@@ -84,7 +84,8 @@ ServerAgentPanel_Client(App, enabled, agent) {
     ping(*) {
         connection.set("连接中...")
         
-        if (!agent.PING()) {
+        res := agent.PING()
+        if (!res) {
             connection.set("无响应")
             return
         } 
