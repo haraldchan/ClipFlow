@@ -27,7 +27,6 @@ class ProfileModifyNext_Agent extends useServerAgent {
             mode:      "single", ; single/waterfall/group
             overwrite: false,    ; isOverwrite value
             rooms:     [],       ; waterfall/group room numbers
-            ; TODO: PMN_Waterfall needs to update to work with this
             party:     "",       ; optional party number for confinement 
             profiles:  [],       ; json object in single, array in waterfall/group
         })
@@ -41,13 +40,19 @@ class ProfileModifyNext_Agent extends useServerAgent {
         
         ; blocks input while listening
         if (status == "在线") {
-            BlockInput true
-            Hotkey("{Esc}", (*) => BlockInput(false), "On")
-            if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Esc 解锁键鼠`n2.点击确定停止服务", popupTitle, "4096") == "OK") {
-                this.isListening.set("离线")
-                BlockInput false
-                Hotkey("{Esc}","Off")
-            }
+            SetTimer(() => this.InputBlock(), -100)
+        }
+    }
+
+    InputBlock() {
+        if (WinExist("Server Agent")) {
+            WinClose("Server Agent")
+        }
+
+        BlockInput true
+        if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务", "Server Agent", "4096") == "OK") {
+            this.isListening.set("离线")
+            BlockInput false
         }
     }
 
