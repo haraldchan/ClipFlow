@@ -33,6 +33,7 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
 
     collectInterval := signal(3000)
     effect(collectInterval, cur => (agent.interval := cur))
+    effect(isListening, cur => App.getCtrlByText("启动服务").Value := cur == "离线" ? false : true)
 
     handleConnect(connectState) {
         isListening.set(connectState ? "在线" : "离线")
@@ -44,7 +45,7 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
         App.AddCheckBox("xs10 yp", "服务端（后台）选项")
            .OnEvent("Click", (ctrl, _) => (
                 comp.disable(!ctrl.Value), 
-                !ctrl.Value && (isListening.set("离线"), App.getCtrlByText("启动服务").Value := false)
+                !ctrl.Value && isListening.set("离线")
         )),
         
         ; service activation
@@ -83,9 +84,8 @@ ServerAgentPanel_Client(App, enabled, agent) {
     ping(*) {
         connection.set("连接中...")
         
-        res := agent.PING(connection)
-        if (!res) {
-            connection.set("无响应...")
+        if (!agent.PING()) {
+            connection.set("无响应")
             return
         } 
 
