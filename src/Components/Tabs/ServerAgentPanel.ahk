@@ -44,11 +44,11 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
         App.AddCheckBox("xs10 yp", "服务端（后台）选项")
            .OnEvent("Click", (ctrl, _) => (
                 comp.disable(!ctrl.Value), 
-                !ctrl.Value && (isListening.set("离线"))
+                !ctrl.Value && (isListening.set("离线"), App.getCtrlByText("启动服务").Value := false)
         )),
         
         ; service activation
-        App.ARCheckBox("xs20 yp+30","启动服务", { checkValue: isListening })
+        App.ARCheckBox("xs20 yp+30","启动服务")
            .OnEvent("Click", (ctrl, _) => handleConnect(ctrl.Value)),
         App.AddText("x+10", "本机: " . A_ComputerName),
 
