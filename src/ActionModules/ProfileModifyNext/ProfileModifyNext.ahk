@@ -22,12 +22,12 @@ class ProfileModifyNext {
             this.fdb.createArchiveBackup(yesterday)
         }
 
-        if (!FileExist(this.db.backup . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . "_backup.json")) {
-            this.db.createBackup({ 
-                path: this.db.main . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . ".json",
-                filename: yesterday
-            })
-        }
+        ; if (!FileExist(this.db.backup . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . "_backup.json")) {
+        ;     this.db.createBackup({ 
+        ;         path: this.db.main . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . ".json",
+        ;         filename: yesterday
+        ;     })
+        ; }
         
         PMN_App(App, this.title, this.fdb, this.db, this.identifier)
     }
