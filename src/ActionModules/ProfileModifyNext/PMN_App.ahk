@@ -7,7 +7,7 @@
 
 PMN_App(App, moduleTitle, fdb, db, identifier) {
     ; server agent
-    agent := ProfileModifyNext_Agent({ pool: A_ScriptDir . "\src\Servers\pmn-pool" })
+    ; agent := ProfileModifyNext_Agent({ pool: A_ScriptDir . "\src\Servers\pmn-pool" })
     delegate := signal(false)
     
     ; setting state
