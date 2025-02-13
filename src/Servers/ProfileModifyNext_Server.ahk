@@ -2,12 +2,12 @@ class ProfileModifyNext_Agent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)     
         effect(this.isListening, cur => this.listen(cur)) 
-        ; delete expired posts
-        ; this.cleanup()
-
         ; binding methods timer methods
         this.res := ObjBindMethod(this, "RESPONSE")
         this.mod := ObjBindMethod(this, "modifyPostedProfiles")
+        
+        ; delete expired posts
+        this.cleanup()
     }
 
     cleanup() {
@@ -16,7 +16,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
             header := StrSplit(A_LoopFileName, "==")
             method := header[1]
             date := SubStr(header[3], 1, 14)
-            if (DateDiff(A_Now, date, "Days") > exp) {
+            if (DateDiff(A_Now, date, "Days") >= exp) {
                 FileDelete(A_LoopFileFullPath)
             }
         }
