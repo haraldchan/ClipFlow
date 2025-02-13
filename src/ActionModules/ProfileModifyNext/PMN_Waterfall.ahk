@@ -53,7 +53,12 @@ class PMN_Waterfall {
         utils.waitLoading()
 
         if (party != "") {
-            ; TODO: move to party and enter it if with party
+            loop 16 {
+                Send "{Tab}"
+                Sleep 10
+            }
+            Send "{Text}" . party
+            utils.waitLoading()
         }
 
         Send "!h" ; alt+h => search
