@@ -13,8 +13,8 @@ class useServerAgent {
         this.isListening := s.isListening
 
         if (!DirExist(this.pool)) {
-			DirCreate(this.pool)
-		}
+            DirCreate(this.pool)
+        }
     }
 
     PING() {
@@ -40,8 +40,10 @@ class useServerAgent {
 
             Sleep 1000
             ; response timeout
-            if(A_Index > (this.interval / 1000 * 3)) {
-                FileDelete(filename)
+            if(A_Index > (this.interval / 1000 * 3 * 3)) {
+                try {
+                    FileDelete(filename)
+                }
                 return false
             }
         }
