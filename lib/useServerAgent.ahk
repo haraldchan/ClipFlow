@@ -3,13 +3,15 @@ class useServerAgent {
         s := useProps(serverSettings, {
             pool: "",       ; post pool dir path
             interval: 3000, ; post checking interval
-            expiration: 1,   ; delete posts after (exp) days
+            expiration: 1,  ; delete posts after (exp) days
+            safePost: false, ; whether PING before each post or not 
             isListening: ""
         })
 
         this.pool := s.pool
         this.interval := s.interval
         this.expiration := s.expiration
+        this.safePost := s.safePost
         this.isListening := s.isListening
 
         if (!DirExist(this.pool)) {
@@ -68,7 +70,7 @@ class useServerAgent {
      * @param {Object} content 
      */
     POST(content) {
-        if (!this.PING()) {
+        if (this.safePost && !this.PING()) {
             MsgBox("Service offline.",, "4096 T2")
             return
         }
