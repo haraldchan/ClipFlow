@@ -78,7 +78,7 @@ class useServerAgent {
         }
 
         message := {
-            id: A_Now . A_MSec . Random(1, 100),
+            id: A_Now . A_MSec . Random(100, 999),
             method: "POST",
             sender: A_ComputerName,
             content: content
@@ -86,6 +86,8 @@ class useServerAgent {
 
         filename := Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", A_ComputerName, message.id)
         FileAppend(JSON.stringify(message), filename, "UTF-8")
+
+        return message
     }
 
     /**
