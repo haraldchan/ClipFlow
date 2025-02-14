@@ -2,8 +2,9 @@ class ProfileModifyNext_Agent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)     
         effect(this.isListening, cur => this.listen(cur)) 
+        
         ; binding methods timer methods
-        this.res := ObjBindMethod(this, "RESPONSE")
+        this.res := ObjBindMethod(this, "keepAlive")
         this.mod := ObjBindMethod(this, "modifyPostedProfiles")
         
         ; delete expired posts
@@ -20,6 +21,16 @@ class ProfileModifyNext_Agent extends useServerAgent {
                 FileDelete(A_LoopFileFullPath)
             }
         }
+    }
+
+    keepAlive() {
+        try {
+            WinActivate("ahk_class SunAwtFrame")
+        }
+
+        Send "!h"
+        utils.waitLoading()
+        this.RESPONSE()
     }
 
     delegate(content) {
@@ -46,7 +57,9 @@ class ProfileModifyNext_Agent extends useServerAgent {
 
     InputBlock() {
         if (WinExist("Server Agent")) {
-            WinClose("Server Agent")
+            BlockInput true
+            WinActivate("Server Agent")
+            return
         }
 
         BlockInput true
@@ -74,7 +87,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
             this.isListening.set("离线")   
             return
         }
-        posts := this.COLLECT("PENDING")
+        posts := this.COLLECT("COLLECTED").append(this.COLLECT("PENDING"))
         if (posts.Length == 0) {
             return 
         }
