@@ -284,13 +284,18 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             }
 
             if (delegate.value) {
-                SetTimer(() => agent.delegate({
-                    mode: "waterfall",
-                    overwrite: settings.value["fillOverwrite"],
-                    rooms: rooms,
-                    party: party,
-                    profiles: selectedGuests
-                }), -250)
+                SetTimer(() => (
+                    post := agent.delegate({
+                        mode: "waterfall",
+                        overwrite: settings.value["fillOverwrite"],
+                        rooms: rooms,
+                        party: party,
+                        profiles: selectedGuests
+                    }),
+                    tracker := ObjBindMethod(ProfileModifyNext_Agent, "trackPost", tracker, post, postQueue),
+                    postQueue.set(cur => [post, cur*]),
+                    SetTimer(tracker, 3000)
+                ), -250)
             } else {
                 PMN_Waterfall.cascade(rooms, selectedGuests, settings.value["fillOverwrite"], party)
             }
