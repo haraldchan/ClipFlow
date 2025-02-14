@@ -11,6 +11,9 @@ class ProfileModifyNext_Agent extends useServerAgent {
         this.cleanup()
     }
 
+    /**
+     * <Agent>
+     */
     cleanup() {
         exp := this.expiration
         loop files (this.pool "\*.json") {
@@ -23,28 +26,10 @@ class ProfileModifyNext_Agent extends useServerAgent {
         }
     }
 
-    keepAlive() {
-        try {
-            WinActivate("ahk_class SunAwtFrame")
-        }
-
-        Send "!h"
-        utils.waitLoading()
-        this.RESPONSE()
-    }
-
-    delegate(content) {
-        c := useProps(content, {
-            mode:      "single", ; single/waterfall/group
-            overwrite: false,    ; isOverwrite value
-            rooms:     [],       ; waterfall/group room numbers
-            party:     "",       ; optional party number for confinement 
-            profiles:  [],       ; json object in single, array in waterfall/group
-        })
-
-        this.POST(c.toObject())
-    }
-
+    /**
+     * <Agent>
+     * @param status 
+     */
     listen(status) {
         SetTimer(this.res, status == "在线" ? this.interval : 0)
         SetTimer(this.mod, status == "在线" ? this.interval : 0)
@@ -55,39 +40,29 @@ class ProfileModifyNext_Agent extends useServerAgent {
         }
     }
 
-    InputBlock() {
-        if (WinExist("Server Agent")) {
-            BlockInput true
-            WinActivate("Server Agent")
-            return
+    /**
+     * <Agent>
+     */
+    keepAlive() {
+        try {
+            WinActivate("ahk_class SunAwtFrame")
         }
-
-        BlockInput true
-        if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务", "Server Agent", "4096") == "OK") {
-            this.isListening.set("离线")
-            BlockInput false
-        }
+        ; press search
+        Send "!h"
+        utils.waitLoading()
+        this.RESPONSE()
     }
 
-    listenSync(status) {
-        if (status != "在线") {
-            return
-        }
-
-        loop {
-            this.RESPONSE()
-            this.modifyPostedProfiles()
-            Sleep this.interval
-        }
-    }
-
+    /**
+     * <Agent>
+     */
     modifyPostedProfiles() {
         if (!WinExist("ahk_class SunAwtFrame")) {
             MsgBox("后台 Opera PMS 不在线。", popupTitle, "4096 T1")
             this.isListening.set("离线")   
             return
         }
-        posts := this.COLLECT("COLLECTED").append(this.COLLECT("PENDING"))
+        posts := this.COLLECT("PENDING")
         if (posts.Length == 0) {
             return 
         }
@@ -95,6 +70,10 @@ class ProfileModifyNext_Agent extends useServerAgent {
         this.postHandler(posts)
     }
 
+    /**
+     * <Agent>
+     * @param {String[]} posts 
+     */
     postHandler(posts) {
         this.isListening.set("处理中...")
 
@@ -113,5 +92,69 @@ class ProfileModifyNext_Agent extends useServerAgent {
         }
 
         this.isListening.set("在线")
+    }
+
+    /**
+     * <Agent>
+     */
+    InputBlock() {
+        if (WinExist("Server Agent")) {
+            BlockInput true
+            WinActivate("Server Agent")
+            return
+        }
+
+        BlockInput true
+        if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务", "Server Agent", "4096") == "OK") {
+            this.isListening.set("离线")
+            BlockInput false
+        }
+    }
+
+    /**
+     * <Client> Send post to pool
+     * @param content post content to send
+     */
+    delegate(content) {
+        c := useProps(content, {
+            mode:      "single", ; single/waterfall/group
+            overwrite: false,    ; isOverwrite value
+            rooms:     [],       ; waterfall/group room numbers
+            party:     "",       ; optional party number for confinement 
+            profiles:  [],       ; json object in single, array in waterfall/group
+        })
+
+        return this.POST(c.toObject())
+    }
+    
+    /**
+     * <Client> Tracks post current status
+     * @param {Map} post 
+     * @returns Returns post status: 已发送|处理中|已完成|无响应
+     */
+    trackPost(thisTracker, post, postQueue) {
+        loop files (this.pool . "\*.json") {
+            if (InStr(A_LoopFileName, post["id"])) {
+                header := StrSplit(A_LoopFileName, "==")
+                if (header[1] == "PENDING") {
+                    return "已发送"
+                } else if (header[1] == "COLLECTED") {
+                    ; stop and ping
+                    SetTimer(thisTracker, 0)
+                    if (!this.PING()) {
+                        SetTimer(thisTracker, 0)
+                        FileMove(A_LoopFileFullPath, StrReplace(A_LoopFileFullPath, "COLLECTED", "ABORTED")) 
+                        MsgBox("后台服务无响应，请查看是否在线。", "Server Agent", "T5")
+                        return "无响应"
+                    }
+                    ; restart tracker
+                    SetTimer(thisTracker, 3000)
+                    return "处理中"
+                } else if (header[1] == "MODIFIED") {
+                    SetTimer(thisTracker, 0)
+                    return "已完成"
+                }
+            }
+        }
     }
 }
