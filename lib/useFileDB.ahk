@@ -94,7 +94,13 @@ class useFileDB {
 
 	loadArchiveOneDay(archiveDate) {
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
-		archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
+		try {
+			archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
+		} catch {
+			this.createArchive(archiveDate)
+			archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
+		}
+
 		return archivedData
 	}
 
