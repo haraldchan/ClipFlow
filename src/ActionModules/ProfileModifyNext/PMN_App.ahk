@@ -6,11 +6,9 @@
 #include "../../Servers/ProfileModifyNext_Server.ahk"
 
 PMN_App(App, moduleTitle, fdb, db, identifier) {
-    ; server agent
-    ; agent := ProfileModifyNext_Agent({ pool: A_ScriptDir . "\src\Servers\pmn-pool" })
-    delegate := signal(false)
-    
+
     ; setting state
+    delegate := signal(false)
     settings := signal({ fillOverwrite: false, loadFrom: "FileDB" })
     fillBtnText := computed(
         [delegate, settings], 
