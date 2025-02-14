@@ -4,15 +4,15 @@ class useServerAgent {
             pool: "",       ; post pool dir path
             interval: 3000, ; post checking interval
             expiration: 1,  ; delete posts after (exp) days
-            safePost: false, ; whether PING before each post or not 
+            safePost: true,
             isListening: ""
         })
 
         this.pool := s.pool
         this.interval := s.interval
         this.expiration := s.expiration
-        this.safePost := s.safePost
         this.isListening := s.isListening
+        this.safePost := s.safePost
 
         if (!DirExist(this.pool)) {
             DirCreate(this.pool)
@@ -70,9 +70,11 @@ class useServerAgent {
      * @param {Object} content 
      */
     POST(content) {
-        if (this.safePost && !this.PING()) {
-            MsgBox("Service offline.",, "4096 T2")
-            return
+        if (this.safePost) {
+            if (!this.PING()) {
+                MsgBox("Service offline.",, "4096 T2")
+                return
+            }
         }
 
         message := {
