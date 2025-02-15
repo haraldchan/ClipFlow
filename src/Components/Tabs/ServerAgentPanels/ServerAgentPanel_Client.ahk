@@ -1,7 +1,7 @@
 ServerAgentPanel_Client(App, enabled, agent) {
     comp := Component(App, A_ThisFunc)
 
-    global postQueue := signal([])
+    global postQueue := signal([{ status: "", id: "" }])
     effect(postQueue, cur => cur.Length > 10 && postQueue.set(cur.slice(1,11)))
     postStatusMap := Map(
         "PENDING", "已发送",
@@ -45,6 +45,23 @@ ServerAgentPanel_Client(App, enabled, agent) {
         }
     }
 
+    handlePostInit() {
+        ownPosts := []
+        
+        loop files (agent.pool . "\*.json") {
+            if (InStr(A_LoopFileName, A_ComputerName)) {
+                status := StrSplit(A_LoopFileName, "==")[1]
+                post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+                post["status"] := postStatusMap[status]
+                ownPosts.InsertAt(1, post)
+            }
+        }
+
+        if (ownPosts.Length > 0) {
+            postQueue.set(ownPosts)
+        }
+    }
+
     lvSettings := {
         columnDetails: {
             keys: ["status","id"],
@@ -76,5 +93,9 @@ ServerAgentPanel_Client(App, enabled, agent) {
         ;    .OnEvent("ContextMenu", PostDetail)
     )
 
-    return (comp.render(), comp.disable(!enabled))
+    return (
+        comp.render(), 
+        comp.disable(!enabled),
+        handlePostInit()
+    )
 }
