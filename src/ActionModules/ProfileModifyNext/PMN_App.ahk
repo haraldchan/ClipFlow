@@ -26,7 +26,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         search: "",
         range: 60
     })
-
+    
     ; list UI states/effect
     lvIsCheckedAll := signal(true)
     searchBy := signal("nameRoom")
@@ -292,9 +292,9 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                         party: party,
                         profiles: selectedGuests
                     }),
-                    tracker := ObjBindMethod(ProfileModifyNext_Agent, "trackPost", tracker, post, postQueue),
-                    postQueue.set(cur => [post, cur*]),
-                    SetTimer(tracker, 3000)
+                    post.status := "已发送",
+                    newQueue := postQueue.value.unshift(post),
+                    postQueue.set(newQueue)
                 ), -250)
             } else {
                 PMN_Waterfall.cascade(rooms, selectedGuests, settings.value["fillOverwrite"], party)
