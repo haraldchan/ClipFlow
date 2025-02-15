@@ -18,7 +18,6 @@ ServerAgentPanel_Client(App, enabled, agent) {
         "default", "cGreen Bold"
     )
 
-
     ping(ctrl, _) {
         connection.set("连接中...")
         ctrl.Enabled := false
@@ -77,7 +76,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
     comp.render := this => this.Add(
         App.AddGroupBox("Section x30 y260 w380 r12"),
         App.AddCheckBox((enabled ? "Checked" : "") . " xs10 yp", "客户端（前台）选项")
-           .OnEvent("Click", (ctrl, _) => comp.disable(!ctrl.Value)),
+           .OnEvent("Click", (ctrl, _) => (comp.disable(!ctrl.Value), config.write("clientEnabled", ctrl.Value))),
         
         ; test connection
         App.ARButton("xs20 w60 h30 yp+30", "测试连接").OnEvent("Click", ping),
