@@ -71,9 +71,7 @@ class PMN_Waterfall {
         ; sort by Prs.
         Click 838, 378, "Right" 
         utils.waitLoading()
-        Send "{Down}"
-        utils.waitLoading()
-        Send "{Enter}"
+        Send "o"
         utils.waitLoading() 
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
