@@ -22,4 +22,3 @@ ServerAgentPanel(App) {
         ServerAgentPanel_Client(App, config.read("clientEnabled"), agent)
     )
 }
-
