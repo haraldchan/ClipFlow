@@ -7,8 +7,20 @@
 
 PMN_App(App, moduleTitle, fdb, db, identifier) {
 
-    ; setting state
+    ; server agent delegate
     delegate := signal(false)
+    handleDelegateActivate(ctrl, _) {
+        delegate.set(ctrl.Value)
+        SetTimer(() => (
+            !agent.PING() && (
+                delegate.set(false), 
+                ctrl.Value := false,
+                MsgBox("无响应。请确保后台服务已启动。", "Server Agent", "4096 T1")
+            )
+        ) , -100)
+    }
+
+    ; settings
     settings := signal({ fillOverwrite: false, loadFrom: "FileDB" })
     fillBtnText := computed(
         [delegate, settings], 
@@ -21,11 +33,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
     ; data states
     listContent := signal(settings.value["loadFrom"] == "FileDB" ? fdb.load() : db.load())
-    queryFilter := signal({
-        date: FormatTime(A_Now, "yyyyMMdd"),
-        search: "",
-        range: 60
-    })
+    queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 })
+    effect(queryFilter, () => handleListContentUpdate())
     
     ; list UI states/effect
     lvIsCheckedAll := signal(true)
@@ -39,7 +48,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         "生日", "birthday",
         "时间戳 ID", "tsId"
     )
-    effect([searchBy, queryFilter], (curSearchBy, curQueryFilter) => handleSearchByChange(curSearchBy))
+    effect(searchBy, curSearchBy => handleSearchByChange(curSearchBy))
     handleSearchByChange(cur) {
         App.getCtrlByType("ListView").Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
         App.getCtrlByName("delegateCheckBox").Enabled := cur == "waterfall"
@@ -50,8 +59,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             App.getCtrlByName("delegateCheckBox").Value := false
             delegate.set(false)
         }
-
-        handleListContentUpdate()
     }
     
     currentGuest := signal(Map("idNum", 0))
@@ -293,8 +300,9 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                         profiles: selectedGuests
                     }),
                     post.status := "已发送",
-                    newQueue := postQueue.value.unshift(post),
-                    postQueue.set(newQueue)
+                    ; newQueue := postQueue.value.unshift(post),
+                    ; postQueue.set(newQueue)
+                    postQueue.set(queue => queue.unshift(post))
                 ), -250)
             } else {
                 PMN_Waterfall.cascade(rooms, selectedGuests, settings.value["fillOverwrite"], party)
@@ -351,7 +359,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         App.AddText("xp15", moduleTitle . " ⓘ ").OnEvent("Click", (*) => PMN_Settings(settings)),
         
         ; agent mode
-        App.AddCheckBox("vdelegateCheckBox x+10 Disabled", "后台代行").OnEvent("Click", (ctrl, _) => delegate.set(ctrl.Value)),
+        App.AddCheckBox("vdelegateCheckBox x+10 Disabled", "后台代行").OnEvent("Click", handleDelegateActivate),
         
         ; datetime
         App.AddDateTime("vdate xs15 yp+25 w90 h25 Choose" . queryFilter.value["date"])
