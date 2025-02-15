@@ -48,7 +48,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
             WinActivate("ahk_class SunAwtFrame")
         }
         ; press search
-        Send "!h"
+        Send "!r"
         utils.waitLoading()
         this.RESPONSE()
     }
@@ -125,36 +125,5 @@ class ProfileModifyNext_Agent extends useServerAgent {
         })
 
         return this.POST(c.toObject())
-    }
-    
-    /**
-     * <Client> Tracks post current status
-     * @param {Map} post 
-     * @returns Returns post status: 已发送|处理中|已完成|无响应
-     */
-    trackPost(thisTracker, post, postQueue) {
-        loop files (this.pool . "\*.json") {
-            if (InStr(A_LoopFileName, post["id"])) {
-                header := StrSplit(A_LoopFileName, "==")
-                if (header[1] == "PENDING") {
-                    return "已发送"
-                } else if (header[1] == "COLLECTED") {
-                    ; stop and ping
-                    SetTimer(thisTracker, 0)
-                    if (!this.PING()) {
-                        SetTimer(thisTracker, 0)
-                        FileMove(A_LoopFileFullPath, StrReplace(A_LoopFileFullPath, "COLLECTED", "ABORTED")) 
-                        MsgBox("后台服务无响应，请查看是否在线。", "Server Agent", "T5")
-                        return "无响应"
-                    }
-                    ; restart tracker
-                    SetTimer(thisTracker, 3000)
-                    return "处理中"
-                } else if (header[1] == "MODIFIED") {
-                    SetTimer(thisTracker, 0)
-                    return "已完成"
-                }
-            }
-        }
     }
 }
