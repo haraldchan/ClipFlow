@@ -1,3 +1,5 @@
+#Include "./PostDetails.ahk"
+
 ServerAgentPanel_Client(App, enabled, agent) {
     comp := Component(App, A_ThisFunc)
 
@@ -73,6 +75,15 @@ ServerAgentPanel_Client(App, enabled, agent) {
         }
     }
 
+    showPostDetails(LV, row, *) {
+        if (row == 0) {
+            return
+        }
+
+        selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 2))
+        PostDetails(selectedPost)
+    }
+
     comp.render := this => this.Add(
         App.AddGroupBox("Section x30 y260 w380 r12"),
         App.AddCheckBox((enabled ? "Checked" : "") . " xs10 yp", "客户端（前台）选项")
@@ -89,7 +100,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
            .OnEvent("Click", handlePostQueueUpdate)
            .SetFont("Bold"),
         App.ARListView(lvSettings.options, lvSettings.columnDetails, postQueue)
-        ;    .OnEvent("ContextMenu", PostDetail)
+           .OnEvent("ContextMenu", showPostDetails)
     )
 
     return (
