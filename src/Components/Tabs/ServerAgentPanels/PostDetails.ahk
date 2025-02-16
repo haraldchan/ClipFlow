@@ -3,7 +3,7 @@ PostDetails(post) {
     PD.SetFont(, "微软雅黑")
     PD.OnEvent("Close", (*) => PD.Destroy())
     
-    content := signal(post["content"])
+    profiles := signal(post["content"]["profiles"])
 
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
@@ -12,23 +12,42 @@ PostDetails(post) {
     }
 
     options := {
-        lvOptions: "vguestProfileList Grid -ReadOnly -Multi LV0x4000 w550 r8 y+10",
+        lvOptions: "vguestProfileList Grid NoSortHdr -Multi LV0x4000 w550 r8 y+10",
         itemOptions: ""
     }
 
-    handleRepost() {
-        newPost := agent.delegate(post["content"])
-        newPost["status"] := "已发送"
-        postQueue.set(cur => cur.unshift(newPost))
+    handleRepost(*) {
+        SetTimer(() => (
+            newPost := agent.delegate({
+                mode: post["content"]["mode"],
+                overwrite: post["content"]["overwrite"],
+                rooms: post["content"]["rooms"],
+                party: post["content"]["party"],
+                profiles: profiles.value
+            }),
+            newPost.status := "已发送",
+            postQueue.set(cur => cur.unshift(newPost))
+        ), -250)
+
         PD.Destroy()
     }
 
+    handleProfilesUpdate(LV, row, *) {
+                
+    }
+
     return (
-        PD.AddGroupBox("Section r10", "代行详情"),
-        PD.AddText("xs20 yp+20", "发送状态: " . post["status"]),
-        PD.AddText("xs20 yp+20" , "客人资料"),
-        PD.ARListView(options, columnDetails, content),
-        PD.AddButton("w120 h30", "重新发送代行")
-          .OnEvent("Click", (*) => (post["status"] := "已发送", agent.delegate(post["content"])))
+        PD.AddGroupBox("Section w560 r11", "代行详情").SetFont("Bold"),
+        PD.AddText("xs10 yp+20", "发送状态: " . post["status"]),
+        PD.AddText("xs10 w200 yp+30" , "客人资料").SetFont("Bold s10"),
+        
+        ; post guest list
+        PD.ARListView(options, columnDetails, profiles)
+          .OnEvent("ItemEdit", handleProfilesUpdate),
+        
+        ; repost btn
+        PD.AddButton("w120 h30 y+20", "重新发送代行")
+          .OnEvent("Click", handleRepost),
+        PD.Show()
     )
 }
