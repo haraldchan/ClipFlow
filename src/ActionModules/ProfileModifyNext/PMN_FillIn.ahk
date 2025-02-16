@@ -101,8 +101,8 @@ class PMN_FillIn {
             anchorX := FoundX - 10
             anchorY := FoundY
         } else {
-            msgbox("not found", , "T1")
-            return
+            MsgBox("界面定位失败", popupTitle, "T2 4096")
+            utils.cleanReload(winGroup)
         }
 
         MouseMove anchorX + 393, anchorY + 50
