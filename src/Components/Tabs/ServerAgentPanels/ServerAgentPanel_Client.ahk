@@ -36,8 +36,13 @@ ServerAgentPanel_Client(App, enabled, agent) {
 
     handlePostQueueUpdate(*) {
         for post in postQueue.value {
+            if (!post["id"]) {
+                continue
+            }
+
             loop files (agent.pool . "\*.json") {
                 if (InStr(A_LoopFileName, post["id"])) {
+                    msgbox "found"
                     newPost := post.deepClone()
                     newPost["status"] := postStatusMap[StrSplit(A_LoopFileName, "==")[1]]
                     postQueue.update(A_Index, newPost)
@@ -81,6 +86,9 @@ ServerAgentPanel_Client(App, enabled, agent) {
         }
 
         selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 2))
+        if (!selectedPost.has("content")) {
+            return 
+        }
         PostDetails(selectedPost)
     }
 
