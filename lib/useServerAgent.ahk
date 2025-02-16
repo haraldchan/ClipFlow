@@ -1,18 +1,22 @@
 class useServerAgent {
     __New(serverSettings) {
         s := useProps(serverSettings, {
-            pool: "",       ; post pool dir path
-            interval: 3000, ; post checking interval
-            expiration: 1,  ; delete posts after (exp) days
-            safePost: true,
-            isListening: ""
+            pool: "",         ; post pool dir path
+            interval: 3000,   ; post checking interval MILLISECONDS
+            expiration: 1,    ; delete posts after (exp) DAYS
+            collectRange: 15, ; collect post from recent MINUTES
+            safePost: true,   ; whether ping before sending a post
+            isListening: serverSettings is Map 
+                ? serverSettings["isListening"] 
+                : serverSettings.isListening ; isListening depend signal
         })
 
         this.pool := s.pool
         this.interval := s.interval
         this.expiration := s.expiration
-        this.isListening := s.isListening
+        this.collectRange := s.collectRange
         this.safePost := s.safePost
+        this.isListening := s.isListening
 
         if (!DirExist(this.pool)) {
             DirCreate(this.pool)
@@ -98,6 +102,13 @@ class useServerAgent {
     COLLECT(method) {
         posts := []
         loop files (this.pool . "\*.json") {
+            if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= this.collectRange) {
+                FileMove(
+                    A_LoopFileFullPath,
+                    StrReplace(A_LoopFileFullPath, method, "ABANDONED")
+                )
+            }
+
             if (InStr(A_LoopFileFullPath, method)) {
                 FileMove(
                     A_LoopFileFullPath,
