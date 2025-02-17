@@ -46,7 +46,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
      * @param status 
      */
     listen(status) {
-        SetTimer(this.res, status == "在线" ? this.interval : 0)
+        SetTimer(this.res, status != "离线" ? this.interval : 0)
         SetTimer(this.mod, status == "在线" ? this.interval : 0)
         
         ; blocks input while listening
@@ -59,12 +59,13 @@ class ProfileModifyNext_Agent extends useServerAgent {
      * <Agent>
      */
     keepAlive() {
-        try {
-            WinActivate("ahk_class SunAwtFrame")
+        if (this.isListening.value == "在线") {
+            try {
+                WinActivate("ahk_class SunAwtFrame")
+                Send "!r"
+                utils.waitLoading()
+            }
         }
-        ; press search
-        Send "!r"
-        utils.waitLoading()
         this.RESPONSE()
     }
 
