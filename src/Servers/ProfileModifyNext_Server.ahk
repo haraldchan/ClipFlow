@@ -99,6 +99,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
             if (c["mode"] == "waterfall" || c["mode"] == "single") {
                 PMN_Waterfall.cascade(c["rooms"], c["profiles"], c["overwrite"], c["party"])
             }
+            this.currentHandlingPost := ""
 
             ; rename file (change flag status & sender)
             FileMove(
