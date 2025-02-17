@@ -76,7 +76,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
             widths: [60, 260]
         },
         options: {
-            lvOptions: "Grid -ReadOnly -Multi LV0x4000 w330 r8 xs20 yp+25",
+            lvOptions: "Grid NoSortHdr -Multi LV0x4000 w330 r8 xs20 yp+25",
             itemOptions: ""
         }
     }
