@@ -102,11 +102,13 @@ class useServerAgent {
     COLLECT(method) {
         posts := []
         loop files (this.pool . "\*.json") {
-            if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= this.collectRange) {
+            postTimestamp := SubStr(StrSplit(A_LoopFileName, "==")[3], 1, 14)
+            if (DateDiff(A_Now, postTimestamp, "Minutes") >= this.collectRange) {
                 FileMove(
                     A_LoopFileFullPath,
                     StrReplace(A_LoopFileFullPath, method, "ABANDONED")
                 )
+                continue
             }
 
             if (InStr(A_LoopFileFullPath, method)) {
