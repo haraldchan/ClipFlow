@@ -13,7 +13,8 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
     effect(isListening, cur => App.getCtrlByText("启动服务").Value := cur == "离线" ? false : true)
 
     handleConnect(ctrl, _) {
-        if (MsgBox("服务将启动，请确保 Opera 处于 InHouse 界面", "Server Agent", "OKCancel") == "Cancel") {
+        if (MsgBox("服务将启动，请确保 Opera 处于 InHouse 界面", "Server Agent", "4096 OKCancel") == "Cancel") {
+            ctrl.Value := false
             return
         }
 
@@ -23,11 +24,11 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
 
     comp.render := this => this.Add(
         App.AddGroupBox("Section x30 y110 w380 r5"),
-        App.AddCheckBox("xs10 yp", "服务端（后台）选项")
+        App.AddCheckBox((enabled ? "Checked" : "") . " xs10 yp", "服务端（后台）选项")
            .OnEvent("Click", (ctrl, _) => (
                 comp.disable(!ctrl.Value), 
-                config.write("agentEnabled", ctrl.Value)
-                !ctrl.Value && isListening.set("离线"),
+                config.write("agentEnabled", ctrl.Value),
+                !ctrl.Value && isListening.set("离线")
         )),
         
         ; service activation
