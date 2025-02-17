@@ -26,8 +26,8 @@ PostDetails(post) {
                 profiles: profiles.value
             }),
             newPost.status := "已发送",
-            renameResendPost(post["id"])
-            postQueue.set(cur => cur.unshift(newPost)),
+            renameResendPost(post["id"]),
+            postQueue.set(cur => cur.unshift(newPost))
         ), -250)
 
         PD.Destroy()
