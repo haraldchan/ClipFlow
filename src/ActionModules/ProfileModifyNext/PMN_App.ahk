@@ -6,7 +6,6 @@
 #include "../../Servers/ProfileModifyNext_Server.ahk"
 
 PMN_App(App, moduleTitle, fdb, db, identifier) {
-
     ; server agent delegate
     delegate := signal(false)
     handleDelegateActivate(ctrl, _) {
@@ -34,7 +33,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     ; data states
     listContent := signal(settings.value["loadFrom"] == "FileDB" ? fdb.load() : db.load())
     queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 })
-    effect(queryFilter, () => handleListContentUpdate())
     
     ; list UI states/effect
     lvIsCheckedAll := signal(true)
@@ -300,6 +298,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                         profiles: selectedGuests
                     }),
                     post.status := "已发送",
+                    ; newQueue := postQueue.value.unshift(post),
+                    ; postQueue.set(newQueue)
                     postQueue.set(queue => queue.unshift(post))
                 ), -250)
             } else {
@@ -326,6 +326,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             dt := App.getCtrlByType("DateTime")
             dt.Value := DateAdd(dt.Value, diff, "Days")
             queryFilter.update("date", FormatTime(dt.Value, "yyyyMMdd"))
+            handleListContentUpdate()
         }
 
         togglePeriod(direction) {
@@ -341,6 +342,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
             p.value := newRange
             queryFilter.update("range", newRange)
+            handleListContentUpdate()
         }
 
         toggleSelectAll() {
