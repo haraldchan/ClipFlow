@@ -5,11 +5,13 @@ ServerAgentPanel_Client(App, enabled, agent) {
 
     global postQueue := signal([{ status: "", id: "" }])
     effect(postQueue, cur => cur.Length > 10 && postQueue.set(cur.slice(1,11)))
-    postStatusMap := Map(
+    postStatus := Map(
         "PENDING", "已发送",
         "COLLECTED", "处理中",
         "MODIFIED", "已完成",
-        "ABORTED", "错误终止"
+        "ABORTED", "错误终止",
+        "RESENT", "已重发",
+        "ABANDONED", "超时弃用"
     )
 
     connection := signal("未连接")
@@ -42,9 +44,8 @@ ServerAgentPanel_Client(App, enabled, agent) {
 
             loop files (agent.pool . "\*.json") {
                 if (InStr(A_LoopFileName, post["id"])) {
-                    msgbox "found"
                     newPost := post.deepClone()
-                    newPost["status"] := postStatusMap[StrSplit(A_LoopFileName, "==")[1]]
+                    newPost["status"] := postStatus[StrSplit(A_LoopFileName, "==")[1]]
                     postQueue.update(A_Index, newPost)
                 }
             } 
@@ -58,7 +59,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
             if (InStr(A_LoopFileName, A_ComputerName)) {
                 status := StrSplit(A_LoopFileName, "==")[1]
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
-                post["status"] := postStatusMap[status]
+                post["status"] := postStatus[status]
                 ownPosts.InsertAt(1, post)
             }
         }
