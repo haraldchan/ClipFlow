@@ -1,7 +1,10 @@
 class ProfileModifyNext_Agent extends useServerAgent {
     __New(serverSettings) {
-        super.__New(serverSettings)     
+        super.__New(serverSettings)
         effect(this.isListening, cur => this.listen(cur)) 
+
+        ; ongoing post
+        this.currentHandlingPost := ""
         
         ; binding methods timer methods
         this.res := ObjBindMethod(this, "keepAlive")
@@ -11,9 +14,6 @@ class ProfileModifyNext_Agent extends useServerAgent {
         this.cleanup()
     }
 
-    /**
-     * <Agent>
-     */
     cleanup() {
         exp := this.expiration
         loop files (this.pool "\*.json") {
@@ -22,6 +22,21 @@ class ProfileModifyNext_Agent extends useServerAgent {
             date := SubStr(header[3], 1, 14)
             if (DateDiff(A_Now, date, "Days") >= exp) {
                 FileDelete(A_LoopFileFullPath)
+            }
+        }
+    }
+
+    abort() {
+        if (!this.currentHandlingPost) {
+            return
+        }
+
+        loop files (this.pool . "\*.json") {
+            if (InStr(A_LoopFileName, this.currentHandlingPost["id"])) {
+                FileMove(
+                    A_LoopFileFullPath, 
+                    StrReplace(A_LoopFileFullPath, StrSplit(A_LoopFileName, "==")[1], "ABORTED")
+                )
             }
         }
     }
@@ -79,6 +94,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
 
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
         for post in unboxedPosts {
+            this.currentHandlingPost := post
             c := post["content"]
             if (c["mode"] == "waterfall" || c["mode"] == "single") {
                 PMN_Waterfall.cascade(c["rooms"], c["profiles"], c["overwrite"], c["party"])
