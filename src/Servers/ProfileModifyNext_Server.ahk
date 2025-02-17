@@ -104,7 +104,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
             ; rename file (change flag status & sender)
             FileMove(
                 posts[A_Index],
-                Format("{1}\{2}=={3}=={4}.json", this.pool, "MODIFIED", A_ComputerName, post["id"]),
+                Format("{1}\{2}=={3}=={4}.json", this.pool, "MODIFIED", post["sender"], post["id"]),
             )
         }
 
