@@ -4,7 +4,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
     comp := Component(App, A_ThisFunc)
 
     global postQueue := signal([{ status: "", id: "" }])
-    effect(postQueue, cur => cur.Length > 10 && postQueue.set(cur.slice(1,11)))
+
     postStatus := Map(
         "PENDING", "已发送",
         "COLLECTED", "处理中",
