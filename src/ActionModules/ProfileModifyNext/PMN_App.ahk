@@ -10,6 +10,10 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     delegate := signal(false)
     handleDelegateActivate(ctrl, _) {
         delegate.set(ctrl.Value)
+        if (ctrl.Value == false) {
+            return
+        }
+        
         SetTimer(() => (
             !agent.PING() && (
                 delegate.set(false), 
