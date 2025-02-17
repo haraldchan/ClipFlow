@@ -21,19 +21,37 @@ PostDetails(post) {
             newPost := agent.delegate({
                 mode: post["content"]["mode"],
                 overwrite: post["content"]["overwrite"],
-                rooms: post["content"]["rooms"],
+                rooms: profiles.value.map(p => p["roomNum"]).unique(),
                 party: post["content"]["party"],
                 profiles: profiles.value
             }),
             newPost.status := "已发送",
-            postQueue.set(cur => cur.unshift(newPost))
+            renameResendPost(post["id"])
+            postQueue.set(cur => cur.unshift(newPost)),
         ), -250)
 
         PD.Destroy()
     }
 
+    renameResendPost(id) {
+        loop files (agent.pool . "\*.json") {
+            if (InStr(A_LoopFileFullPath, id)) {
+                status := StrSplit(A_LoopFileName, "==")[1]
+                FileMove(A_LoopFileFullPath, StrReplace(A_LoopFileFullPath, status, "RESENT"))
+                break
+            }
+        }
+    }
+
+    getSelectedCell(LV, row, key) {
+        return LV.GetText(row, columnDetails.keys.findIndex(item => item == key))
+    }
+
     handleProfilesUpdate(LV, row, *) {
-                
+        profileToChange := profiles.value.find(profile => profile["idNum"] == getSelectedCell(LV, row, "idNum"))
+        profileToChange["roomNum"] := getSelectedCell(LV, row, "roomNum")
+
+        profiles.update(profiles.value.findIndex(p => p["idNum"] == profileToChange["idNum"]), profileToChange)
     }
 
     return (
@@ -42,12 +60,11 @@ PostDetails(post) {
         PD.AddText("xs10 w200 yp+30" , "客人资料").SetFont("Bold s10"),
         
         ; post guest list
-        PD.ARListView(options, columnDetails, profiles)
-          .OnEvent("ItemEdit", handleProfilesUpdate),
+        PD.ARListView(options, columnDetails, profiles).OnEvent("ItemEdit", handleProfilesUpdate),
         
         ; repost btn
-        PD.AddButton("w120 h30 y+20", "重新发送代行")
-          .OnEvent("Click", handleRepost),
+        PD.AddButton("w120 h30 y+20", "重新发送代行").OnEvent("Click", handleRepost),
+        
         PD.Show()
     )
 }
