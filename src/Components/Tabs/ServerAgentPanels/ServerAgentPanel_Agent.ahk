@@ -12,9 +12,13 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
     effect(collectInterval, cur => (agent.interval := cur))
     effect(isListening, cur => App.getCtrlByText("启动服务").Value := cur == "离线" ? false : true)
 
-    handleConnect(connectState) {
-        isListening.set(connectState ? "在线" : "离线")
-        App.getCtrlByName("intervalEdit").Enabled := !connectState
+    handleConnect(ctrl, _) {
+        if (MsgBox("服务将启动，请确保 Opera 处于 InHouse 界面", "Server Agent", "OKCancel") == "Cancel") {
+            return
+        }
+
+        isListening.set(ctrl.Value ? "在线" : "离线")
+        App.getCtrlByName("intervalEdit").Enabled := !ctrl.Value
     }
 
     comp.render := this => this.Add(
@@ -27,8 +31,7 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
         )),
         
         ; service activation
-        App.ARCheckBox("xs20 yp+30","启动服务")
-           .OnEvent("Click", (ctrl, _) => handleConnect(ctrl.Value)),
+        App.ARCheckBox("xs20 yp+30","启动服务").OnEvent("Click", handleConnect),
         App.AddText("x+10", "本机: " . A_ComputerName),
 
         ; service state
@@ -44,5 +47,8 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
         App.AddText("x+5 h30 0x200", "毫秒"),
     )
 
-    return (comp.render(), comp.disable(!enabled))
+    return (
+        comp.render(), 
+        comp.disable(!enabled)
+    )
 }
