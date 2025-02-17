@@ -12,7 +12,7 @@ PostDetails(post) {
     }
 
     options := {
-        lvOptions: "vguestProfileList Grid NoSortHdr -Multi LV0x4000 w550 r8 y+10",
+        lvOptions: "vguestProfileList Grid NoSortHdr -ReadOnly -Multi LV0x4000 w550 r8 y+10",
         itemOptions: ""
     }
 
