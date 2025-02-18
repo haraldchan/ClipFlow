@@ -101,7 +101,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
         ; test connection
         App.ARButton("xs20 w60 h30 yp+30", "测试连接").OnEvent("Click", ping),
         App.AddText("x+10 h30 0x200", "后台服务状态: "),
-        App.ARText("vstatusText w200 h25 x+1 0x200", "{1}", connection).SetFontStyles(statusTextStyle),
+        App.ARText("vstatusText w200 h30 x+1 0x200", "{1}", connection).SetFontStyles(statusTextStyle),
 
         ; post status list
         App.AddText("xs20 yp+50 h20 0x200", "已发送代行状态").SetFont("Bold"),
