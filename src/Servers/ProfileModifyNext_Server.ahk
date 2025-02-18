@@ -7,8 +7,8 @@ class ProfileModifyNext_Agent extends useServerAgent {
         this.currentHandlingPost := ""
         
         ; binding methods timer methods
-        this.res := ObjBindMethod(this, "keepAlive")
-        this.mod := ObjBindMethod(this, "modifyPostedProfiles")
+        this.response := ObjBindMethod(this, "keepAlive")
+        this.handlePost := ObjBindMethod(this, "postHandler")
         
         ; delete expired posts
         this.cleanup()
@@ -47,8 +47,8 @@ class ProfileModifyNext_Agent extends useServerAgent {
      * @param status 
      */
     listen(status) {
-        SetTimer(this.res, status != "离线" ? this.interval : 0)
-        SetTimer(this.mod, status == "在线" ? this.interval : 0)
+        SetTimer(this.response, status != "离线" ? this.interval : 0)
+        SetTimer(this.handlePost, status == "在线" ? this.interval : 0)
         
         ; blocks input while listening
         if (status == "在线") {
@@ -73,7 +73,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
     /**
      * <Agent>
      */
-    modifyPostedProfiles() {
+    postHandler() {
         if (!WinExist("ahk_class SunAwtFrame")) {
             MsgBox("后台 Opera PMS 不在线。", popupTitle, "4096 T1")
             this.isListening.set("离线")   
@@ -84,14 +84,14 @@ class ProfileModifyNext_Agent extends useServerAgent {
             return 
         }
 
-        this.postHandler(posts)
+        this.modifyPostedProfiles(posts)
     }
 
     /**
      * <Agent>
      * @param {String[]} posts 
      */
-    postHandler(posts) {
+    modifyPostedProfiles(posts) {
         this.isListening.set("处理中...")
 
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
