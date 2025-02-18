@@ -3,8 +3,10 @@ class QM2_Agent extends useServerAgent {
         super.__New(serverSettings)
         effect(this.isListening, cur => this.listen(cur))
 
-        ; ongoing post
         this.currentHandlingPost := ""
+        this.moduleIndex := Map(
+            "BlankShare", this.blankShareHandler
+        )
 
         ; binding methods timer methods
         this.handlePost := ObjBindMethod(this, "postHandler")
@@ -56,9 +58,8 @@ class QM2_Agent extends useServerAgent {
         for post in unboxedPosts {
             this.currentHandlingPost := post
 
-            if (post["module"] == "BlankShare") {
-                this.makeBlankShare(post)
-            }
+            ; calls handler
+            this.moduleIndex[post["module"]].Call()
 
             this.currentHandlingPost := ""
             this.updatePostStatus(post[A_Index], "MODIFIED")
@@ -72,7 +73,7 @@ class QM2_Agent extends useServerAgent {
      * <Agent>
      * @param {String[]} posts 
      */
-    makeBlankShare(post) {
+    blankSharehandler(post) {
         ; search
         MouseMove 329, 196 ; room number field
         Click 3
