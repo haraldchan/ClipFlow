@@ -23,6 +23,11 @@ class useServerAgent {
         }
     }
 
+    updatePostStatus(postPath, newStatus) {
+        curStatus := postPath.split("\").at(-1).replace(".json", "").split("==")[1]
+        FileMove(postPath, postPath.replace(curStatus, newStatus))
+    }
+
     PING() {
         ; send
         message := { method: "PING", sender: A_ComputerName, id: A_Now . A_MSec . Random(1, 100) }
@@ -99,24 +104,27 @@ class useServerAgent {
      * @param {String} method 
      * @returns {string[]} post filepaths array
      */
-    COLLECT(method) {
+    COLLECT(status) {
         posts := []
         loop files (this.pool . "\*.json") {
-            postTimestamp := SubStr(StrSplit(A_LoopFileName, "==")[3], 1, 14)
+            ; postTimestamp := SubStr(StrSplit(A_LoopFileName, "==")[3], 1, 14)
+            postTimestamp := A_LoopFileName.split("==")[3].substr(1, 14)
             if (DateDiff(A_Now, postTimestamp, "Minutes") >= this.collectRange) {
-                FileMove(
-                    A_LoopFileFullPath,
-                    StrReplace(A_LoopFileFullPath, method, "ABANDONED")
-                )
+                ; FileMove(
+                    ; A_LoopFileFullPath,
+                    ; StrReplace(A_LoopFileFullPath, status, "ABANDONED")
+                ; )
+                this.updatePostStatus(A_LoopFileFullPath, "ABANDONED")
                 continue
             }
 
-            if (InStr(A_LoopFileFullPath, method)) {
-                FileMove(
-                    A_LoopFileFullPath,
-                    StrReplace(A_LoopFileFullPath, method, "COLLECTED")
-                )
-                posts.Push(StrReplace(A_LoopFileFullPath, method, "COLLECTED"))
+            if (InStr(A_LoopFileFullPath, status)) {
+                ; FileMove(
+                    ; A_LoopFileFullPath,
+                    ; StrReplace(A_LoopFileFullPath, status, "COLLECTED")
+                ; )
+                this.updatePostStatus(A_LoopFileFullPath, "COLLECTED")
+                posts.Push(StrReplace(A_LoopFileFullPath, status, "COLLECTED"))
             }
         }
 

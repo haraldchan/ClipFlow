@@ -33,10 +33,11 @@ class ProfileModifyNext_Agent extends useServerAgent {
 
         loop files (this.pool . "\*.json") {
             if (InStr(A_LoopFileName, this.currentHandlingPost["id"])) {
-                FileMove(
-                    A_LoopFileFullPath, 
-                    StrReplace(A_LoopFileFullPath, StrSplit(A_LoopFileName, "==")[1], "ABORTED")
-                )
+                ; FileMove(
+                    ; A_LoopFileFullPath, 
+                    ; StrReplace(A_LoopFileFullPath, StrSplit(A_LoopFileName, "==")[1], "ABORTED")
+                ; )
+                this.updatePostStatus(A_LoopFileFullPath, "ABORTED")
             }
         }
     }
@@ -102,11 +103,11 @@ class ProfileModifyNext_Agent extends useServerAgent {
             }
             this.currentHandlingPost := ""
 
-            ; rename file (change flag status & sender)
-            FileMove(
-                posts[A_Index],
-                Format("{1}\{2}=={3}=={4}.json", this.pool, "MODIFIED", post["sender"], post["id"]),
-            )
+            ; FileMove(
+                ; posts[A_Index],
+                ; Format("{1}\{2}=={3}=={4}.json", this.pool, "MODIFIED", post["sender"], post["id"]),
+            ; )
+            this.updatePostStatus(post[A_Index], "MODIFIED")
         }
 
         this.isListening.set("在线")
