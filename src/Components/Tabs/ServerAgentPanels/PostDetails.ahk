@@ -1,4 +1,10 @@
 PostDetails(post) {
+    ; prevent QM2 agent posts (for now!)
+    if (post["content"].has("module")) {
+        MsgBox("(QM2 消息不适用)", "Server Agent", "4096 T2")
+        return
+    }
+
     PD := Gui(, "Post Details")
     PD.SetFont(, "微软雅黑")
     PD.OnEvent("Close", (*) => PD.Destroy())
