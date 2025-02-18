@@ -302,8 +302,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                         profiles: selectedGuests
                     }),
                     post.status := "已发送",
-                    ; newQueue := postQueue.value.unshift(post),
-                    ; postQueue.set(newQueue)
                     postQueue.set(queue => queue.unshift(post))
                 ), -250)
             } else {
