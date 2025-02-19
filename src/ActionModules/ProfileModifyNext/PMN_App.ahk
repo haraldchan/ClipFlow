@@ -302,6 +302,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                         profiles: selectedGuests
                     }),
                     post.status := "已发送",
+                    ; newQueue := postQueue.value.unshift(post),
+                    ; postQueue.set(newQueue)
                     postQueue.set(queue => queue.unshift(post))
                 ), -250)
             } else {
@@ -357,7 +359,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     }
 
     return (
-        App.AddGroupBox("Section R17 w580 y+20", ""),
+        App.AddGroupBox("Section R18 w685 y+20", ""),
         App.AddText("xp15", moduleTitle . " ⓘ ").OnEvent("Click", (*) => PMN_Settings(settings)),
         
         ; agent mode
@@ -375,7 +377,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
            .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
         
         ; search box
-        App.AREdit("vsearchBox x+5 w100 h25")
+        App.AREdit("vsearchBox x+5 w210 h25")
            .OnEvent("LoseFocus", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
         
         ; range
@@ -396,7 +398,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile),
 
         ; waterfall controls
-        App.ARCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+3", "全选"),
+        App.ARCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+5", "全选"),
         shareCheckStatus(
             App.getCtrlByName("$selectAllBtn"), 
             App.getCtrlByName("$guestProfileList"), 

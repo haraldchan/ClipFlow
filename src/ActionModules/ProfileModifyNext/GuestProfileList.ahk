@@ -2,11 +2,11 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile) {
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
-        widths: [60, 90, 40, 80, 145, 120]
+        widths: [70, 130, 40, 80, 145, 170]
     }
 
     options := {
-        lvOptions: "$guestProfileList Grid -ReadOnly -Multi LV0x4000 w550 r15 xp-470 y+10",
+        lvOptions: "$guestProfileList Grid -ReadOnly -Multi LV0x4000 w658 r16 xp-580 y+10",
         itemOptions: ""
     }
 
@@ -39,6 +39,7 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile) {
 
     return (    
         App.AddReactiveListView(options, columnDetails, listContent)
+           .SetFont("s10.5")
            .OnEvent(
                 "DoubleClick", copyIdNumber,
                 "ItemEdit", handleUpdateItem,
