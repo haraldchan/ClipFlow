@@ -109,20 +109,13 @@ class useServerAgent {
         loop files (this.pool . "\*.json") {
             ; postTimestamp := SubStr(StrSplit(A_LoopFileName, "==")[3], 1, 14)
             postTimestamp := A_LoopFileName.split("==")[3].substr(1, 14)
-            if (DateDiff(A_Now, postTimestamp, "Minutes") >= this.collectRange) {
-                ; FileMove(
-                    ; A_LoopFileFullPath,
-                    ; StrReplace(A_LoopFileFullPath, status, "ABANDONED")
-                ; )
+            if (DateDiff(A_Now, postTimestamp, "Minutes") >= this.collectRange && A_LoopFileName.includes(status)) {
+
                 this.updatePostStatus(A_LoopFileFullPath, "ABANDONED")
                 continue
             }
 
             if (InStr(A_LoopFileFullPath, status)) {
-                ; FileMove(
-                    ; A_LoopFileFullPath,
-                    ; StrReplace(A_LoopFileFullPath, status, "COLLECTED")
-                ; )
                 this.updatePostStatus(A_LoopFileFullPath, "COLLECTED")
                 posts.Push(StrReplace(A_LoopFileFullPath, status, "COLLECTED"))
             }
