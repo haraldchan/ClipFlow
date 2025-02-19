@@ -16,7 +16,7 @@ ServerAgentPanel(App) {
     })
     
     return (
-        App.AddText("x30 y75 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5"),
+        App.AddText("x30 y75 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold"),
 
         ; server-side options
         ServerAgentPanel_Agent(App, config.read("agentEnabled"), agent, isListening),
@@ -24,7 +24,7 @@ ServerAgentPanel(App) {
         ; client-side options
         ServerAgentPanel_Client(App, config.read("clientEnabled"), agent)
 
-        ; QM agents
+        ; qm2 panel
         QM_Panel(App, isListening)
     )
 }
