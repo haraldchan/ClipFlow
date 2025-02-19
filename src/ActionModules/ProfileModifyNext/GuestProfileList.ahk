@@ -2,7 +2,7 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile) {
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
-        widths: [70, 130, 40, 80, 145, 170]
+        widths: [70, 120, 45, 80, 180, 150]
     }
 
     options := {
