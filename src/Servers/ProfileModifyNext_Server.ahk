@@ -7,7 +7,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
         this.currentHandlingPost := ""
         
         ; binding methods timer methods
-        this.response := ObjBindMethod(this, "keepAlive")
+        this.res := ObjBindMethod(this, "keepAlive")
         this.handlePost := ObjBindMethod(this, "postHandler")
         
         ; delete expired posts
@@ -33,10 +33,6 @@ class ProfileModifyNext_Agent extends useServerAgent {
 
         loop files (this.pool . "\*.json") {
             if (InStr(A_LoopFileName, this.currentHandlingPost["id"])) {
-                ; FileMove(
-                    ; A_LoopFileFullPath, 
-                    ; StrReplace(A_LoopFileFullPath, StrSplit(A_LoopFileName, "==")[1], "ABORTED")
-                ; )
                 this.updatePostStatus(A_LoopFileFullPath, "ABORTED")
             }
         }
@@ -47,7 +43,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
      * @param status 
      */
     listen(status) {
-        SetTimer(this.response, status != "离线" ? this.interval : 0)
+        SetTimer(this.res, status != "离线" ? this.interval : 0)
         SetTimer(this.handlePost, status == "在线" ? this.interval : 0)
         
         ; blocks input while listening
@@ -102,11 +98,6 @@ class ProfileModifyNext_Agent extends useServerAgent {
                 PMN_Waterfall.cascade(c["rooms"], c["profiles"], c["overwrite"], c["party"])
             }
             this.currentHandlingPost := ""
-
-            ; FileMove(
-                ; posts[A_Index],
-                ; Format("{1}\{2}=={3}=={4}.json", this.pool, "MODIFIED", post["sender"], post["id"]),
-            ; )
             this.updatePostStatus(post[A_Index], "MODIFIED")
         }
 
