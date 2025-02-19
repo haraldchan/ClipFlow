@@ -23,7 +23,7 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
     }
 
     comp.render := this => this.Add(
-        App.AddGroupBox("Section x30 y110 w380 r5"),
+        App.AddGroupBox("Section x30 y110 w300 r5"),
         App.AddCheckBox((enabled ? "Checked" : "") . " xs10 yp", "服务端（后台）选项")
            .OnEvent("Click", (ctrl, _) => (
                 comp.disable(!ctrl.Value), 
@@ -37,7 +37,7 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
 
         ; service state
         App.AddText("xs20 h30 yp+30 0x200", "当前服务状态: "),
-        App.ARText("vonlineText w250 h30 x+1 0x200", "{1}", isListening)
+        App.ARText("vonlineText w150 h30 x+1 0x200", "{1}", isListening)
            .SetFont("cRed Bold")
            .SetFontStyles(onlineTextStyles),
 

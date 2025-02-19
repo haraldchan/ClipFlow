@@ -30,7 +30,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
         if (!res) {
             connection.set("无响应")
         } else {
-            connection.set(Format("在线 响应主机: {1}", res.sender))
+            connection.set(Format("在线 {1}", res.sender))
         }
         
         ctrl.Enabled := true
@@ -73,10 +73,10 @@ ServerAgentPanel_Client(App, enabled, agent) {
         columnDetails: {
             keys: ["status","id"],
             titles: ["当前状态", "POST ID"],
-            widths: [60, 260]
+            widths: [60, 168]
         },
         options: {
-            lvOptions: "Grid NoSortHdr -Multi LV0x4000 w330 r8 xs20 yp+25",
+            lvOptions: "Grid NoSortHdr -Multi LV0x4000 w260 r8 xs20 yp+25",
             itemOptions: ""
         }
     }
@@ -94,14 +94,14 @@ ServerAgentPanel_Client(App, enabled, agent) {
     }
 
     comp.render := this => this.Add(
-        App.AddGroupBox("Section x30 y260 w380 r12"),
+        App.AddGroupBox("Section x30 y260 w300 r12"),
         App.AddCheckBox((enabled ? "Checked" : "") . " xs10 yp", "客户端（前台）选项")
            .OnEvent("Click", (ctrl, _) => (comp.disable(!ctrl.Value), config.write("clientEnabled", ctrl.Value))),
         
         ; test connection
         App.ARButton("xs20 w60 h30 yp+30", "测试连接").OnEvent("Click", ping),
-        App.AddText("x+10 h30 0x200", "后台服务状态: "),
-        App.ARText("vstatusText w200 h30 x+1 0x200", "{1}", connection).SetFontStyles(statusTextStyle),
+        App.AddText("x+5 h30 0x200", "服务状态: "),
+        App.ARText("vstatusText w150 h30 x+1 0x200", "{1}", connection).SetFontStyles(statusTextStyle),
 
         ; post status list
         App.AddText("xs20 yp+50 h20 0x200", "已发送代行状态").SetFont("Bold"),
