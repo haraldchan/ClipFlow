@@ -20,30 +20,32 @@ QM_Panel(App, isListening) {
         moduleComponents[module.name] := module
     }
 
-
-    makeShare(*) {
-        form := App.getComponent("BlankShare").submit()
-        MSGBOX JSON.Stringify(form)
+    delegateQmActions(module, cleanup := () => {}) {
+        form := App.getComponent(module).submit()
         SetTimer(() => (
             post := qmAgent.delegate({
-                module: "BlankShare",
-                room: form.room,
-                shareQty: form.shareQty,
-                checkIn: form.checkIn
+                module: module,
+                form: form
             }),
             post.status := "已发送",
-            postQueue.set(queue => queue.unshift(post))
-        ), -250)
+            ; postQueue.set(queue => queue.unshift(post))
+        ), -250)   
+        return cleanup()
     }
 
     comingSoon(*) {
-        MsgBox("敬 请 期 待", "Server Agent", "4096 T1")
+        MsgBox("敬 请 期 待", "QM2 Agent", "4096 T1")
         return "end"
     }
     
     onLoad() {
-        App.getCtrlByName("BlankShareAction").OnEvent("Click", comingSoon, -1)
-        App.getCtrlByName("PaymentRelationAction").OnEvent("Click", comingSoon, -1)
+        App.getCtrlByName("BlankShareAction").OnEvent("Click", (*) => 
+            delegateQmActions("BlankShare", () => (
+                App.getCtrlByName("shareRoomNums").Value := "",
+                App.getCtrlByName("checkIn").Value := 1,
+                App.getCtrlByName("shareQty").Value := 1
+            )), -1)
+        App.getCtrlByName("PaymentRelationAction").OnEvent("Click", (*) => delegateQmActions("PaymentRelation"), -1)
     }
 
     return (
@@ -52,7 +54,11 @@ QM_Panel(App, isListening) {
             App.AddRadio(A_Index == 1 ? "Checked xs10 yp+30 h20" : "xs10 yp+30 h20", modules[module])
                .OnEvent("Click", (*) => selectedModule.set(module.name))
         ),
-        Dynamic(selectedModule, moduleComponents, { App: App, styles: { xPos:"x350 ", yPos: "y200 ", wide: "w350 ", rPanelXPos: "x530 "} }),
+        Dynamic(
+            selectedModule, 
+            moduleComponents, 
+            { App: App, styles: { xPos:"x350 ", yPos: "y200 ", wide: "w350 ", rPanelXPos: "x530 "} }
+        ),
 
         ; override action events
         onLoad()
