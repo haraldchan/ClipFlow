@@ -5,7 +5,8 @@ class QM2_Agent extends useServerAgent {
 
         this.currentHandlingPost := ""
         this.moduleIndex := Map(
-            "BlankShare", this.blankShareHandler
+            "BlankShare", BlankShare_Action,
+            "PaymentRelation", PaymentRelation_Action
         )
 
         ; binding methods timer methods
@@ -48,7 +49,8 @@ class QM2_Agent extends useServerAgent {
             return
         }
         posts := this.COLLECT("PENDING") 
-        if (posts.Length == 0) {
+        if (posts.Length == 0 || this.isListening.value != "在线") {
+            ; return if no post, or not idle, prevent conflict with other server agents.
             return
         }
 
@@ -58,8 +60,8 @@ class QM2_Agent extends useServerAgent {
         for post in unboxedPosts {
             this.currentHandlingPost := post
 
-            ; calls handler
-            this.moduleIndex[post["module"]].Call()
+            ; call QM action module
+            ObjBindMethod(this.moduleIndex[post["content"]["module"]], "USE", post["content"]["form"]).Call()
 
             this.currentHandlingPost := ""
             this.updatePostStatus(post[A_Index], "MODIFIED")
@@ -67,25 +69,6 @@ class QM2_Agent extends useServerAgent {
 
         this.isListening.set("在线")
     }
-
-
-    /**
-     * <Agent>
-     * @param {String[]} posts 
-     */
-    blankSharehandler(post) {
-        ; search
-        MouseMove 329, 196 ; room number field
-        Click 3
-        utils.waitLoading()
-        Send post["content"]["room"]
-        utils.waitLoading()
-        Send "!h" ; alt+h => search
-        utils.waitLoading()
-        ; call module's USE method
-        BlankShare_Action.USE(post["content"]["checkIn"], post["content"]["shareQty"])
-    }
-
 
     /**
      * <Client> Send post to pool
