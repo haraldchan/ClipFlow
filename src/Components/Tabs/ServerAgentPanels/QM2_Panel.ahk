@@ -57,7 +57,7 @@ QM_Panel(App, isListening) {
         Dynamic(
             selectedModule, 
             moduleComponents, 
-            { App: App, styles: { xPos:"x350 ", yPos: "y200 ", wide: "w350 ", rPanelXPos: "x530 "} }
+            { App: App, styles: { xPos:"x350 ", yPos: "y200 ", wide: "w350 ", rPanelXPos: "x530 ", useCopyBtn: false} }
         ),
 
         ; override action events
