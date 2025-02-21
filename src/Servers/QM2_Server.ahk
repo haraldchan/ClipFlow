@@ -64,7 +64,7 @@ class QM2_Agent extends useServerAgent {
             ObjBindMethod(this.moduleIndex[post["content"]["module"]], "USE", post["content"]["form"]).Call()
 
             this.currentHandlingPost := ""
-            this.updatePostStatus(post[A_Index], "MODIFIED")
+            this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
 
         this.isListening.set("在线")

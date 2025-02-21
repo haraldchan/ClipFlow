@@ -98,7 +98,7 @@ class ProfileModifyNext_Agent extends useServerAgent {
                 PMN_Waterfall.cascade(c["rooms"], c["profiles"], c["overwrite"], c["party"])
             }
             this.currentHandlingPost := ""
-            this.updatePostStatus(post[A_Index], "MODIFIED")
+            this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
 
         this.isListening.set("在线")
