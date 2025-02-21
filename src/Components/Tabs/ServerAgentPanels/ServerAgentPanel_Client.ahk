@@ -11,7 +11,9 @@ ServerAgentPanel_Client(App, enabled, agent) {
         "MODIFIED", "已完成",
         "ABORTED", "错误终止",
         "RESENT", "已重发",
-        "ABANDONED", "超时弃用"
+        "ABANDONED", "超时弃用",
+        "PING", "连接中",
+        "ONLINE", "已连接"
     )
 
     connection := signal("未连接")
