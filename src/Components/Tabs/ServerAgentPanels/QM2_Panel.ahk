@@ -1,4 +1,4 @@
-#Include "../../../../../QM2-for-FrontDesk/src/ActionModules/ActionModuleIndex.ahk"
+#Include "../../../../../QM2-for-FrontDesk-main/src/ActionModules/ActionModuleIndex.ahk"
 
 QM_Panel(App, isListening) {
     qmAgent := QM2_Agent({ 
@@ -26,11 +26,34 @@ QM_Panel(App, isListening) {
             post := qmAgent.delegate({
                 module: module,
                 form: form
-            }),
-            post.status := "已发送",
+            })
+            ; post.status := "已发送",
             ; postQueue.set(queue => queue.unshift(post))
         ), -250)   
+        MsgBox("QM 2 代行任务已发送。", "QM2 Agent", "4096 T1")
         return cleanup()
+    }
+
+    handleBlankShareDelegate(*) {
+        if (!App.getCtrlByName("shareRoomNums").Value) {
+            return "end"
+        }
+
+        delegateQmActions("BlankShare", () => (
+            App.getCtrlByName("shareRoomNums").Value := "",
+            App.getCtrlByName("checkIn").Value := 1,
+            App.getCtrlByName("shareQty").Value := 1
+        ))
+        return "end"
+    }
+
+    handlePaymentRelationDelegate(*) {
+        if (!App.getCtrlByName("pfRoom").Value || !App.getCtrlByName("pfName").Value) {
+            return "end"
+        }
+
+        delegateQmActions("PaymentRelation")
+        return "end"
     }
 
     comingSoon(*) {
@@ -39,17 +62,13 @@ QM_Panel(App, isListening) {
     }
     
     onLoad() {
-        App.getCtrlByName("BlankShareAction").OnEvent("Click", (*) => 
-            delegateQmActions("BlankShare", () => (
-                App.getCtrlByName("shareRoomNums").Value := "",
-                App.getCtrlByName("checkIn").Value := 1,
-                App.getCtrlByName("shareQty").Value := 1
-            )), -1)
-        App.getCtrlByName("PaymentRelationAction").OnEvent("Click", (*) => delegateQmActions("PaymentRelation"), -1)
+        App.getCtrlByName("BlankShareAction").OnEvent("Click", handleBlankShareDelegate, -1)
+        App.getCtrlByName("PaymentRelationAction").OnEvent("Click", handlePaymentRelationDelegate, -1)
+        
     }
 
     return (
-        App.AddGroupBox("Section w370 h464 x340 y108", "QM2 Server").SetFont("s12 Bold"),
+        App.AddGroupBox("Section w370 h464 x340 y108", "QM2 Agent").SetFont("s12 Bold"),
         modules.keys().map(module =>
             App.AddRadio(A_Index == 1 ? "Checked xs10 yp+30 h20" : "xs10 yp+30 h20", modules[module])
                .OnEvent("Click", (*) => selectedModule.set(module.name))
