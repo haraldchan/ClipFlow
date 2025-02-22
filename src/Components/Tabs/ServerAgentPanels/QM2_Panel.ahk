@@ -22,6 +22,7 @@ QM_Panel(App, isListening) {
 
     delegateQmActions(module, cleanup := () => {}) {
         form := App.getComponent(module).submit()
+        qmSent := App.getCtrlByName("qmSent")
         SetTimer(() => (
             post := qmAgent.delegate({
                 module: module,
@@ -30,7 +31,9 @@ QM_Panel(App, isListening) {
             ; post.status := "已发送",
             ; postQueue.set(queue => queue.unshift(post))
         ), -250)   
-        MsgBox("QM 2 代行任务已发送。", "QM2 Agent", "4096 T1")
+        qmSent.visible := true
+        SetTimer(() => qmSent.visible := false, -2000)
+
         return cleanup()
     }
 
@@ -69,6 +72,7 @@ QM_Panel(App, isListening) {
 
     return (
         App.AddGroupBox("Section w370 h464 x340 y108", "QM2 Agent").SetFont("s12 Bold"),
+        App.AddText("vqmSent Hidden xs120 yp+2", "代行任务已发送！").SetFont("cGreen Bold"),
         modules.keys().map(module =>
             App.AddRadio(A_Index == 1 ? "Checked xs10 yp+30 h20" : "xs10 yp+30 h20", modules[module])
                .OnEvent("Click", (*) => selectedModule.set(module.name))
