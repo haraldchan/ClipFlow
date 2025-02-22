@@ -28,8 +28,6 @@ QM_Panel(App, isListening) {
                 module: module,
                 form: form
             })
-            ; post.status := "已发送",
-            ; postQueue.set(queue => queue.unshift(post))
         ), -250)   
         qmSent.visible := true
         SetTimer(() => qmSent.visible := false, -2000)
@@ -39,35 +37,31 @@ QM_Panel(App, isListening) {
 
     handleBlankShareDelegate(*) {
         if (!App.getCtrlByName("shareRoomNums").Value) {
-            return "end"
+            return 0
         }
 
-        delegateQmActions("BlankShare", () => (
+        return delegateQmActions("BlankShare", () => (
             App.getCtrlByName("shareRoomNums").Value := "",
             App.getCtrlByName("checkIn").Value := 1,
             App.getCtrlByName("shareQty").Value := 1
         ))
-        return "end"
     }
 
     handlePaymentRelationDelegate(*) {
         if (!App.getCtrlByName("pfRoom").Value || !App.getCtrlByName("pfName").Value) {
-            return "end"
+            return 0
         }
 
-        delegateQmActions("PaymentRelation")
-        return "end"
+        return delegateQmActions("PaymentRelation")
     }
 
     comingSoon(*) {
-        MsgBox("敬 请 期 待", "QM2 Agent", "4096 T1")
-        return "end"
+        return MsgBox("敬 请 期 待", "QM2 Agent", "4096 T1")
     }
     
     onLoad() {
         App.getCtrlByName("BlankShareAction").OnEvent("Click", handleBlankShareDelegate, -1)
         App.getCtrlByName("PaymentRelationAction").OnEvent("Click", handlePaymentRelationDelegate, -1)
-        
     }
 
     return (
