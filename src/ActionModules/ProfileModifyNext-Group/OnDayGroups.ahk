@@ -51,7 +51,7 @@ OnDayGroups(App, selectedGroup) {
         
         ; group selector radios
         arrvingGroups.value.map(group => 
-            App.AddRadio((A_Index = 1 ? "Checked " : "") . "h28 w200 y+10", Format("{1} - {2}", group["blockName"], group["blockCode"]))
+            App.AddRadio((A_Index = 1 ? "Checked " : "") . "h28 w280 y+10", Format("{1} - {2}", group["blockName"], group["blockCode"]))
                .OnEvent("Click", (*) => selectedGroup.set(group))
         )
     )

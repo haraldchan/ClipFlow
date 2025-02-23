@@ -31,7 +31,7 @@ PMNG_App(App, popupTitle, db) {
         guestInfo := PMNG_Data.getGroupGuests(db, groupInfo["inhRooms"], fetchPeriod.value)
 
         currentGroupRooms.set(groupInfo["inhRooms"])
-        loadedGuests.set(guestInfo)
+        loadedGuests.set(guestInfo.Length == 0 ? [{ roomNum: "Nil", name: "Nil" }] : guestInfo)
     }
 
     performModify(*) {
@@ -45,7 +45,7 @@ PMNG_App(App, popupTitle, db) {
     }
 
     return (
-        App.AddGroupBox("R16 y+20 w550", " "),
+        App.AddGroupBox("R16 y+20 w685", " "),
         App.AddText("xp15 ", popupTitle . " ⓘ ")
            .OnEvent("Click", (*) => PMNG_Settings(fetchPeriod)),
 
