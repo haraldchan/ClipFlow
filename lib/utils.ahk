@@ -20,8 +20,11 @@ class utils {
 
     ; Exit app with clean reload.
     static quitApp(appName, popupTitle, winGroup) {
-        quitConfirm := MsgBox(Format("是否退出 {1}？", appName), popupTitle, "OKCancel 4096")
-        quitConfirm = "OK" ? this.cleanReload(winGroup, "quit") : this.cleanReload(winGroup)
+        if (MsgBox(Format("是否退出 {1}？", appName), popupTitle, "OKCancel 4096") == "OK") {
+            this.cleanReload(winGroup, "quit")
+        } else {
+            return true
+        }
     }
 
     ; Insert text at the beginning of file.
