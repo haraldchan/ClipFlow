@@ -24,7 +24,7 @@ PostDetails(post) {
 
     handleRepost(*) {
         SetTimer(() => (
-            newPost := agent.delegate({
+            newPost := pmnAgent.delegate({
                 mode: post["content"]["mode"],
                 overwrite: post["content"]["overwrite"],
                 rooms: profiles.value.map(p => p["roomNum"]).unique(),
@@ -40,7 +40,7 @@ PostDetails(post) {
     }
 
     renameResendPost(id) {
-        loop files (agent.pool . "\*.json") {
+        loop files (pmnAgent.pool . "\*.json") {
             if (InStr(A_LoopFileFullPath, id)) {
                 status := StrSplit(A_LoopFileName, "==")[1]
                 FileMove(A_LoopFileFullPath, StrReplace(A_LoopFileFullPath, status, "RESENT"))

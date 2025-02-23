@@ -6,7 +6,7 @@
 
 ServerAgentPanel(App) {
     isListening := signal("离线")
-    global agent := ProfileModifyNext_Agent({
+    global pmnAgent := ProfileModifyNext_Agent({
         pool: A_ScriptDir . "\src\Servers\pmn-pool",
         interval: 3000,
         expiration: 1,
@@ -19,10 +19,10 @@ ServerAgentPanel(App) {
         App.AddText("x30 y75 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold"),
 
         ; server-side options
-        ServerAgentPanel_Agent(App, config.read("agentEnabled"), agent, isListening),
+        ServerAgentPanel_Agent(App, config.read("agentEnabled"), pmnAgent, isListening),
         
         ; client-side options
-        ServerAgentPanel_Client(App, config.read("clientEnabled"), agent)
+        ServerAgentPanel_Client(App, config.read("clientEnabled"), pmnAgent)
 
         ; qm2 panel
         QM_Panel(App, isListening)

@@ -9,7 +9,7 @@ ServerAgentPanel_Agent(App, enabled, agent, isListening) {
     )
 
     collectInterval := signal(3000)
-    effect(collectInterval, cur => (agent.interval := cur))
+    effect(collectInterval, cur => (pmnAgent.interval := cur))
     effect(isListening, cur => App.getCtrlByText("启动服务").Value := cur == "离线" ? false : true)
 
     handleConnect(ctrl, _) {

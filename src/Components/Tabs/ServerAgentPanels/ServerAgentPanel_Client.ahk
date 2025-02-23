@@ -28,7 +28,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
         connection.set("连接中...")
         ctrl.Enabled := false
         
-        res := agent.PING()
+        res := pmnAgent.PING()
         if (!res) {
             connection.set("无响应")
         } else {
@@ -44,7 +44,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
                 continue
             }
 
-            loop files (agent.pool . "\*.json") {
+            loop files (pmnAgent.pool . "\*.json") {
                 if (InStr(A_LoopFileName, post["id"])) {
                     collectedPostStatus := StrSplit(A_LoopFileName, "==")[1]
                     if (post["status"] == postStatus[collectedPostStatus]) {
@@ -62,7 +62,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
     handlePostInit() {
         ownPosts := []
         
-        loop files (agent.pool . "\*.json") {
+        loop files (pmnAgent.pool . "\*.json") {
             if (InStr(A_LoopFileName, A_ComputerName)) {
                 status := StrSplit(A_LoopFileName, "==")[1]
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))

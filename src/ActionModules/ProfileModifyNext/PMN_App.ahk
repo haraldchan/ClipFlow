@@ -15,7 +15,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         }
         
         SetTimer(() => (
-            !agent.PING() && (
+            !pmnAgent.PING() && (
                 delegate.set(false), 
                 ctrl.Value := false,
                 MsgBox("无响应。请确保后台服务已启动。", "Server Agent", "4096 T1")
@@ -294,7 +294,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
             if (delegate.value) {
                 SetTimer(() => (
-                    post := agent.delegate({
+                    post := pmnAgent.delegate({
                         mode: "waterfall",
                         overwrite: settings.value["fillOverwrite"],
                         rooms: rooms,
