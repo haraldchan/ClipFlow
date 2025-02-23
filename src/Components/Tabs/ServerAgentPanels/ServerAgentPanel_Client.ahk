@@ -47,12 +47,12 @@ ServerAgentPanel_Client(App, enabled, agent) {
             loop files (agent.pool . "\*.json") {
                 if (InStr(A_LoopFileName, post["id"])) {
                     collectedPostStatus := StrSplit(A_LoopFileName, "==")[1]
-                    if (post["status"] == collectedPostStatus) {
+                    if (post["status"] == postStatus[collectedPostStatus]) {
                         continue
                     }
 
                     newPost := post.deepClone()
-                    newPost["status"] := collectedPostStatus
+                    newPost["status"] := postStatus[collectedPostStatus]
                     postQueue.update(A_Index, newPost)
                 }
             } 
