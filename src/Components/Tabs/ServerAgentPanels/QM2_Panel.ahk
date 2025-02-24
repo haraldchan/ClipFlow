@@ -20,6 +20,12 @@ QM_Panel(App, isListening) {
         moduleComponents[module.name] := module
     }
 
+    db := useFileDB({
+        main: A_ScriptDir . "\src\ActionModules\ProfileModifyNext\GuestProfiles",
+        archive: A_ScriptDir . "\src\ActionModules\ProfileModifyNext\GuestProfilesArchive",
+        backup: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\GuestProfilesBackup",
+    })
+
     delegateQmActions(module, cleanup := () => {}) {
         form := App.getComponent(module).submit()
         qmSent := App.getCtrlByName("qmSent")
@@ -40,10 +46,28 @@ QM_Panel(App, isListening) {
             return 0
         }
 
+        isSendPmPost := App.getCtrlByName("sendPmPost").Value
+        if (isSendPmPost) {
+            roomNums := App.getCtrlByName("shareRoomNums").Value
+            profiles := db.load(,, pmnAgent.collectRange)
+                          .filter(guest => roomNums.includes(guest["roomNum"]))
+        }
+
         return delegateQmActions("BlankShare", () => (
             App.getCtrlByName("shareRoomNums").Value := "",
             App.getCtrlByName("checkIn").Value := 1,
-            App.getCtrlByName("shareQty").Value := 1
+            App.getCtrlByName("shareQty").Value := 1,
+            isSendPmPost && SetTimer(() => (
+                post := pmnAgent.delegate({
+                    mode: "waterfall",
+                    overwrite: false,
+                    rooms: roomNums.trim().split(" "),
+                    party: "",
+                    profiles: profiles
+                }),
+                post.status := "已发送",
+                postQueue.set(queue => queue.unshift(post))
+            ), -250)
         ))
     }
 
@@ -54,15 +78,12 @@ QM_Panel(App, isListening) {
 
         return delegateQmActions("PaymentRelation")
     }
-
-    comingSoon(*) {
-        return MsgBox("敬 请 期 待", "QM2 Agent", "4096 T1")
-    }
     
     onLoad() {
         App.getCtrlByName("BlankShareAction").OnEvent("Click", handleBlankShareDelegate, -1)
         App.getCtrlByName("PaymentRelationAction").OnEvent("Click", handlePaymentRelationDelegate, -1)
     }
+
 
     return (
         App.AddGroupBox("Section w370 h464 x340 y108", "QM2 Agent").SetFont("s12 Bold"),
@@ -74,7 +95,11 @@ QM_Panel(App, isListening) {
         Dynamic(
             selectedModule, 
             moduleComponents, 
-            { App: App, styles: { xPos:"x350 ", yPos: "y200 ", wide: "w350 ", rPanelXPos: "x530 ", useCopyBtn: false} }
+            { 
+                App: App, 
+                styles: { xPos:"x350 ", yPos: "y200 ", wide: "w350 ", rPanelXPos: "x530 ", useCopyBtn: false },
+                BlankShare: { children: App => App.AddCheckBox("vsendPmPost xs10 h20 x+10 0x200", "Share 后录入 Profile") } 
+            }
         ),
 
         ; override action events
