@@ -1,4 +1,4 @@
-#Include "../../../../../QM2-for-FrontDesk-main/src/ActionModules/ActionModuleIndex.ahk"
+#Include "../../../../../QM2-for-FrontDesk/src/ActionModules/ActionModuleIndex.ahk"
 
 QM2_Panel(App, isListening) {
     qmAgent := QM2_Agent({ 
@@ -20,11 +20,7 @@ QM2_Panel(App, isListening) {
         moduleComponents[module.name] := module
     }
 
-    db := useFileDB({
-        main: A_ScriptDir . "\src\ActionModules\ProfileModifyNext\GuestProfiles",
-        archive: A_ScriptDir . "\src\ActionModules\ProfileModifyNext\GuestProfilesArchive",
-        backup: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\GuestProfilesBackup",
-    })
+    db := useFileDB(config.read("dbSetting"))
 
     resMessage := {}
     delegateQmActions(module, cleanup := () => {}) {

@@ -4,9 +4,11 @@
     "tabPos":1
   },
   "clipHistory":[" "," "],
-  "profileModifyNext": {
-    "centralPath": "",
-    "localPath" : ""
+  "dbSetting": {
+    "main": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfiles",
+    "archive": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfilesArchive",
+    "backup": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\GuestProfilesBackup",
+    "cleanPeriod": 180
   },
   "resvHandler":{
     "JSON":{}
