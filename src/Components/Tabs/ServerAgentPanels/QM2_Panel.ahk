@@ -1,6 +1,6 @@
-#Include "../../../../../QM2-for-FrontDesk/src/ActionModules/ActionModuleIndex.ahk"
+#Include "../../../../../QM2-for-FrontDesk-main/src/ActionModules/ActionModuleIndex.ahk"
 
-QM_Panel(App, isListening) {
+QM2_Panel(App, isListening) {
     qmAgent := QM2_Agent({ 
         pool: A_ScriptDir . "\src\Servers\qm-pool",
         interval: 3000,
@@ -26,17 +26,19 @@ QM_Panel(App, isListening) {
         backup: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\GuestProfilesBackup",
     })
 
+    resMessage := {}
     delegateQmActions(module, cleanup := () => {}) {
         form := App.getComponent(module).submit()
         qmSent := App.getCtrlByName("qmSent")
+        qmSent.visible := true
+        SetTimer(() => qmSent.visible := false, -2000)
+
         SetTimer(() => (
-            post := qmAgent.delegate({
+            resMessage := qmAgent.delegate({
                 module: module,
                 form: form
             })
         ), -250)   
-        qmSent.visible := true
-        SetTimer(() => qmSent.visible := false, -2000)
 
         return cleanup()
     }
@@ -47,28 +49,47 @@ QM_Panel(App, isListening) {
         }
 
         isSendPmPost := App.getCtrlByName("sendPmPost").Value
+         delegateQmActions("BlankShare", () => (
+            !isSendPmPost && App.getCtrlByName("shareRoomNums").Value := "",
+            App.getCtrlByName("checkIn").Value := 1,
+            App.getCtrlByName("shareQty").Value := 1
+        ))
+
         if (isSendPmPost) {
-            roomNums := App.getCtrlByName("shareRoomNums").Value
-            profiles := db.load(,, pmnAgent.collectRange)
-                          .filter(guest => roomNums.includes(guest["roomNum"]))
+            SetTimer(handleTriggerPmPost, 1000)
         }
 
-        return delegateQmActions("BlankShare", () => (
-            App.getCtrlByName("shareRoomNums").Value := "",
-            App.getCtrlByName("checkIn").Value := 1,
-            App.getCtrlByName("shareQty").Value := 1,
-            isSendPmPost && SetTimer(() => (
+        return 0
+    }
+
+    handleTriggerPmPost() {
+        if (!resMessage.hasOwnProp("id")) {
+            return
+        }
+
+        loop files (qmAgent.pool . "\*.json") {
+            if (A_LoopFileName.includes(resMessage.id)) {
+                if (!A_LoopFileName.includes("MODIFIED")) {
+                    return
+                }
+            }
+        }
+
+        SetTimer(, 0)
+
+        roomNums := App.getCtrlByName("shareRoomNums").Value
+        App.getCtrlByName("shareRoomNums").Value := ""
+        profiles := db.load(,, 480)
+                      .filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
+
+        SetTimer(() => (
                 post := pmnAgent.delegate({
-                    mode: "waterfall",
-                    overwrite: false,
                     rooms: roomNums.trim().split(" "),
-                    party: "",
                     profiles: profiles
                 }),
                 post.status := "已发送",
                 postQueue.set(queue => queue.unshift(post))
-            ), -250)
-        ))
+        ), -250)
     }
 
     handlePaymentRelationDelegate(*) {
@@ -98,7 +119,7 @@ QM_Panel(App, isListening) {
             { 
                 App: App, 
                 styles: { xPos:"x350 ", yPos: "y200 ", wide: "w350 ", rPanelXPos: "x530 ", useCopyBtn: false },
-                BlankShare: { children: App => App.AddCheckBox("vsendPmPost xs10 h20 x+10 0x200", "Share 后录入 Profile") } 
+                BlankShare: { children: App => App.AddCheckBox("vsendPmPost h20 x+20 yp 0x200", "Share Check-in 后录入 Profile") } 
             }
         ),
 
