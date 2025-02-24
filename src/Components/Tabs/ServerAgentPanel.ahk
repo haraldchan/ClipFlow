@@ -25,6 +25,6 @@ ServerAgentPanel(App) {
         ServerAgentPanel_Client(App, config.read("clientEnabled"), pmnAgent)
 
         ; qm2 panel
-        QM_Panel(App, isListening)
+        QM2_Panel(App, isListening)
     )
 }
