@@ -20,7 +20,7 @@ QM2_Panel(App, isListening) {
         moduleComponents[module.name] := module
     }
 
-    db := useFileDB(config.read("dbSetting"))
+    db := useFileDB(config.read("dbSettings"))
 
     resMessage := {}
     delegateQmActions(module, cleanup := () => {}) {
