@@ -65,10 +65,13 @@ class useServerAgent {
             if (InStr(A_LoopFileName, "PING")) {
                 header := StrSplit(A_LoopFileName, "==")
                 responseHeader := Format("{}=={}=={}", "ONLINE", A_ComputerName, header[3])
-                FileMove(
-                    A_LoopFileFullPath, 
-                    StrReplace(A_LoopFileFullPath, A_LoopFileName, responseHeader)
-                )
+                try {
+                    FileMove(
+                        A_LoopFileFullPath, 
+                        StrReplace(A_LoopFileFullPath, A_LoopFileName, responseHeader)
+                    )
+                }
+
                 return responseHeader
             }
         }
