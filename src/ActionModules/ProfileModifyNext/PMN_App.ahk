@@ -294,17 +294,13 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
             if (delegate.value) {
                 SetTimer(() => (
-                    post := pmnAgent.delegate({
+                    pmnAgent.delegate({
                         mode: "waterfall",
                         overwrite: settings.value["fillOverwrite"],
                         rooms: rooms,
                         party: party,
                         profiles: selectedGuests
-                    }),
-                    post.status := "已发送",
-                    ; newQueue := postQueue.value.unshift(post),
-                    ; postQueue.set(newQueue)
-                    postQueue.set(queue => queue.unshift(post))
+                    })
                 ), -250)
             } else {
                 PMN_Waterfall.cascade(rooms, selectedGuests, settings.value["fillOverwrite"], party)

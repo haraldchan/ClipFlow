@@ -1,11 +1,5 @@
 PostDetails(post) {
-    ; prevent QM2 agent posts (for now!)
-    if (post["content"].has("module")) {
-        MsgBox("(QM2 消息不适用)", "Server Agent", "4096 T2")
-        return
-    }
-
-    PD := Gui(, "Post Details")
+    PD := Gui(, "Post Details - " . post["id"])
     PD.SetFont(, "微软雅黑")
     PD.OnEvent("Close", (*) => PD.Destroy())
     
@@ -24,16 +18,14 @@ PostDetails(post) {
 
     handleRepost(*) {
         SetTimer(() => (
-            newPost := pmnAgent.delegate({
+            pmnAgent.delegate({
                 mode: post["content"]["mode"],
                 overwrite: post["content"]["overwrite"],
                 rooms: profiles.value.map(p => p["roomNum"]).unique(),
                 party: post["content"]["party"],
                 profiles: profiles.value
             }),
-            newPost.status := "已发送",
-            renameResendPost(post["id"]),
-            postQueue.set(cur => cur.unshift(newPost))
+            renameResendPost(post["id"])
         ), -250)
 
         PD.Destroy()
@@ -61,15 +53,16 @@ PostDetails(post) {
     }
 
     return (
-        PD.AddGroupBox("Section w560 r11", "代行详情").SetFont("Bold"),
+        PD.AddGroupBox("Section w560 r12", "代行详情").SetFont("Bold"),
         PD.AddText("xs10 yp+20", "发送状态: " . post["status"]),
+        PD.AddText("xs10 yp+20", "发送时间: " . post["time"]),
         PD.AddText("xs10 w200 yp+30" , "客人资料").SetFont("Bold s10"),
         
         ; post guest list
         PD.ARListView(options, columnDetails, profiles).OnEvent("ItemEdit", handleProfilesUpdate),
         
         ; repost btn
-        PD.AddButton("w120 h30 y+20", "重新发送代行").OnEvent("Click", handleRepost),
+        PD.AddButton("w120 h30 y+25", "重新发送代行").OnEvent("Click", handleRepost),
         
         PD.Show()
     )

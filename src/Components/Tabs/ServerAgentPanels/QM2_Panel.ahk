@@ -79,12 +79,10 @@ QM2_Panel(App, isListening) {
                       .filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
 
         SetTimer(() => (
-                post := pmnAgent.delegate({
-                    rooms: roomNums.trim().split(" "),
-                    profiles: profiles
-                }),
-                post.status := "已发送",
-                postQueue.set(queue => queue.unshift(post))
+            post := pmnAgent.delegate({
+                rooms: roomNums.trim().split(" "),
+                profiles: profiles
+            })
         ), -250)
     }
 
