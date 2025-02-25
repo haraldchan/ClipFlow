@@ -24,11 +24,11 @@ QM2_Panel(App, isListening) {
 
     resMessage := {}
     delegateQmActions(module, cleanup := () => {}) {
-        form := App.getComponent(module).submit()
         qmSent := App.getCtrlByName("qmSent")
         qmSent.visible := true
         SetTimer(() => qmSent.visible := false, -2000)
 
+        form := App.getComponent(module).submit()
         SetTimer(() => (
             resMessage := qmAgent.delegate({
                 module: module,
