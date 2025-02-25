@@ -44,13 +44,17 @@ History(App) {
 
 	handleCopyHistory(ctrl, item) {
 		A_Clipboard := item
-		ctrl.Text := "✅"
-		SetTimer(() => ctrl.Text := "📋", -1000)
+		
+		ctrl.SetFont("s10")
+		ctrl.Text := "☑"
+		SetTimer(() => (ctrl.Text := "⿻", ctrl.SetFont("s14")), -1000)
 	}
 
 	return (
 		clipHistory.value.map(item => (
-			App.AddButton("x30 y+10 w40 h40", "📋").OnEvent("Click", (ctrl, _) => handleCopyHistory(ctrl, item)),
+			App.ARButton("x30 y+10 w40 h40", "⿻")
+			   .SetFont("s14")
+			   .OnEvent("Click", (ctrl, _) => handleCopyHistory(ctrl, item)),
 			App.AREdit("x+0 h40 w250 ReadOnly", "{1}", clipHistory, A_Index)
 		))
 	)
