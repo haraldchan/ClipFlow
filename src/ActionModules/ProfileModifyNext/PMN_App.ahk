@@ -180,7 +180,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
     handleSearchResultFilter(loadedItems) {
         filteredItems := []
-        searchInput := Trim(queryFilter.value["search"])
+        searchInput := queryFilter.value["search"]
 
         if (searchInput == "") {
             return loadedItems
@@ -378,7 +378,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         
         ; search box
         App.AREdit("vsearchBox x+5 w210 h25")
-           .OnEvent("LoseFocus", (ctrl, _) => queryFilter.update("search", ctrl.Value)),
+           .OnEvent("LoseFocus", (ctrl, _) => queryFilter.update("search", Trim(ctrl.Value))),
         
         ; range
         App.AddText("x+10 h25 0x200", "最近"),
