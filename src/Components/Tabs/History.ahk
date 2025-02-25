@@ -15,12 +15,12 @@ History(App) {
 		updated := config.read("clipHistory")
 		
 		for item in updated {
-			if (A_Clipboard = item) {
+			if (A_Clipboard == item) {
 				return
 			}
 		}
 
-		if (updated.Length = 10) {
+		if (updated.Length == 10) {
 			updated.Pop()
 		}
 		updated.InsertAt(1, A_Clipboard)
@@ -45,9 +45,15 @@ History(App) {
 	handleCopyHistory(ctrl, item) {
 		A_Clipboard := item
 		
+		ctrl.Enabled := false
 		ctrl.SetFont("s10")
 		ctrl.Text := "☑"
-		SetTimer(() => (ctrl.Text := "⿻", ctrl.SetFont("s14")), -1000)
+
+		SetTimer(() => (
+			ctrl.Text := "⿻", 
+			ctrl.SetFont("s14"),
+			ctrl.Enabled := true
+		), -1000)
 	}
 
 	return (
