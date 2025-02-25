@@ -18,10 +18,12 @@ class Component {
         this.GuiObj := GuiObj
         this.name := name
         this.props := {}
-        this.defineProps(props)
         this.ctrls := []
+        this.children := () => {}
         this.childComponents := []
-
+        
+        this.defineProps(props)
+        this.defineChildren()
         GuiObj.components.Push(this)
     }
 
@@ -77,8 +79,17 @@ class Component {
      */
     defineProps(props) {
         checkType(props, Object.Prototype)
+        
         for name, val in props.OwnProps() {
-            this.props.DefineProp(name, { Value: val })
+            if (name == this.name) {
+                this.props := val
+            }
+        }
+    }
+
+    defineChildren() {
+        if (this.props.HasOwnProp("children")) {
+            this.children := this.props.children.Bind(this.GuiObj)
         }
     }
 
