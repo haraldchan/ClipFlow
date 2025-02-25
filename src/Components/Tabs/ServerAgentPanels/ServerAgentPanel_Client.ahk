@@ -28,7 +28,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
         connection.set("连接中...")
         ctrl.Enabled := false
         
-        res := pmnAgent.PING()
+        res := agent.PING()
         if (!res) {
             connection.set("无响应")
         } else {
@@ -38,31 +38,10 @@ ServerAgentPanel_Client(App, enabled, agent) {
         ctrl.Enabled := true
     }
 
-    handlePostQueueUpdate(*) {
-        for post in postQueue.value {
-            if (!post["id"]) {
-                continue
-            }
-
-            loop files (pmnAgent.pool . "\*.json") {
-                if (InStr(A_LoopFileName, post["id"])) {
-                    collectedPostStatus := StrSplit(A_LoopFileName, "==")[1]
-                    if (post["status"] == postStatus[collectedPostStatus]) {
-                        continue
-                    }
-
-                    newPost := post.deepClone()
-                    newPost["status"] := postStatus[collectedPostStatus]
-                    postQueue.update(A_Index, newPost)
-                }
-            } 
-        }
-    }
-
-    handlePostInit() {
+    handlePostUpdate(*) {
         ownPosts := []
         
-        loop files (pmnAgent.pool . "\*.json") {
+        loop files (agent.pool . "\*.json") {
             if (InStr(A_LoopFileName, A_ComputerName)) {
                 status := StrSplit(A_LoopFileName, "==")[1]
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
@@ -113,7 +92,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
         ; post status list
         App.AddText("xs20 yp+50 h20 0x200", "已发送代行状态").SetFont("Bold"),
         App.ARButton("x+5 h20 w20 +Center", "↻")
-           .OnEvent("Click", handlePostQueueUpdate)
+           .OnEvent("Click", handlePostUpdate)
            .SetFont("Bold"),
         App.ARListView(lvSettings.options, lvSettings.columnDetails, postQueue)
            .OnEvent("ContextMenu", showPostDetails)
@@ -122,6 +101,6 @@ ServerAgentPanel_Client(App, enabled, agent) {
     return (
         comp.render(), 
         comp.disable(!enabled),
-        handlePostInit()
+        handlePostUpdate()
     )
 }
