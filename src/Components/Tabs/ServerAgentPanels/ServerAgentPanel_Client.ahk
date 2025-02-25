@@ -3,7 +3,7 @@
 ServerAgentPanel_Client(App, enabled, agent) {
     comp := Component(App, A_ThisFunc)
 
-    global postQueue := signal([{ status: "", id: "" }])
+    postQueue := signal([{ status: "", time: "", id: "" }])
 
     postStatus := Map(
         "PENDING", "已发送",
@@ -46,6 +46,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
                 status := StrSplit(A_LoopFileName, "==")[1]
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
                 post["status"] := postStatus[status]
+                post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
                 ownPosts.InsertAt(1, post)
             }
         }
@@ -57,9 +58,9 @@ ServerAgentPanel_Client(App, enabled, agent) {
 
     lvSettings := {
         columnDetails: {
-            keys: ["status","id"],
-            titles: ["当前状态", "POST ID"],
-            widths: [60, 168]
+            keys: ["status", "time" ,"id"],
+            titles: ["当前状态", "发送时间", "POST ID"],
+            widths: [60, 120, 168]
         },
         options: {
             lvOptions: "Grid NoSortHdr -Multi LV0x4000 w260 r8 xs20 yp+25",
@@ -72,7 +73,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
             return
         }
 
-        selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 2))
+        selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 3))
         if (!selectedPost.has("content")) {
             return 
         }
