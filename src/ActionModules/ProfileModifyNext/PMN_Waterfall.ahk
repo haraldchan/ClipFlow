@@ -12,7 +12,11 @@ class PMN_Waterfall {
                 remaining := selectedGuests.filter(g => g["roomNum"] = curRoom.value).Length
 
                 if (guest["roomNum"] == curRoom.value) {
-                    this.search(room, index, party)
+                    res := this.search(room, index, party)
+                    if (res == "not found") {
+                        continue
+                    }
+
                     if (!PMN_FillIn.isRunning) {
                         msgbox("脚本已终止", popupTitle, "4096 T1")
                         return
@@ -41,8 +45,7 @@ class PMN_Waterfall {
     static search(roomNum, index, party := "") {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
-        MouseMove 329, 196 ; room number field
-        Click 3
+        Send "!r"
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -63,6 +66,13 @@ class PMN_Waterfall {
 
         Send "!h" ; alt+h => search
         utils.waitLoading()
+
+        CoordMode "Pixel", "Screen"
+        if (ImageSearch(&_, &_ ,0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\assets\info.PNG")) {
+            Send "{Enter}"
+            return "not found"
+        }
+
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
