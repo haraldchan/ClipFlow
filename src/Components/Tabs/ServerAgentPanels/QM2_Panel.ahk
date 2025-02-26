@@ -45,7 +45,7 @@ QM2_Panel(App, isListening) {
         }
 
         isSendPmPost := App.getCtrlByName("sendPmPost").Value
-         delegateQmActions("BlankShare", () => (
+        delegateQmActions("BlankShare", () => (
             !isSendPmPost && App.getCtrlByName("shareRoomNums").Value := "",
             App.getCtrlByName("checkIn").Value := 1,
             App.getCtrlByName("shareQty").Value := 1
