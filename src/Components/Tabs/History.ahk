@@ -42,8 +42,8 @@ History(App) {
 		fillBlank(updatedHistory)
 	}
 
-	handleCopyHistory(ctrl, item) {
-		A_Clipboard := item
+	handleCopyHistory(ctrl, index) {
+		A_Clipboard := clipHistory.value[index]
 		
 		ctrl.Enabled := false
 		ctrl.SetFont("s10")
@@ -57,10 +57,10 @@ History(App) {
 	}
 
 	return (
-		clipHistory.value.map(item => (
+		clipHistory.value.map((item, index) => (
 			App.ARButton("x30 y+10 w40 h40", "⿻")
 			   .SetFont("s14")
-			   .OnEvent("Click", (ctrl, _) => handleCopyHistory(ctrl, item)),
+			   .OnEvent("Click", (ctrl, _) => handleCopyHistory(ctrl, index)),
 			App.AREdit("x+0 h40 w250 ReadOnly", "{1}", clipHistory, A_Index)
 		))
 	)
