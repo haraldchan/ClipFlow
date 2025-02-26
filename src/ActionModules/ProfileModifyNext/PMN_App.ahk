@@ -11,8 +11,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     serverConnection := signal("")
     serverConnectionStatus := Map(
         "default", "Norm cBlack",
-        "服务在线", "Bold cGreen",
-        "无响应", "Bold cRed"
+        "后台服务在线", "Bold cGreen",
+        "超时无响应", "Bold cRed"
     )
     handleDelegateActivate(ctrl, _) {
         delegate.set(ctrl.Value)
@@ -26,8 +26,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
         SetTimer(() => (
             pmnAgent.PING() 
-                ? (connectionStatus.set("服务在线"), SetTimer(() => connectionStatus.Visible := false, -2000))
-                : (delegate.set(false), ctrl.Value := false, connectionStatus.set("无响应"))
+                ? (serverConnection.set("后台服务在线"), SetTimer(() => connectionStatus.Visible := false, -2000))
+                : (delegate.set(false), ctrl.Value := false, serverConnection.set("超时无响应"))
         ) , -100)
     }
 
@@ -368,7 +368,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         
         ; agent mode
         App.AddCheckBox("vdelegateCheckBox x+10 Disabled", "后台代行").OnEvent("Click", handleDelegateActivate),
-        App.ARText("vconnectionStatus x+20 Hidden", "{1}", serverConnection).SetFontStyles(serverConnectionStatus)
+        App.ARText("vconnectionStatus x+20 w80 Hidden", " {1}", serverConnection).SetFontStyles(serverConnectionStatus),
         
         ; datetime
         App.AddDateTime("vdate xs15 yp+25 w90 h25 Choose" . queryFilter.value["date"])
