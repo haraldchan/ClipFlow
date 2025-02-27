@@ -12,6 +12,7 @@ class ProfileModifyNext {
     }
     static fdb := useFileDB(this.dbSetting)
     static db := useDateBase(this.dbSetting)
+    static testers := ["4CE325BJNW", "4CE325BJS4", "4CE325BJRC"]
 
     static USE(App) {
         today := Format(A_Now, "yyyyMMdd")
