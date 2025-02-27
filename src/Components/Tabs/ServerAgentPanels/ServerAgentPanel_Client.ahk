@@ -4,7 +4,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
     comp := Component(App, A_ThisFunc)
 
     postQueue := signal([{ status: "", time: "", id: "" }])
-
+    
     postStatus := Map(
         "PENDING", "已发送",
         "COLLECTED", "处理中",
@@ -63,13 +63,13 @@ ServerAgentPanel_Client(App, enabled, agent) {
             widths: [60, 120, 168]
         },
         options: {
-            lvOptions: "Grid NoSortHdr -Multi LV0x4000 w260 r8 xs20 yp+25",
+            lvOptions: "Grid -Multi LV0x4000 w260 r8 xs20 yp+25",
             itemOptions: ""
         }
     }
 
     showPostDetails(LV, row, *) {
-        if (row == 0) {
+        if (row == 0 || row > 10000) {
             return
         }
 
