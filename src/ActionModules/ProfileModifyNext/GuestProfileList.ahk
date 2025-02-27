@@ -1,4 +1,7 @@
-GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile) {
+#Include "./GuestProfileDetails.ahk"
+#Include "./BlankShareDetails.ahk"
+
+GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile) {
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
@@ -37,11 +40,29 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile) {
         GuestProfileDetails(selectedItem, fillPmsProfile, App)
     }
 
+    showBlankShare(LV, row, *) {
+        if (searchBy.value != "waterfall") {
+            return
+        }
+
+        selectedRooms := []
+        ; pick selected guests
+        for checkedRow in LV.getCheckedRowNumbers() {
+            if (LV.getCheckedRowNumbers()[1] == "0") {
+                BlankShareDetails(LV, [listContent.value[row]["roomNum"]])
+                return
+            }
+            selectedRooms.Push(listContent.value[checkedRow]["roomNum"])
+        }
+
+        BlankShareDetails(LV, selectedRooms, true)
+    }
+
     return (    
         App.AddReactiveListView(options, columnDetails, listContent)
            .SetFont("s10.5")
            .OnEvent(
-                "DoubleClick", copyIdNumber,
+                "DoubleClick", showBlankShare,
                 "ItemEdit", handleUpdateItem,
                 "ContextMenu", showProfileDetails
             )

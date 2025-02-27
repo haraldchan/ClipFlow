@@ -1,5 +1,4 @@
 #Include "./GuestProfileList.ahk"
-#Include "./GuestProfileDetails.ahk"
 #Include "./Settings.ahk"
 #Include "./PMN_FillIn.ahk"
 #Include "./PMN_Waterfall.ahk"
@@ -400,7 +399,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         ),
 
         ; profile list
-        GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile),
+        GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile),
 
         ; waterfall controls
         App.ARCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+5", "全选"),
