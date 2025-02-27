@@ -67,6 +67,7 @@ BlankShareDetails(LV, selectedRooms, sendPm := false) {
     onLoad() {
         App.getCtrlByName("shareRoomNums").Value := roomCountMap.keys().join(" ")
         App.getCtrlByName("shareQty").Value := roomCountMap.values().join(" ")
+        App.getCtrlByName("BlankShareAction").Text := "Share 代行 "
         App.getCtrlByName("BlankShareAction").OnEvent("Click", handleBlankShareDelegate, -1)
     }
 
