@@ -21,6 +21,8 @@ class Component {
         this.ctrls := []
         this.children := () => {}
         this.childComponents := []
+        this.isDisabled := false
+        this.isVisible := true
         
         this.defineProps(props)
         this.defineChildren()
@@ -94,17 +96,17 @@ class Component {
     }
 
     /**
-     * Sets the visibility state of the component
-     * @param {boolean} isShow 
+     * Sets the visibility state of the component.
+     * @param {Integer|Func} isShow a true/false value or a computation function to change visibility of the component.
      */
     visible(isShow) {
-        state := isShow is Func ? isShow() : isShow
+        this.isVisible := isShow is Func ? isShow(this.isVisible) : isShow
 
         for ctrl in this.ctrls {
-            ctrl.visible := state
+            ctrl.visible := this.isVisible 
         }
 
-        this._handleChildComponentVisible(state, this.childComponents)
+        this._handleChildComponentVisible(this.isVisible , this.childComponents)
     }
 
     _handleChildComponentVisible(state, childComponents) {
@@ -156,14 +158,18 @@ class Component {
         }
     }
 
+    /**
+     * Sets the enabled state of the component.
+     * @param {Integer|Func} disabled a true/false value or a computation function to change enabled of the component.
+     */
     disable(disabled) {
-        state := disabled is Func ? disabled() : disabled
+        this.isDisabled := disabled is Func ? disabled(this.isDisabled) : disabled
 
         for ctrl in this.ctrls {
-            ctrl.Enabled := !state
+            ctrl.Enabled := !this.isDisabled
         }
 
-        this._handleChildComponentDisable(state, this.childComponents)
+        this._handleChildComponentDisable(this.isDisabled, this.childComponents)
     }
 
     _handleChildComponentDisable(state, childComponents) {
