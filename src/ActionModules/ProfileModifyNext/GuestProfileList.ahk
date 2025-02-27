@@ -18,18 +18,18 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, fillPmsProfile) {
         A_Clipboard := getSelectedCell(LV, row, "idNum")
         MsgBox(Format("已复制证件号码: `n`n{1} : {2}", getSelectedCell(LV, row, "name"), A_Clipboard), popupTitle, "4096 T1")
     }
-
+ 
     handleUpdateItem(LV, row) {
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
         ; FileDB
-        fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"])
+        SetTimer(() => fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
         ; DateDase
         ; db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
     }
 
     showProfileDetails(LV, row, *) {
-        if (row = 0) {
+        if (row == 0 || row > 10000) {
             return
         }
 
