@@ -1,5 +1,5 @@
 #Include "./GuestProfileDetails.ahk"
-#Include "./BlankShareDetails.ahk"
+#Include "./QM2_Panel.ahk"
 
 GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile) {
     columnDetails := {
@@ -40,7 +40,7 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
         GuestProfileDetails(selectedItem, fillPmsProfile, App)
     }
 
-    showBlankShare(LV, row, *) {
+    showQm2Panel(LV, row, *) {
         if (searchBy.value != "waterfall") {
             return
         }
@@ -49,20 +49,20 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
         ; pick selected guests
         for checkedRow in LV.getCheckedRowNumbers() {
             if (LV.getCheckedRowNumbers()[1] == "0") {
-                BlankShareDetails(LV, [listContent.value[row]["roomNum"]])
+                QM2_Panel([listContent.value[row]["roomNum"]])
                 return
             }
             selectedRooms.Push(listContent.value[checkedRow]["roomNum"])
         }
 
-        BlankShareDetails(LV, selectedRooms, true)
+        QM2_Panel(selectedRooms, true)
     }
 
     return (    
         App.AddReactiveListView(options, columnDetails, listContent)
            .SetFont("s10.5")
            .OnEvent(
-                "DoubleClick", showBlankShare,
+                "DoubleClick", showQm2Panel,
                 "ItemEdit", handleUpdateItem,
                 "ContextMenu", showProfileDetails
             )
