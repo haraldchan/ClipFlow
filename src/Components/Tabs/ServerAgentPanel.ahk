@@ -2,6 +2,7 @@
 #Include "../../Servers/QM2_Server.ahk"
 #Include "./ServerAgentPanels/ServerAgentPanel_Agent.ahk"
 #Include "./ServerAgentPanels/ServerAgentPanel_Client.ahk"
+#Include "./ServerAgentPanels/QM2_Panel.ahk"
 
 ServerAgentPanel(App) {
     isListening := signal("离线")
@@ -34,6 +35,6 @@ ServerAgentPanel(App) {
         ServerAgentPanel_Client(App, config.read("clientEnabled"), pmnAgent)
 
         ; qm2 panel
-        ; QM2_Panel(App, isListening)
+        QM2_Panel({ App: App, sendPm: false })
     )
 }

@@ -1,5 +1,4 @@
 #Include "./GuestProfileDetails.ahk"
-#Include "./QM2_Panel.ahk"
 
 GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile) {
     columnDetails := {
@@ -49,22 +48,22 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
         ; pick selected guests
         for checkedRow in LV.getCheckedRowNumbers() {
             if (LV.getCheckedRowNumbers()[1] == "0") {
-                QM2_Panel([listContent.value[row]["roomNum"]])
+                QM2_Panel({ selectedRooms: [listContent.value[row]["roomNum"]] })
                 return
             }
             selectedRooms.Push(listContent.value[checkedRow]["roomNum"])
         }
 
-        QM2_Panel(selectedRooms, true)
+        QM2_Panel({ selectedRooms: selectedRooms })
     }
 
     return (    
         App.AddReactiveListView(options, columnDetails, listContent)
            .SetFont("s10.5")
            .OnEvent(
-                "DoubleClick", showQm2Panel,
-                "ItemEdit", handleUpdateItem,
-                "ContextMenu", showProfileDetails
+                "DoubleClick", showProfileDetails,
+                "ContextMenu", showQm2Panel,
+                "ItemEdit", handleUpdateItem
             )
     )
 }
