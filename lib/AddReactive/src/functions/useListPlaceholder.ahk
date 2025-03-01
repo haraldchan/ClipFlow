@@ -20,7 +20,7 @@ class useListPlaceholder {
     }
 
     _setLoadingValue(){
-        loadingValue := Map()
+        loadingValue := OrderedMap()
 
         for key in this.columnKeys {
             loadingValue[key] := this.placeHolder
