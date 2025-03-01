@@ -129,8 +129,8 @@ QM2_Panel(props) {
                 styles: { 
                     xPos: isPopup ? "x10 " : "x350 ", 
                     yPos: isPopup ? "y150 " : "y200 ", 
-                    rPanelXPos: isPopup ? "x170 " : "x530", 
-                    wide: "w350", 
+                    rPanelXPos: isPopup ? "x170 " : "x530 ", 
+                    wide: "w350 ", 
                     useCopyBtn: false 
                 },
                 BlankShare: {
@@ -141,6 +141,6 @@ QM2_Panel(props) {
 
         ; initializing
         onLoad(),
-        isPopup ? App.Show() : {}
+        isPopup ? App.Show() : 0
     )
 }
