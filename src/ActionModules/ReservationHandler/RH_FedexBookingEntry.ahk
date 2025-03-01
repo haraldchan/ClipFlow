@@ -1,5 +1,25 @@
 class FedexBookingEntry {
-    static USE(infoObj, curIndex, initX := 194, initY := 183) {
+
+    static keyDesc := Map(
+        "identifier", "插件标识",
+        "roomQty", "订房数量",
+        "remarks", "备注信息",
+        "ciDate", "入住日期",
+        "coDate", "退房日期",
+        "roomRates", "房价构成",
+        "resvType", "订单类型",
+        "flightIn", "预抵航班",
+        "flightOut", "离开航班",
+        "ETA", "入住时间",
+        "ETD", "退房时间",
+        "stayHours", "在住时长",
+        "daysActual", "计费天数",
+        "crewNames", "机组姓名",
+        "tripNum", "Trip No.",
+        "tracking", "Tracking 单号",
+    )
+
+    static USE(infoObj, curIndex := 1, initX := 194, initY := 183) {
         pmsCiDate := (StrSplit(infoObj["ETA"], ":"))[1] < 10
             ? DateAdd(infoObj["ciDate"], -1, "days")
             : infoObj["ciDate"]
@@ -113,7 +133,7 @@ class FedexBookingEntry {
         ; fill-in checkin/checkout
         MouseMove initX + 9, initY - 150 ; 332, 356
         Sleep 100
-        Click 2 
+        Click 2
         Sleep 100
         Send "!c"
         Sleep 100
@@ -137,7 +157,7 @@ class FedexBookingEntry {
         Sleep 100
         MouseMove initX + 12, initY - 101 ; 335, 405
         Sleep 100
-        Click 2 
+        Click 2
         Sleep 100
         Send "!c"
         Sleep 100
@@ -359,7 +379,7 @@ class FedexBookingEntry {
         Sleep 200
     }
 
-    static crsNumEntry(tracking, initX := 739, initY := 505){
+    static crsNumEntry(tracking, initX := 739, initY := 505) {
         MouseMove initX, initY
         Sleep 100
         Click
@@ -380,7 +400,7 @@ class FedexBookingEntry {
         Sleep 100
         Send "!c"
         Sleep 100
-    }   
+    }
 }
 
 RH_Fedex(infoObj) {
