@@ -25,8 +25,6 @@ RH_App(App, moduleTitle, identifier) {
 
         for btn in entryBtns {
             exist := crewLastNames.has(A_Index)
-
-            btn.Visible := exist
             btn.Text := exist ? crewLastNames[A_Index] : ""
         }
     }
@@ -52,7 +50,7 @@ RH_App(App, moduleTitle, identifier) {
 
         ; entry btns
         App.AddGroupBox("y+10 w200 r2", "录入订单")
-        App.AddButton("ventry1 w80 yp+20 Hidden", ""),
-        App.AddButton("ventry2 w80 x+10 Hidden", "")
+        App.AddButton("ventry1 w80 yp+20", ""),
+        App.AddButton("ventry2 w80 x+10", "")
     )
 }
