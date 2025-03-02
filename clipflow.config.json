@@ -11,7 +11,7 @@
     "cleanPeriod": 180
   },
   "resvHandler":{
-    "JSON":{}
+    "JSON":""
   },
   "serverAgent": {
     "agentEnabled": false,
