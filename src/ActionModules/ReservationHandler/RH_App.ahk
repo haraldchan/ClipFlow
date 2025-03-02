@@ -2,9 +2,10 @@
 #Include "./RH_FedexBookingEntry.ahk"
 
 RH_App(App, moduleTitle, identifier) {
-    README := FileRead("./README.txt", "UTF-8")
+    README := FileRead(A_ScriptDir . "\src\ActionModules\ReservationHandler\README.txt", "UTF-8")
 
     curResv := signal({})
+    resvType := signal("")
     OnClipboardChange (*) => handleCaptured(identifier)
     handleCaptured(identifier){
         if (!A_Clipboard.includes(identifier)) {
@@ -16,16 +17,13 @@ RH_App(App, moduleTitle, identifier) {
 
     effect(curResv, cur => handleEntryBtnUpdate(cur))
     handleEntryBtnUpdate(curResv) {
-        if (!curResv.value["crewNames"]) {
-            return
-        }
-
+        resvType.set(": " . curResv["resvType"])
         entryBtns := [App.getCtrlByName("entry1"), App.getCtrlByName("entry2")]
-        crewLastNames := curResv.value["crewNames"].map(name => name.split(" ")[2])
+        crewLastNames := curResv["crewNames"].map(name => name.split(" ")[2])
 
         for btn in entryBtns {
             exist := crewLastNames.has(A_Index)
-            btn.Text := exist ? crewLastNames[A_Index] : ""
+            btn.Text := exist ? curResv["crewNames"][A_Index] : ""
         }
     }
 
@@ -42,15 +40,15 @@ RH_App(App, moduleTitle, identifier) {
         App.AddText("xp15", moduleTitle),
 
         ; read me info
-        App.AddText("xs10 y+30 h200", README),
+        App.AddText("xs20 y+30 h200", README),
 
         ; reservation info
-        App.AddText("x300 w200 h40", "订单详情").SetFont("s13 q5 Bold"),
+        App.ARText("x300 y140 w200 h30", "订单详情  {1}", resvType).SetFont("s13 q5 Bold"),
         ReservationDetails(App, curResv),
 
         ; entry btns
-        App.AddGroupBox("y+10 w200 r2", "录入订单")
-        App.AddButton("ventry1 w80 yp+20", ""),
-        App.AddButton("ventry2 w80 x+10", "")
+        App.AddGroupBox("Section y+10 w310 r2", "录入订单"),
+        App.AddButton("ventry1 xs10 w140 h40 yp+20", ""),
+        App.AddButton("ventry2 w140 x+10 h40", "")
     )
 }

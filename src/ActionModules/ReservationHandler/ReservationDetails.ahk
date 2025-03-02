@@ -13,7 +13,6 @@ ReservationDetails(App, curResv) {
         "stayHours", "在住时长",
         "daysActual", "计费天数",
         "tracking", "Tracking 单号",
-        "remarks", "备注信息"
     )
 
     effect(curResv, cur => handleListUpdate(cur, fieldIndex))
@@ -22,21 +21,19 @@ ReservationDetails(App, curResv) {
         LV.Delete()
 
         for key, field in fieldIndex {
-            LV.Add(, field, curResv[key])
+            val := key == "crewNames" ? curResv[key].join(", ") : curResv[key]
+            LV.Add(, field, val)
         }
     }
 
     onMount() {
         LV := App.getCtrlByType("ListView")
-        LV.SetFont("s10.5")
-        LV.ModifyCol(1, 80)
-        LV.ModifyCol(2, 220)
-        
-        useListPlaceholder(curResv, fieldIndex.keys(), "")
+        LV.ModifyCol(1, 100)
+        LV.ModifyCol(2, 200)        
     }
 
     return (
-        App.AddListView("vresvDetailList Grid w300 r14 y+20", ["预订项目", "预订详情"]),
+        App.AddListView("vresvDetailList Grid LV0x4000 NoSortHdr w310 r13 yp+30", ["预订项目", "预订详情"]),
         onMount()
     )
 }
