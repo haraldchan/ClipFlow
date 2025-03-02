@@ -30,6 +30,10 @@ QM2_Panel(props) {
     form := {}
     delegateQmActions(module, cleanup := () => {}) {
         form := App.getComponent(module).submit()
+        qmSent := App.getCtrlByName("qmSent")
+        qmSent.visible := true
+        SetTimer(() => qmSent.visible := false, -2000)
+
         SetTimer(() => (
             resMessage := qmAgent.delegate({
                 module: module,
@@ -37,7 +41,7 @@ QM2_Panel(props) {
             })
         ), -250)
 
-        return isPopup ? App.Destroy() : cleanup()
+        return isPopup ? SetTimer((*) => App.Destroy(), -2100) : cleanup()
     }
 
     handleBlankShareDelegate(*) {
@@ -114,9 +118,9 @@ QM2_Panel(props) {
 
     return (
         ; GroupBox frame
-        App.AddGroupBox("Section w370" . (isPopup ? "h464 x340 y108" : "h300 x10 y10"), "QM2 Agent")
-           .SetFont("s12 Bold"),
-        
+        App.AddGroupBox("Section w370 " . (isPopup ? "h300 x10 y10" : "h464 x340 y108"), "QM2 Agent").SetFont("s12 Bold"),
+        App.AddText("vqmSent Hidden xs120 yp+2", "代行任务已发送！").SetFont("cGreen Bold"),
+
         ; QM modules
         modules.keys().map(module =>
             App.AddRadio(A_Index == 1 ? "Checked xs10 yp+30 h20" : "xs10 yp+30 h20", modules[module])
@@ -127,9 +131,9 @@ QM2_Panel(props) {
             moduleComponents, {
                 App: App,
                 styles: { 
-                    xPos: isPopup ? "x10 " : "x350 ", 
-                    yPos: isPopup ? "y150 " : "y200 ", 
-                    rPanelXPos: isPopup ? "x170 " : "x530 ", 
+                    xPos: isPopup ? "x20 " : "x350 ", 
+                    yPos: isPopup ? "y110 " : "y200 ", 
+                    rPanelXPos: isPopup ? "x200 " : "x530 ", 
                     wide: "w350 ", 
                     useCopyBtn: false 
                 },
