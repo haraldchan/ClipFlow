@@ -13,6 +13,7 @@ RH_App(App, moduleTitle, identifier) {
         }
 
         curResv.set(JSON.parse(A_Clipboard))
+        config.write("JSON", A_Clipboard)
     }
 
     effect(curResv, cur => handleEntryBtnUpdate(cur))
@@ -35,6 +36,24 @@ RH_App(App, moduleTitle, identifier) {
         FedexBookingEntry.USE(curResv.value, ctrl.Text == "entry1" ? 1 : 2)
     }
 
+    handleEntry(ctrl, _) {
+        if (ctrl.Text == "") {
+            return 
+        }
+        
+        FedexBookingEntry.USE(curResv.value, ctrl.name == "entry1" ? 1 : 2)
+    }
+
+    onMount() {
+        LV := App.getCtrlByType("ListView")
+        LV.ModifyCol(1, 100)
+        LV.ModifyCol(2, 200)
+        try {
+            curResv.set(JSON.parse(config.read("JSON")))       
+        }
+   
+    }
+
     return (
         App.AddGroupBox("Section R18 w685 y+20", ""),
         App.AddText("xp15", moduleTitle),
@@ -48,7 +67,9 @@ RH_App(App, moduleTitle, identifier) {
 
         ; entry btns
         App.AddGroupBox("Section y+10 w310 r2", "录入订单"),
-        App.AddButton("ventry1 xs10 w140 h40 yp+20", ""),
-        App.AddButton("ventry2 w140 x+10 h40", "")
+        App.AddButton("ventry1 xs10 w140 h40 yp+20", "").OnEvent("Click", handleEntry)
+        App.AddButton("ventry2 w140 x+10 h40", "").OnEvent("Click", handleEntry),
+
+        onMount()
     )
 }
