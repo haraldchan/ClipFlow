@@ -26,14 +26,7 @@ ReservationDetails(App, curResv) {
         }
     }
 
-    onMount() {
-        LV := App.getCtrlByType("ListView")
-        LV.ModifyCol(1, 100)
-        LV.ModifyCol(2, 200)        
-    }
-
     return (
-        App.AddListView("vresvDetailList Grid LV0x4000 NoSortHdr w310 r13 yp+30", ["预订项目", "预订详情"]),
-        onMount()
+        App.AddListView("vresvDetailList Grid LV0x4000 NoSortHdr w310 r13 yp+30", ["预订项目", "预订详情"])
     )
 }
