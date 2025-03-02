@@ -2,12 +2,37 @@ class FedexBookingEntry {
     static AnchorImage := A_ScriptDir . "\src\Assets\opera-active-win.PNG"
     static isRunning := false
 
-    static USE(infoObj, index := 1, bringForwardTime := 10, initX := 194, initY := 183) {
-        schdCiYear := StrSplit(infoObj["ibDate"], "/")[1] < A_MM ? A_Year + 1 : A_Year
-        schdCoYear := StrSplit(infoObj["obDate"], "/")[1] < A_MM ? A_Year + 1 : A_Year
+    static start(config := {}) {
+        c := useProps(config, {
+            setOnTop: false,
+            blockInput: false
+        })
 
-        schdCiDate := Format("{1}{2}{3}", schdCiYear, StrSplit(infoObj["ibDate"], "/")[1], StrSplit(infoObj["ibDate"], "/")[2])
-        schdCoDate := Format("{1}{2}{3}", schdCoYear, StrSplit(infoObj["obDate"], "/")[1], StrSplit(infoObj["obDate"], "/")[2])
+        this.isRunning := true
+        HotIf (*) => this.isRunning
+        Hotkey("F12", (*) => this.end(), "On")
+
+        CoordMode "Pixel", "Screen"
+        CoordMode "Mouse", "Screen"
+
+        WinActivate "ahk_class SunAwtFrame"
+        WinSetAlwaysOnTop c.setOnTop, "ahk_class SunAwtFrame"
+
+        BlockInput c.blockInput
+    }
+
+    static end() {
+        this.isRunning := false
+        Hotkey("F12", "Off")
+
+        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        BlockInput false
+    }
+
+
+    static USE(infoObj, index := 1, bringForwardTime := 10, initX := 194, initY := 183) {
+        schdCiDate := infoObj["ciDate"]
+        schdCoDate := infoObj["coDate"]
 
         pmsCiDate := StrSplit(infoObj["ETA"], ":")[1] < bringForwardTime
             ? DateAdd(schdCiDate, -1, "days")
@@ -20,26 +45,57 @@ class FedexBookingEntry {
         pmsCiDate := FormatTime(pmsCiDate, "MMddyyyy")
         pmsCoDate := FormatTime(pmsCoDate, "MMddyyyy")
 
-
         ; workflow start
+        this.start()
+
         this.profileEntry(infoObj["crewNames"], index)
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
         
         this.dateTimeEntry(pmsCiDate, pmsCoDate, infoObj["ETA"], infoObj["ETD"])
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         this.moreFieldsEntry(schdCiDate, schdCoDate, infoObj["ETA"], infoObj["ETD"], infoObj["flightIn"], infoObj["flightOut"])
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         this.commentEntry(infoObj)
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         if (infoObj["daysActual"] < pmsNts) {
             this.dailyDetailsEntry(infoObj["daysActual"])
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
         }
-
-        this.crsNumEntry(infoObj["tracking"])
 
         ; post Alert reminder when room charge needs to be post manually
         if (infoObj["daysActual"] > pmsNts) {
             this.postRoomChargeAlertEntry(pmsNts, infoObj["daysActual"])
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
         }
+
+        this.crsNumEntry(infoObj["tracking"])
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
+
+        this.end()
     }
 
     static profileEntry(crewNames, index, initX := 471, initY := 217) {
@@ -116,19 +172,10 @@ class FedexBookingEntry {
         MouseMove initX + 2, initY - 108 ; 325, 398
         utils.waitLoading()
         Click
-        utils.waitLoading()
-        MouseMove initX + 338, initY + 37 ; 661, 543
-        utils.waitLoading()
-        Click
-        MouseMove initX + 313, initY + 37 ; 636, 543
-        utils.waitLoading()
-        Click
-        MouseMove initX + 312, initY + 37 ; 635, 543
-        utils.waitLoading()
-        Click
-        utils.waitLoading()
-        Click
-        utils.waitLoading()
+        loop 5 {
+            Send "{Esc}"
+            utils.waitLoading()
+        }
         MouseMove 345, initY - 101 ; 335, 405
         utils.waitLoading()
         Click 1
@@ -261,13 +308,18 @@ class FedexBookingEntry {
         }
         Send "!e"
         utils.waitLoading()
-        loop 4 {
+        loop {
             Send "{Tab}"
             utils.waitLoading()
+            Send "^c"
+            utils.waitLoading()
+            if (A_Clipboard == "FEDEXN")
+            break
         }
         Send "{Text}NRR"
         utils.waitLoading()
         Send "!o"
+        utils.waitLoading()
         loop 3 {
             Send "{Esc}"
             utils.waitLoading()
@@ -332,6 +384,26 @@ class FedexBookingEntry {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
+
+        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\error.PNG")) {
+            Send "!o"
+            utils.waitLoading()
+            Send "!c"
+            utils.waitLoading()
+            Send "{Esc}"
+            utils.waitLoading()
+            Send "!e"
+            utils.waitLoading()
+            Send "{Tab}"
+            utils.waitLoading()
+            Send "^{Right}"
+            utils.waitLoading()
+            Send "{Text}" . "\" . tracking
+            utils.waitLoading()
+            Send "!o"
+        }
+
+
         Send "!c"
         utils.waitLoading()
     }
