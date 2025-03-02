@@ -61,8 +61,8 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
         App.AddReactiveListView(options, columnDetails, listContent)
            .SetFont("s10.5")
            .OnEvent(
-                "DoubleClick", showProfileDetails,
-                "ContextMenu", showQm2Panel,
+                "ContextMenu", showProfileDetails,
+                ; "DoubleClick", showQm2Panel,
                 "ItemEdit", handleUpdateItem
             )
     )
