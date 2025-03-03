@@ -28,16 +28,8 @@ RH_App(App, moduleTitle, identifier) {
         }
     }
 
-    handleBookingEntry(ctrl, _) {
-        if (ctrl.Text == "") {
-            return
-        }
-
-        FedexBookingEntry.USE(curResv.value, ctrl.Text == "entry1" ? 1 : 2)
-    }
-
     handleEntry(ctrl, _) {
-        if (ctrl.Text == "") {
+        if (!ctrl.Text) {
             return 
         }
         
@@ -51,7 +43,6 @@ RH_App(App, moduleTitle, identifier) {
         try {
             curResv.set(JSON.parse(config.read("JSON")))       
         }
-   
     }
 
     return (
