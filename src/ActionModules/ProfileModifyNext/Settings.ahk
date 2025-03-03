@@ -27,7 +27,7 @@ PMN_Settings(settingSignal) {
         =========== 设置选项 ===========
     )"
 
-    onLoad() {
+    onMount() {
         Settings.getCtrlByName("ow").Value := settingSignal.value["fillOverwrite"]
         btns := [Settings.getCtrlByName("fdb"), Settings.getCtrlByName("ddb")]
         for btn in btns {
@@ -47,13 +47,13 @@ PMN_Settings(settingSignal) {
                 .OnEvent("Click", (ctrl, _) => settingSignal.update("fillOverwrite", ctrl.value)),
         
         ; load from FileDB/DateBase
-        Settings.AddText("x10", "来源数据库"),
+        Settings.AddText("x10 y+10", "来源数据库"),
         Settings.AddRadio("vfdb x+10 Checked", "FileDB")
                 .OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
         Settings.AddRadio("vddb x+10", "DateBase")
                 .OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
 
-        onLoad(),
+        onMount(),
         Settings.Show()
     )
 }
