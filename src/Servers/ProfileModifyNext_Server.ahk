@@ -127,11 +127,11 @@ class ProfileModifyNext_Agent extends useServerAgent {
      */
     delegate(content) {
         c := useProps(content, {
-            mode:      "single", ; single/waterfall/group
-            overwrite: false,    ; isOverwrite value
-            rooms:     [],       ; waterfall/group room numbers
-            party:     "",       ; optional party number for confinement 
-            profiles:  [],       ; json object in single, array in waterfall/group
+            mode:      "waterfall", ; single/waterfall/group
+            overwrite: false,       ; isOverwrite value
+            rooms:     [],          ; waterfall/group room numbers
+            party:     "",          ; optional party number for confinement 
+            profiles:  [],          ; json object in single, array in waterfall/group
         })
 
         return this.POST(c.toObject())
