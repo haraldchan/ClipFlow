@@ -59,7 +59,8 @@ RH_App(App, moduleTitle, identifier) {
         App.AddText("xp15", moduleTitle),
 
         ; read me info
-        App.AddText("xs20 y+30 h200", README),
+        App.AddText("xs20 y+30 h30", "使用说明").SetFont("s10.5 Bold"),
+        App.AddText("xs20 y+30 h170", README),
 
         ; reservation info
         App.ARText("x300 y140 w200 h30", "订单详情  {1}", resvType).SetFont("s13 q5 Bold"),
