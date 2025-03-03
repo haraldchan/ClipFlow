@@ -85,7 +85,7 @@ class useServerAgent {
         if (this.safePost) {
             if (!this.PING()) {
                 MsgBox("Service offline.",, "4096 T2")
-                return
+                return { status: "failed" }
             }
         }
 
