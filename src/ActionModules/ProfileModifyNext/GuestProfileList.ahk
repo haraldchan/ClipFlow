@@ -44,17 +44,17 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
             return
         }
 
-        selectedRooms := []
+        selectedGuests := []
         ; pick selected guests
         for checkedRow in LV.getCheckedRowNumbers() {
             if (LV.getCheckedRowNumbers()[1] == "0") {
-                QM2_Panel({ selectedRooms: [listContent.value[row]["roomNum"]] })
+                QM2_Panel({ selectedGuests: [listContent.value[row]], sendPm: false})
                 return
             }
-            selectedRooms.Push(listContent.value[checkedRow]["roomNum"])
+            selectedGuests.Push(listContent.value[checkedRow])
         }
 
-        QM2_Panel({ selectedRooms: selectedRooms })
+        QM2_Panel({ selectedGuests: selectedGuests })
     }
 
     return (    
