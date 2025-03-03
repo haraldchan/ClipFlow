@@ -11,7 +11,7 @@ QM2_Panel(props) {
 
     p := useProps(props, {
         sendPm: true,
-        selectedRooms: []
+        selectedGuests: []
     })
     
     modules := OrderedMap(
@@ -41,7 +41,7 @@ QM2_Panel(props) {
             })
         ), -250)
 
-        return isPopup ? SetTimer((*) => App.Destroy(), -2100) : cleanup()
+        return isPopup ? SetTimer((*) => App.Destroy(), -2100) : cleanup.Call()
     }
 
     handleBlankShareDelegate(*) {
@@ -79,8 +79,12 @@ QM2_Panel(props) {
         SetTimer(, 0)
 
         roomNums := form.shareRoomNums
-        profiles := db.load(,, isPopup ? 480 : qmAgent.collectRange)
-                      .filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
+        ; selectedGuests can only pass by GuestProfileList
+        ; if no selectedGuest, then filter results in db by room number(request from ServerAgent_Panel)
+        profiles := p.selectedGuests.Length == 0
+            ? db.load(,, isPopup ? 480 : qmAgent.collectRange)
+                .filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
+            : p.selectedGuests
 
         SetTimer(() => (
             post := pmnAgent.delegate({
@@ -101,7 +105,8 @@ QM2_Panel(props) {
     onLoad() {
         ; initialize BlankShare values
         roomCountMap := Map()
-        for room in p.selectedRooms {
+        selectedRooms := p.selectedGuests.map(guest => guest["roomNum"])
+        for room in selectedRooms {
             roomCountMap[room] := (roomCountMap.has(room) ? roomCountMap[room] : -1) + 1
         }
         App.getCtrlByName("shareRoomNums").Value := roomCountMap.keys().join(" ")
