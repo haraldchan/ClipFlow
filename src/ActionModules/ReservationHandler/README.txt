@@ -1,5 +1,9 @@
-1. blabla
+1. 在邮箱中通过右键菜单 OpenFrame 中打开修改单
+ - 推荐使用 open in new tab
 
-2. blablabla
+2. 点击浏览器右上角的 ReservationHandler 插件
+ - 在插件弹窗中点击“获取订单信息”读取信息
 
-3. blablablabla
+3. 回到 Opera，在需要修改的订单界面打开的状态
+   下，点击“录入订单”中的按键即可
+ - 点击按键显示的名字将录入相应名字的订单
