@@ -20,8 +20,15 @@ ReservationDetails(App, curResv) {
         LV := App.getCtrlByType("ListView")
         LV.Delete()
 
-        for key, field in fieldIndex {
-            val := key == "crewNames" ? curResv[key].join(", ") : curResv[key]
+        for key, field in fieldIndex {            
+            if (key == "crewNames") {
+                val := curResv[key].join(", ")
+            } else if (key == "ciDate" || key == "coDate") {
+                val := FormatTime(curResv[key], "yyyy/MM/dd")
+            } else {
+                val := curResv[key]
+            }
+
             LV.Add(, field, val)
         }
     }
