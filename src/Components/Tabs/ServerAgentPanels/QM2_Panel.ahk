@@ -39,7 +39,7 @@ QM2_Panel(props) {
             })
         ), -250)
 
-        return isPopup ? SetTimer((*) => App.Destroy(), -2100) : cleanup.Call()
+        return isPopup ? (SetTimer((*) => App.Destroy(), -2100), 0) : cleanup.Call()
     }
 
     handleBlankShareDelegate(*) {
