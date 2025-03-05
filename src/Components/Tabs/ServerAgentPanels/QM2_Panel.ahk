@@ -27,7 +27,7 @@ QM2_Panel(props) {
     resMessage := {}
     form := {}
     delegateQmActions(module, cleanup := () => {}) {
-        form := App.getComponent(module).submit()
+        form := isPopup ? App.Submit(false) : App.getComponent(module).submit()
         qmSent := App.getCtrlByName("qmSent")
         qmSent.visible := true
         SetTimer(() => qmSent.visible := false, -2000)
