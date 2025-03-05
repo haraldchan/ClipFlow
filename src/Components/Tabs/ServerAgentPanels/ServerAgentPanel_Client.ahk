@@ -53,6 +53,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
 
         if (ownPosts.Length > 0) {
             postQueue.set(ownPosts)
+            App.getCtrlByName("postList").ModifyCol(2, "SortDesc")
         }
     }
 
@@ -63,7 +64,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
             widths: [60, 120, 168]
         },
         options: {
-            lvOptions: "Grid -Multi LV0x4000 w260 r8 xs20 yp+25",
+            lvOptions: "vpostList Grid -Multi LV0x4000 w260 r8 xs20 yp+25",
             itemOptions: ""
         }
     }
