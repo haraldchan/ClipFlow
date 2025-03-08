@@ -1,13 +1,9 @@
 #Include "../../../../../QM2-for-FrontDesk/src/ActionModules/ActionModuleIndex.ahk"
 
 QM2_Panel(props) {
-    isPopup := !props.hasOwnProp("App")
-    if (isPopup) {
-        App := Gui("+AlwaysOnTop", "ServerAgents - QM2 Agent")
-        App.SetFont(, "微软雅黑")
-    } else {
-        App := props.App
-    }
+    App := Gui("+AlwaysOnTop", "ServerAgents - QM2 Agent")
+    App.SetFont(, "微软雅黑")
+
 
     p := useProps(props, {
         sendPm: true,
@@ -26,8 +22,8 @@ QM2_Panel(props) {
 
     resMessage := {}
     form := {}
-    delegateQmActions(module, cleanup := () => {}) {
-        form := isPopup ? App.Submit(false) : App.getComponent(module).submit()
+    delegateQmActions(module) {
+        form := App.Submit(false)
         qmSent := App.getCtrlByName("qmSent")
         qmSent.visible := true
         SetTimer(() => qmSent.visible := false, -2000)
@@ -39,7 +35,7 @@ QM2_Panel(props) {
             })
         ), -250)
 
-        return isPopup ? (SetTimer((*) => App.Destroy(), -2100), 0) : cleanup.Call()
+        return (SetTimer((*) => App.Destroy(), -2100), 0)
     }
 
     handleBlankShareDelegate(*) {
@@ -50,13 +46,6 @@ QM2_Panel(props) {
         if (App.getCtrlByName("sendPmPost").Value) {
             SetTimer(handleTriggerPmPost, 1000)
         }
-
-        delegateQmActions("BlankShare", () => (
-            App.getCtrlByName("shareRoomNums").Value := "",
-            App.getCtrlByName("shareQty").Value := 1,
-            App.getCtrlByName("checkIn").Value := true,
-            App.getCtrlByName("sendPmPost").Value := false
-        ))
 
         return 0
     }
@@ -84,7 +73,7 @@ QM2_Panel(props) {
         ; selectedGuests can only pass by GuestProfileList
         ; if no selectedGuest, then filter results in db by room number(request from ServerAgent_Panel)
         profiles := p.selectedGuests.Length == 0
-            ? db.load(,,qmAgent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
+            ? db.load(, , qmAgent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
             : p.selectedGuests
 
         SetTimer(() => (
@@ -124,7 +113,7 @@ QM2_Panel(props) {
 
     return (
         ; GroupBox frame
-        App.AddGroupBox("Section w370 " . (isPopup ? "h300 x10 y10" : "h464 x340 y108"), "QM2 Agent").SetFont("s12 Bold"),
+        App.AddGroupBox("Section w370 h300 x10 y10", "QM2 Agent").SetFont("s12 Bold"),
         App.AddText("vqmSent Hidden xs120 yp+2", "代行任务已发送！").SetFont("cGreen Bold"),
         ; QM modules
         modules.keys().map(module =>
@@ -136,9 +125,9 @@ QM2_Panel(props) {
             moduleComponents, {
                 App: App,
                 styles: {
-                    xPos: isPopup ? "x20 " : "x350 ",
-                    yPos: isPopup ? "y110 " : "y200 ",
-                    rPanelXPos: isPopup ? "x200 " : "x530 ",
+                    xPos: "x20 ",
+                    yPos: "y110 ",
+                    rPanelXPos: "x200 ",
                     wide: "w350 ",
                     useCopyBtn: false
                 },
@@ -149,6 +138,6 @@ QM2_Panel(props) {
         ),
         ; initializing
         onMount(),
-        isPopup ? App.Show() : 0
+        App.Show()
     )
 }

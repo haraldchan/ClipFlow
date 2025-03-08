@@ -29,12 +29,9 @@ ServerAgentPanel(App) {
         App.AddText("x30 y75 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold"),
 
         ; server-side options
-        ServerAgentPanel_Agent(App, config.read("agentEnabled"), pmnAgent, isListening),
+        ServerAgentPanel_Agent(App, config.read("agentEnabled"), isListening),
         
         ; client-side options
-        ServerAgentPanel_Client(App, config.read("clientEnabled"), pmnAgent)
-
-        ; qm2 panel
-        QM2_Panel({ App: App, sendPm: false })
+        ServerAgentPanel_Client(App, config.read("clientEnabled"))
     )
 }
