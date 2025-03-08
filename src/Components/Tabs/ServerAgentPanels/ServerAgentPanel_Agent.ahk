@@ -1,4 +1,4 @@
-ServerAgentPanel_Agent(App, enabled, agent, isListening) {
+ServerAgentPanel_Agent(App, enabled, isListening) {
     comp := Component(App, A_ThisFunc)
 
     onlineTextStyles := Map(
