@@ -16,18 +16,30 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     handleDelegateActivate(ctrl, _) {
         delegate.set(ctrl.Value)
         if (ctrl.Value == false) {
+            App.getCtrlByName("qm2Agent").Enabled := false
             return
         }
         
         connectionStatus := App.getCtrlByName("connectionStatus")
+        ctrl.Enabled := false
         serverConnection.set("尝试连接中...")
         connectionStatus.Visible := true
+        App.getCtrlByName("qm2Agent").Enabled := true
 
-        SetTimer(() => (
+        SetTimer(() => ((
             pmnAgent.PING() 
-                ? (serverConnection.set("后台服务在线"), SetTimer(() => connectionStatus.Visible := false, -2000))
-                : (delegate.set(false), ctrl.Value := false, serverConnection.set("超时无响应"))
-        ) , -100)
+                ? (
+                    serverConnection.set("后台服务在线"), 
+                    SetTimer(() => connectionStatus.Visible := false, -2000)
+
+                )
+                : (
+                    delegate.set(false), 
+                    ctrl.Value := false, 
+                    serverConnection.set("超时无响应"),
+                    App.getCtrlByName("qm2Agent").Enabled := false
+                )
+        ), ctrl.Enabled := true) , -100)
     }
 
     ; settings
@@ -80,7 +92,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         incomingGuest := JSON.parse(A_Clipboard)
 
         ; updating from add guest modal
-        if (currentGuest.value["idNum"] == incomingGuest["idNum"] && incomingGuest["isMod"] == false) {
+        if (currentGuest.value["idNum"] == incomingGuest["idNum"] && !incomingGuest["isMod"]) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
             MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
 
@@ -318,6 +330,26 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         }
     }
 
+    showQm2Panel(*) {
+        if (searchBy.value != "waterfall") {
+            return
+        }
+
+        LV := App.getCtrlByName("$guestProfileList").ctrl
+
+        selectedGuests := []
+        ; pick selected guests
+        for checkedRow in LV.getCheckedRowNumbers() {
+            if (LV.getCheckedRowNumbers()[1] == "0") {
+                QM2_Panel({ sendPm: false})
+                return
+            }
+            selectedGuests.Push(listContent.value[checkedRow])
+        }
+
+        QM2_Panel({ selectedGuests: selectedGuests })
+    }
+
     setHotkeys() {
         HotIfWinActive(popupTitle)
         Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
@@ -381,7 +413,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
            .OnEvent("Change", (ctrl, _) => searchBy.set(searchByMap[ctrl.Text])),
         
         ; search box
-        App.AREdit("vsearchBox x+5 w210 h25")
+        App.AREdit("vsearchBox x+5 w125 h25")
            .OnEvent("LoseFocus", (ctrl, _) => queryFilter.update("search", Trim(ctrl.Value))),
         
         ; range
@@ -390,13 +422,14 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
            .OnEvent("Change", (ctrl, _) => queryFilter.update("range", ctrl.Value = "" ? 60 * 24 : ctrl.Value)),
         App.AddText("x+1 h25 0x200", "分钟"),
         
-        ; manual updating btns
+        ; btns
         App.AddButton("x+10 w80 h25", "刷 新(&R)").OnEvent("Click", handleListContentUpdate),
         App.ARButton("vfillIn x+5 w80 h25 Default", "{1}", fillBtnText)
            .OnEvent(
                 "Click", fillPmsProfile,
                 "ContextMenu", (*) => settings.update("fillOverwrite", o => !o)
         ),
+        App.AddButton("vqm2Agent x+5 w80 h25 Disabled", "&QM2 Agent").OnEvent("Click", showQm2Panel),
 
         ; profile list
         GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile),
