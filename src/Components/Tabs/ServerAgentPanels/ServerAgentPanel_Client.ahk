@@ -97,7 +97,7 @@ ServerAgentPanel_Client(App, enabled) {
     }
 
     comp.render := this => this.Add(
-        App.AddGroupBox("Section x30 y260 w300 r12"),
+        App.AddGroupBox("Section x350 y110 w350 r18"),
         App.AddCheckBox((enabled ? "Checked" : "") . " xs10 yp", "客户端（前台）选项")
            .OnEvent("Click", (ctrl, _) => (comp.disable(!ctrl.Value), config.write("clientEnabled", ctrl.Value))),
         
