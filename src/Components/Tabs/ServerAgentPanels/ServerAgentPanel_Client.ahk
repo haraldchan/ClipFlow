@@ -1,6 +1,6 @@
 #Include "./PostDetails.ahk"
 
-ServerAgentPanel_Client(App, enabled, agent) {
+ServerAgentPanel_Client(App, enabled) {
     comp := Component(App, A_ThisFunc)
 
     postQueue := signal([{ status: "", time: "", id: "" }])
@@ -28,7 +28,7 @@ ServerAgentPanel_Client(App, enabled, agent) {
         connection.set("连接中...")
         ctrl.Enabled := false
         
-        res := agent.PING()
+        res := pmnAgent.PING()
         if (!res) {
             connection.set("无响应")
         } else {
@@ -41,15 +41,29 @@ ServerAgentPanel_Client(App, enabled, agent) {
     handlePostUpdate(*) {
         ownPosts := []
         
-        loop files (agent.pool . "\*.json") {
+        ; check pmn posts
+        loop files (pmnAgent.pool . "\*.json") {
             if (InStr(A_LoopFileName, A_ComputerName)) {
                 status := StrSplit(A_LoopFileName, "==")[1]
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
                 post["status"] := postStatus[status]
                 post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+                post["action"] := "Profile"
                 ownPosts.InsertAt(1, post)
             }
         }
+
+        ; check qm posts
+        loop files (pmnAgent.pool . "\*.json") {
+            if (InStr(A_LoopFileName, A_ComputerName)) {
+                status := StrSplit(A_LoopFileName, "==")[1]
+                post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+                post["status"] := postStatus[status]
+                post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+                post["action"] := post["content"]["module"] == "BlankShare" ? "Share" : "PbPf"
+                ownPosts.InsertAt(1, post)
+            }
+        }     
 
         if (ownPosts.Length > 0) {
             postQueue.set(ownPosts)
@@ -59,9 +73,9 @@ ServerAgentPanel_Client(App, enabled, agent) {
 
     lvSettings := {
         columnDetails: {
-            keys: ["status", "time" ,"id"],
-            titles: ["当前状态", "发送时间", "POST ID"],
-            widths: [60, 120, 168]
+            keys: ["status", "action", "time", "id"],
+            titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
+            widths: [60, 100, 120, 170]
         },
         options: {
             lvOptions: "vpostList Grid -Multi LV0x4000 w260 r8 xs20 yp+25",
@@ -74,10 +88,11 @@ ServerAgentPanel_Client(App, enabled, agent) {
             return
         }
 
-        selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 3))
-        if (!selectedPost.has("content")) {
+        selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
+        if (selectedPost["action"] != "Profile") {
             return 
         }
+
         PostDetails(selectedPost)
     }
 
