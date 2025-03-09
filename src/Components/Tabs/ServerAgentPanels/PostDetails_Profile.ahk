@@ -1,7 +1,7 @@
-PostDetails(post) {
-    PD := Gui(, "Post Details - " . post["id"])
-    PD.SetFont(, "微软雅黑")
-    PD.OnEvent("Close", (*) => PD.Destroy())
+PostDetails_Profile(post) {
+    App := Gui(, "Post Details - " . post["id"])
+    App.SetFont(, "微软雅黑")
+    App.OnEvent("Close", (*) => App.Destroy())
     
     profiles := signal(post["content"]["profiles"])
 
@@ -28,7 +28,7 @@ PostDetails(post) {
             renameResendPost(post["id"])
         ), -250)
 
-        PD.Destroy()
+        App.Destroy()
     }
 
     renameResendPost(id) {
@@ -53,17 +53,17 @@ PostDetails(post) {
     }
 
     return (
-        PD.AddGroupBox("Section w560 r12", "代行详情").SetFont("Bold"),
-        PD.AddText("xs10 yp+20", "发送状态: " . post["status"]),
-        PD.AddText("xs10 yp+20", "发送时间: " . post["time"]),
-        PD.AddText("xs10 w200 yp+30" , "客人资料").SetFont("Bold s10"),
+        App.AddGroupBox("Section w560 r12", "代行详情").SetFont("Bold"),
+        App.AddText("xs10 yp+20", "发送状态: " . post["status"]),
+        App.AddText("xs10 yp+20", "发送时间: " . post["time"]),
+        App.AddText("xs10 w200 yp+30" , "客人资料").SetFont("Bold s10"),
         
         ; post guest list
-        PD.ARListView(options, columnDetails, profiles).OnEvent("ItemEdit", handleProfilesUpdate),
+        App.ARListView(options, columnDetails, profiles).OnEvent("ItemEdit", handleProfilesUpdate),
         
         ; repost btn
-        PD.AddButton("w120 h30 y+25", "重新发送代行").OnEvent("Click", handleRepost),
+        App.AddButton("w120 h30 y+25", "重新发送代行").OnEvent("Click", handleRepost),
         
-        PD.Show()
+        App.Show()
     )
 }

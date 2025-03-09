@@ -1,4 +1,5 @@
-#Include "./PostDetails.ahk"
+#Include "./PostDetails_Profile.ahk"
+#Include "./PostDetails_PaymentRelation.ahk"
 
 ServerAgentPanel_Client(App, enabled) {
     comp := Component(App, A_ThisFunc)
@@ -54,20 +55,20 @@ ServerAgentPanel_Client(App, enabled) {
         }
 
         ; check qm posts
-        loop files (pmnAgent.pool . "\*.json") {
+        loop files (qmAgent.pool . "\*.json") {
             if (InStr(A_LoopFileName, A_ComputerName)) {
                 status := StrSplit(A_LoopFileName, "==")[1]
                 post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
                 post["status"] := postStatus[status]
                 post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
-                post["action"] := post["content"]["module"] == "BlankShare" ? "Share" : "PbPf"
+                post["action"] := post["content"]["module"] == "BlankShare" ? "Share" : "PayBy PayFor"
                 ownPosts.InsertAt(1, post)
             }
         }     
 
         if (ownPosts.Length > 0) {
             postQueue.set(ownPosts)
-            App.getCtrlByName("postList").ModifyCol(2, "SortDesc")
+            App.getCtrlByName("postList").ModifyCol(3, "SortDesc")
         }
     }
 
@@ -75,10 +76,10 @@ ServerAgentPanel_Client(App, enabled) {
         columnDetails: {
             keys: ["status", "action", "time", "id"],
             titles: ["当前状态", "代行类型", "发送时间", "POST ID"],
-            widths: [60, 100, 120, 170]
+            widths: [60, 100, 150, 170]
         },
         options: {
-            lvOptions: "vpostList Grid -Multi LV0x4000 w260 r8 xs20 yp+25",
+            lvOptions: "vpostList Grid -Multi LV0x4000 w320 r14 xs20 yp+25",
             itemOptions: ""
         }
     }
@@ -89,11 +90,13 @@ ServerAgentPanel_Client(App, enabled) {
         }
 
         selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
-        if (selectedPost["action"] != "Profile") {
-            return 
-        }
 
-        PostDetails(selectedPost)
+        switch selectedPost["action"] {
+            case "Profile":
+                PostDetails_Profile(selectedPost)
+            case "PayBy PayFor":
+                PostDetails_PaymentRelation(selectedPost)
+        }
     }
 
     comp.render := this => this.Add(
