@@ -75,6 +75,12 @@ class QM2_Agent extends useServerAgent {
      * @param content post content to send
      */
     delegate(content) {
-        return this.POST(content)
+        c := useProps(content, {
+            module: content.module,
+            form: content.form,
+            profiles: []
+        })
+
+        return this.POST(c.toObject())
     }
 }
