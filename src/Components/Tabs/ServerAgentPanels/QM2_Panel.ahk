@@ -31,7 +31,8 @@ QM2_Panel(props) {
         SetTimer(() => (
             resMessage := qmAgent.delegate({
                 module: module,
-                form: form
+                form: form,
+                profiles: p.selectedGuests
             })
         ), -250)
 
@@ -47,7 +48,7 @@ QM2_Panel(props) {
             SetTimer(handleTriggerPmPost, 1000)
         }
 
-        return 0
+        return delegateQmActions("BlankShare")
     }
 
     db := useFileDB(config.read("dbSettings"))
