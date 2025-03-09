@@ -1,5 +1,5 @@
 #Include "./PostDetails_Profile.ahk"
-#Include "./PostDetails_PaymentRelation.ahk"
+#Include "./PostDetails_QM2.ahk"
 
 ServerAgentPanel_Client(App, enabled) {
     comp := Component(App, A_ThisFunc)
@@ -90,12 +90,44 @@ ServerAgentPanel_Client(App, enabled) {
         }
 
         selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
+        form := selectedPost["content"]
 
         switch selectedPost["action"] {
             case "Profile":
                 PostDetails_Profile(selectedPost)
             case "PayBy PayFor":
-                PostDetails_PaymentRelation(selectedPost)
+                PostDetails_QM2(selectedPost, "PaymentRelation", {
+                    styles: {
+                        useCopyBtn: false,
+                        xPos: "x20 ",
+                        yPos: "y110 ",
+                        wide: "w350 ",
+                        panelWide: "w170 ",
+                        rPanelXPos: "x200 "
+                    },
+                    form : {
+                        pfRoom: form["pfRoom"],
+                        pfName: form["pfName"],
+                        party:  form["party"],
+                        partyRoomQty: form["partyRoomQty"],
+                        pbRoom: form["pbRoom"],
+                        pbName: form["pbName"]
+                    }
+                }).render()
+            case "BlankShare": 
+                PostDetails_QM2(selectedPost, "BlankShare", {
+                    styles: {
+                        useCopyBtn: false,
+                        xPos: "x20 ",
+                        yPos: "y110 ",
+                        wide: "w350 "
+                    },
+                    form : {
+                        shareRoomNums: form["shareRoomNums"],
+                        shareQty: form["shareQty"],
+                        checkIn: form["checkIn"]
+                    }
+                }).render()  
         }
     }
 
