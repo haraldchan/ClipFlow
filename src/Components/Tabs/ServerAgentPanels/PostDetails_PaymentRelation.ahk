@@ -51,12 +51,14 @@ PostDetails_PaymentRelation(post) {
                 panelWide: "w170 ",
                 rPanelXPos: "x200 "
             },
-            pfRoom: form["pfRoom"],
-            pfName: form["pfName"],
-            party:  form["party"],
-            partyRoomQty: form["partyRoomQty"],
-            pbRoom: form["pbRoom"],
-            pbName: form["pbName"]
+            form : {
+                pfRoom: form["pfRoom"],
+                pfName: form["pfName"],
+                party:  form["party"],
+                partyRoomQty: form["partyRoomQty"],
+                pbRoom: form["pbRoom"],
+                pbName: form["pbName"]
+            }
         }).render(),
 
         onMount(),
