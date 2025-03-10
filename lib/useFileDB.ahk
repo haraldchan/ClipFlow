@@ -13,6 +13,12 @@ class useFileDB {
 		this.cleanPeriod := s.cleanPeriod
 	}
 
+	/**
+	 * 
+	 * @param {String} jsonString 
+	 * @param {String} date 
+	 * @param {String} saveName 
+	 */
 	add(jsonString, date := FormatTime(A_Now, "yyyyMMdd"), saveName := JSON.parse(jsonString)["fileName"]) {
 		dateFolder := "\" . date
 		fileName := "\" . saveName . ".json"
@@ -31,6 +37,12 @@ class useFileDB {
 		}
 	}
 
+	/**
+	 * 
+	 * @param {String} db 
+	 * @param {String}  queryDate 
+	 * @param {Number}  queryPeriodInput 
+	 */
 	findByPeriod(db, queryDate, queryPeriodInput) {
 		matchFilePaths := []
 		loop files, (db . "\" . queryDate . "\*.json") {
@@ -49,6 +61,13 @@ class useFileDB {
 		}
 	}
 
+	/**
+	 * 
+	 * @param {String} db 
+	 * @param {String}  queryDate 
+	 * @param {Number}  queryPeriodInput 
+	 * @return {Map[]}
+	 */
 	load(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
 		if (queryDate = FormatTime(A_Now, "yyyyMMdd")) {
 			return this.loadOneDay(db, queryDate, queryPeriodInput)
@@ -64,6 +83,13 @@ class useFileDB {
 		}
 	}
 
+	/**
+	 * 
+	 * @param {String} db 
+	 * @param {String}  queryDate 
+	 * @param {Number}  queryPeriodInput 
+	 * @return {Map[]}
+	 */
 	loadOneDay(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
 		loadedData := this.findByPeriod(db, queryDate, queryPeriodInput)
 			.map(file => JSON.parse(FileRead(file, "UTF-8")))
@@ -71,6 +97,12 @@ class useFileDB {
 		return loadedData
 	}
 
+	/**
+	 * 
+	 * @param newJsonString 
+	 * @param queryDate 
+	 * @param fileName 
+	 */
 	updateOne(newJsonString, queryDate, fileName) {
 		loop files, (this.main . "\" . queryDate . "\*.json") {
 			if (fileName . ".json" = A_LoopFileName) {
@@ -90,12 +122,21 @@ class useFileDB {
 		}
 	}
 
+	/**
+	 * 
+	 * @param archiveDate 
+	 */
 	createArchive(archiveDate) {
 		archiveData := JSON.stringify(this.loadOneDay(, archiveDate, 60 * 24 * this.cleanPeriod))
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
 		FileAppend(archiveData, archiveFullPath, "UTF-8")
 	}
 
+	/**
+	 * 
+	 * @param archiveDate 
+	 * @return {Map[]}
+	 */
 	loadArchiveOneDay(archiveDate) {
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
 		try {
