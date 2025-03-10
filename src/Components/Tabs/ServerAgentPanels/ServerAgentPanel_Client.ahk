@@ -40,34 +40,40 @@ ServerAgentPanel_Client(App, enabled) {
     }
 
     handlePostUpdate(*) {
-        ownPosts := []
+        posts := []
+        showMyOwnPost := App.getCtrlByName("showMyOwnPosts").Value
         
         ; check pmn posts
         loop files (pmnAgent.pool . "\*.json") {
-            if (InStr(A_LoopFileName, A_ComputerName)) {
-                status := StrSplit(A_LoopFileName, "==")[1]
-                post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
-                post["status"] := postStatus[status]
-                post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
-                post["action"] := "Profile"
-                ownPosts.InsertAt(1, post)
+            if (showMyOwnPost && !A_LoopFileName.includes(A_ComputerName)) {
+                continue
             }
+
+            status := StrSplit(A_LoopFileName, "==")[1]
+            post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+            post["status"] := postStatus[status]
+            post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+            post["action"] := "Profile"
+
+            posts.InsertAt(1, post)
         }
 
         ; check qm posts
         loop files (qmAgent.pool . "\*.json") {
-            if (InStr(A_LoopFileName, A_ComputerName)) {
-                status := StrSplit(A_LoopFileName, "==")[1]
-                post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
-                post["status"] := postStatus[status]
-                post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
-                post["action"] := post["content"]["module"] == "BlankShare" ? "Share" : "PayBy PayFor"
-                ownPosts.InsertAt(1, post)
-            }
+            if (showMyOwnPost && !A_LoopFileName.includes(A_ComputerName)) {
+                continue
+            }                
+
+            status := StrSplit(A_LoopFileName, "==")[1]
+            post := JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8"))
+            post["status"] := postStatus[status]
+            post["time"] := FormatTime(post["id"].substr(1, 14), "yyyy/MM/dd HH:mm")
+            post["action"] := post["content"]["module"] == "BlankShare" ? "Share" : "PayBy PayFor"
+            posts.InsertAt(1, post)
         }     
 
-        if (ownPosts.Length > 0) {
-            postQueue.set(ownPosts)
+        if (posts.Length > 0) {
+            postQueue.set(posts)
             App.getCtrlByName("postList").ModifyCol(3, "SortDesc")
         }
     }
@@ -90,12 +96,13 @@ ServerAgentPanel_Client(App, enabled) {
         }
 
         selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
-        form := selectedPost["content"]
+        
 
         switch selectedPost["action"] {
             case "Profile":
                 PostDetails_Profile(selectedPost)
             case "PayBy PayFor":
+                form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "PaymentRelation", {
                     styles: {
                         useCopyBtn: false,
@@ -113,8 +120,9 @@ ServerAgentPanel_Client(App, enabled) {
                         pbRoom: form["pbRoom"],
                         pbName: form["pbName"]
                     }
-                }).render()
-            case "BlankShare": 
+                })
+            case "Share": 
+                form := selectedPost["content"]["form"]
                 PostDetails_QM2(selectedPost, "BlankShare", {
                     styles: {
                         useCopyBtn: false,
@@ -126,8 +134,11 @@ ServerAgentPanel_Client(App, enabled) {
                         shareRoomNums: form["shareRoomNums"],
                         shareQty: form["shareQty"],
                         checkIn: form["checkIn"]
+                    },
+                    BlankShare: {
+                        children: App => App.AddCheckBox("Checked vsendPmPost h20 x+20 yp 0x200", "Share Check-in 后录入 Profile")
                     }
-                }).render()  
+                })
         }
     }
 
@@ -146,6 +157,7 @@ ServerAgentPanel_Client(App, enabled) {
         App.ARButton("x+5 h20 w20 +Center", "↻")
            .OnEvent("Click", handlePostUpdate)
            .SetFont("Bold"),
+        App.AddCheckBox("vshowMyOwnPosts Checked x+140 h20", "本机发送"),
         App.ARListView(lvSettings.options, lvSettings.columnDetails, postQueue)
            .OnEvent("ContextMenu", showPostDetails)
     )
