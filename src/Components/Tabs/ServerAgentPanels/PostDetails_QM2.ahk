@@ -2,10 +2,11 @@ PostDetails_QM2(post, moduleName, props) {
     App := Gui(, "Post Details - " . post["id"])
     App.SetFont(, "微软雅黑")
     App.OnEvent("Close", (*) => App.Destroy())
+    props.App := App
 
     qmModules := Map(
-        "BlankShare", BlankShare,
-        "PaymentRelation", PaymentRelation
+        "BlankShare",      [BlankShare, "Share 详情"],
+        "PaymentRelation", [PaymentRelation, "Payment 关系"]
     )
 
     handleRepost(*) {
@@ -42,13 +43,9 @@ PostDetails_QM2(post, moduleName, props) {
         App.AddGroupBox("Section w370 r12", "代行详情").SetFont("Bold"),
         App.AddText("xs10 yp+20", "发送状态: " . post["status"]),
         App.AddText("xs10 yp+20", "发送时间: " . post["time"]),
-        App.AddText("xs10 w200 h35 yp+30" , moduleName).SetFont("Bold s10"),
+        App.AddText("xs10 w200 h35 yp+30" , qmModules[moduleName][2]).SetFont("Bold s10"),
         
-        qmModules[moduleName].Call({ 
-            App: App,
-            styles: props.styles,
-            form : props.form
-        }).render(),
+        qmModules[moduleName][1].Call(props).render(),
 
         onMount(),
         App.Show()
