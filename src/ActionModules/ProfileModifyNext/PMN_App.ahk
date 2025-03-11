@@ -16,7 +16,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     handleDelegateActivate(ctrl, _) {
         delegate.set(ctrl.Value)
         if (ctrl.Value == false) {
-            App.getCtrlByName("qm2Agent").Enabled := false
             return
         }
         
@@ -24,7 +23,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         ctrl.Enabled := false
         serverConnection.set("尝试连接中...")
         connectionStatus.Visible := true
-        App.getCtrlByName("qm2Agent").Enabled := true
 
         SetTimer(() => ((
             pmnAgent.PING() 
@@ -36,11 +34,12 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                 : (
                     delegate.set(false), 
                     ctrl.Value := false, 
-                    serverConnection.set("超时无响应"),
-                    App.getCtrlByName("qm2Agent").Enabled := false
+                    serverConnection.set("超时无响应")
                 )
         ), ctrl.Enabled := true) , -100)
     }
+    effect(delegate, state => App.getCtrlByName("qm2Agent").Enabled := state)
+
 
     ; settings
     settings := signal({ fillOverwrite: false, loadFrom: "FileDB" })
@@ -53,10 +52,12 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         return (curDelegate ? (curOverwrite ? "覆盖代行" : "代 行") : (curOverwrite ? "覆盖填入" : "填 入"))
     }
 
+
     ; data states
     listContent := signal(settings.value["loadFrom"] == "FileDB" ? fdb.load() : db.load())
     queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 })
     
+
     ; list UI states/effect
     lvIsCheckedAll := signal(true)
     searchBy := signal("nameRoom")
@@ -82,6 +83,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         }
     }
     
+
+    ; incoming data handling
     currentGuest := signal(Map("idNum", 0))
     OnClipboardChange (*) => handleCaptured(identifier)
     handleCaptured(identifier) {
@@ -275,6 +278,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         return filteredItems
     }
 
+
+    ; fill in profile by actions
     fillPmsProfile(*) {
         if (!WinExist("ahk_class SunAwtFrame")) {
             MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
@@ -330,6 +335,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         }
     }
 
+
+    ; QM2 agent
     showQm2Panel(*) {
         if (searchBy.value != "waterfall") {
             return
@@ -350,6 +357,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         QM2_Panel({ selectedGuests: selectedGuests })
     }
 
+
+    ; hotkey setup
     setHotkeys() {
         HotIfWinActive(popupTitle)
         Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
@@ -392,6 +401,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             lvIsCheckedAll.set(c => !c)
         }
     }
+
 
     return (
         App.AddGroupBox("Section R18 w685 y+20", ""),
