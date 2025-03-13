@@ -13,14 +13,31 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
     effect(isListening, cur => App.getCtrlByText("启动服务").Value := cur == "离线" ? false : true)
 
     handleConnect(ctrl, _) {
+        ctrl.Enabled := false
+        ctrl.Text := "启动中..."
+
         if (MsgBox("服务将启动，请确保 Opera 处于 InHouse 界面", "Server Agent", "4096 OKCancel") == "Cancel") {
             ctrl.Value := false
+            ctrl.Enabled := true
+            ctrl.Text := "启动服务"
+            return
+        }
+
+        res := pmnAgent.PING()
+        if (res) {
+            Msgbox("已有服务在线。 主机：" . res.sender,, "4096 T2")
+            ctrl.Value := false
+            ctrl.Enabled := true
+            ctrl.Text := "启动服务"
             return
         }
 
         isListening.set(ctrl.Value ? "在线" : "离线")
+        ctrl.Enabled := true
+        ctrl.Text := "启动服务"
         App.getCtrlByName("intervalEdit").Enabled := !ctrl.Value
     }
+
 
     comp.render := this => this.Add(
         App.AddGroupBox("Section x30 y110 w300 r5"),
