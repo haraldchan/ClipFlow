@@ -37,6 +37,7 @@ PostDetails_QM2(post, moduleName, props) {
 
     onMount() {
         App.getCtrlByName(moduleName . "Action").OnEvent("Click", handleRepost, -1)
+        App.getCtrlByName(moduleName . "Action").Opt("+Default")
     }
 
     return (
