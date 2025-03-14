@@ -1,4 +1,4 @@
-#Include "../../../../../QM2-for-FrontDesk-main/src/ActionModules/ActionModuleIndex.ahk"
+#Include "../../../../../QM2-for-FrontDesk/src/ActionModules/ActionModuleIndex.ahk"
 
 QM2_Panel(props) {
     App := Gui("+AlwaysOnTop", "ServerAgents - QM2 Agent")
