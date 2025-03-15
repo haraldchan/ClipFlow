@@ -100,6 +100,7 @@ QM2_Panel(props) {
         for room in selectedRooms {
             roomCountMap[room] := (roomCountMap.has(room) ? roomCountMap[room] : -1) + 1
         }
+        App.getCtrlByName("shareRoomNums").Enabled := false
         App.getCtrlByName("shareRoomNums").Value := roomCountMap.keys().join(" ")
         App.getCtrlByName("shareQty").Value := roomCountMap.values().join(" ")
 
