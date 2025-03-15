@@ -41,11 +41,11 @@ ServerAgentPanel_Client(App, enabled) {
 
     handlePostUpdate(*) {
         posts := []
-        showMyOwnPost := App.getCtrlByName("showMyOwnPosts").Value
+        showMyOwnPosts := App.getCtrlByName("showMyOwnPosts").Value
         
         ; check pmn posts
         loop files (pmnAgent.pool . "\*.json") {
-            if (showMyOwnPost && !A_LoopFileName.includes(A_ComputerName)) {
+            if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
                 continue
             }
 
@@ -60,7 +60,7 @@ ServerAgentPanel_Client(App, enabled) {
 
         ; check qm posts
         loop files (qmAgent.pool . "\*.json") {
-            if (showMyOwnPost && !A_LoopFileName.includes(A_ComputerName)) {
+            if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
                 continue
             }                
 
@@ -91,13 +91,12 @@ ServerAgentPanel_Client(App, enabled) {
     }
 
     showPostDetails(LV, row, *) {
-        if (row == 0 || row > 10000) {
+        if (row == 0 || row > 10000 || LV.GetText(row, 1) == "连接中") {
             return
         }
 
         selectedPost := postQueue.value.find(post => post["id"] == LV.GetText(row, 4))
         
-
         switch selectedPost["action"] {
             case "Profile":
                 PostDetails_Profile(selectedPost)
