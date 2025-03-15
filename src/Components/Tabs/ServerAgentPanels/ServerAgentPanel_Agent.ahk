@@ -10,7 +10,7 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
 
     collectInterval := signal(3000)
     effect(collectInterval, cur => (pmnAgent.interval := cur))
-    effect(isListening, cur => App.getCtrlByText("启动服务").Value := cur == "离线" ? false : true)
+    effect(isListening, cur => App.getCtrlByName("serviceActivator").Value := cur == "离线" ? false : true)
 
     handleConnect(ctrl, _) {
         ctrl.Enabled := false
@@ -49,7 +49,7 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
         )),
         
         ; service activation
-        App.ARCheckBox("xs20 yp+30","启动服务").OnEvent("Click", handleConnect),
+        App.ARCheckBox("vserviceActivator xs20 yp+30","启动服务").OnEvent("Click", handleConnect),
         App.AddText("x+10", "本机: " . A_ComputerName),
 
         ; service state
