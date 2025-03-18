@@ -81,7 +81,7 @@ class useServerAgent {
      * <client> Post to pool
      * @param {Object} content 
      */
-    POST(content) {
+    POST(content, pool := this.pool) {
         if (this.safePost) {
             if (!this.PING()) {
                 MsgBox("Service offline.",, "4096 T2")
@@ -96,7 +96,7 @@ class useServerAgent {
             content: content
         }
 
-        filename := Format("{1}\{2}=={3}=={4}.json", this.pool, "PENDING", A_ComputerName, message.id)
+        filename := Format("{1}\{2}=={3}=={4}.json", pool, "PENDING", A_ComputerName, message.id)
         FileAppend(JSON.stringify(message), filename, "UTF-8")
 
         return message
@@ -107,9 +107,9 @@ class useServerAgent {
      * @param {String} method 
      * @returns {string[]} post filepaths array
      */
-    COLLECT(status) {
+    COLLECT(status, pool := this.pool) {
         posts := []
-        loop files (this.pool . "\*.json") {
+        loop files (pool . "\*.json") {
             ; postTimestamp := SubStr(StrSplit(A_LoopFileName, "==")[3], 1, 14)
             postTimestamp := A_LoopFileName.split("==")[3].substr(1, 14)
             if (DateDiff(A_Now, postTimestamp, "Minutes") >= this.collectRange && A_LoopFileName.includes(status)) {
