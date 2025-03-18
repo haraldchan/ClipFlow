@@ -5,7 +5,7 @@ FlowModes(App) {
 		ProfileModifyNext,
 		ProfileModifyNext_Group,
 		ShareClip,
-		ResvHandler,
+		ReservationHandler,
 	]
 
 	moduleNames := modules.map(module => module.name)
