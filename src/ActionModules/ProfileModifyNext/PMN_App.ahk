@@ -25,7 +25,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         connectionStatus.Visible := true
 
         SetTimer(() => ((
-            pmnAgent.PING() 
+            ; pmnAgent.PING() 
+            agent.PING()
                 ? (
                     serverConnection.set("后台服务在线"), 
                     SetTimer(() => connectionStatus.Visible := false, -2000)
@@ -318,7 +319,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
             if (delegate.value) {
                 SetTimer(() => (
-                    pmnAgent.delegate({
+                    ; pmnAgent.delegate({
+                    agent.delegate({
                         mode: "waterfall",
                         overwrite: settings.value["fillOverwrite"],
                         rooms: rooms,

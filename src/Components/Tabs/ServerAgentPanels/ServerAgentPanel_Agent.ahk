@@ -9,7 +9,8 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
     )
 
     collectInterval := signal(3000)
-    effect(collectInterval, cur => (pmnAgent.interval := cur))
+    ; effect(collectInterval, cur => (pmnAgent.interval := cur))
+    effect(collectInterval, cur => (agent.interval := cur))
     effect(isListening, cur => App.getCtrlByName("serviceActivator").Value := cur == "离线" ? false : true)
 
     handleConnect(ctrl, _) {
@@ -23,7 +24,8 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
             return
         }
 
-        res := pmnAgent.PING()
+        ; res := pmnAgent.PING()
+        res := agent.PING()
         if (res) {
             Msgbox("已有服务在线。 主机：" . res.sender,, "4096 T2")
             ctrl.Value := false
