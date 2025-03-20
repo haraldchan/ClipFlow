@@ -29,7 +29,6 @@ QM2_Panel(props) {
         SetTimer(() => qmSent.visible := false, -2000)
 
         SetTimer(() => (
-            ; resMessage := qmAgent.delegate({
             resMessage := agent.delegate({
                 module: module,
                 form: form,
@@ -61,7 +60,6 @@ QM2_Panel(props) {
             return
         }
 
-        ; loop files (qmAgent.pool . "\*.json") {
         loop files (agent.qmPool . "\*.json") {
             if (A_LoopFileName.includes(resMessage.id)) {
                 if (!A_LoopFileName.includes("MODIFIED")) {
@@ -76,12 +74,10 @@ QM2_Panel(props) {
         ; selectedGuests can only pass by GuestProfileList
         ; if no selectedGuest, then filter results in db by room number(request from ServerAgent_Panel)
         profiles := p.selectedGuests.Length == 0
-            ; ? db.load(,, qmAgent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
             ? db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
             : p.selectedGuests
 
         SetTimer(() => (
-            ; post := pmnAgent.delegate({
             post := agent.delegate({
                 rooms: roomNums.split(" "),
                 profiles: profiles

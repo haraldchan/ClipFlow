@@ -12,7 +12,6 @@ PostDetails_QM2(post, moduleName, props) {
     handleRepost(*) {
         form := App.Submit()
         SetTimer(() => (
-            ; qmAgent.delegate({
             agent.delegate({
                 module: moduleName,
                 form: form,
@@ -27,7 +26,6 @@ PostDetails_QM2(post, moduleName, props) {
     }
 
     renameResendPost(id) {
-        ; loop files (qmAgent.pool . "\*.json") {
         loop files (agent.qmPool . "\*.json") {
             if (InStr(A_LoopFileFullPath, id)) {
                 status := StrSplit(A_LoopFileName, "==")[1]

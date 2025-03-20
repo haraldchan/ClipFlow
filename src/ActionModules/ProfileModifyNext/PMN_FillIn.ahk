@@ -102,7 +102,6 @@ class PMN_FillIn {
             anchorY := FoundY
         } else {
             MsgBox("界面定位失败", popupTitle, "T2 4096")
-            ; pmnAgent.abort()
             agent.abort()
             utils.cleanReload(winGroup)
         }
@@ -129,7 +128,6 @@ class PMN_FillIn {
             Sleep 100
             if (A_Index > 30) {
                 MsgBox("界面定位失败", popupTitle, "T2 4096")
-                ; pmnAgent.abort()
                 agent.abort()
                 utils.cleanReload(winGroup)
             }

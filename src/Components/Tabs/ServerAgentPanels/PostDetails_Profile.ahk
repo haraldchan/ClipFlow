@@ -18,7 +18,6 @@ PostDetails_Profile(post) {
 
     handleRepost(*) {
         SetTimer(() => (
-            ; pmnAgent.delegate({
             agent.delegate({
                 mode: post["content"]["mode"],
                 overwrite: post["content"]["overwrite"],
@@ -33,7 +32,6 @@ PostDetails_Profile(post) {
     }
 
     renameResendPost(id) {
-        ; loop files (pmnAgent.pool . "\*.json") {
         loop files (agent.pool . "\*.json") {
             if (InStr(A_LoopFileFullPath, id)) {
                 status := StrSplit(A_LoopFileName, "==")[1]

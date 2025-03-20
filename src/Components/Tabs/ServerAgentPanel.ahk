@@ -1,5 +1,3 @@
-#Include "../../Servers/ProfileModifyNext_Server.ahk"
-#Include "../../Servers/QM2_Server.ahk"
 #Include "../../Servers/UnifiedAgent.ahk"
 #Include "./ServerAgentPanels/ServerAgentPanel_Agent.ahk"
 #Include "./ServerAgentPanels/ServerAgentPanel_Client.ahk"
@@ -7,24 +5,6 @@
 
 ServerAgentPanel(App) {
     isListening := signal("离线")
-
-    ; global pmnAgent := ProfileModifyNext_Agent({
-    ;     pool: A_ScriptDir . "\src\Servers\pmn-pool",
-    ;     interval: 3000,
-    ;     expiration: 1,
-    ;     collectRange: 10,
-    ;     safePost: false,
-    ;     isListening: isListening
-    ; })
-
-    ; global qmAgent := QM2_Agent({
-    ;     pool: A_ScriptDir . "\src\Servers\qm-pool",
-    ;     interval: 3000,
-    ;     expiration: 1,
-    ;     collectRange: 15,
-    ;     safePost: true,
-    ;     isListening: isListening
-    ; })
 
     global agent := UnifiedAgent({
         pool: A_ScriptDir . "\src\Servers\pmn-pool",

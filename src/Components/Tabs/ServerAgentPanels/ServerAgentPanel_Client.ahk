@@ -29,7 +29,6 @@ ServerAgentPanel_Client(App, enabled) {
         connection.set("连接中...")
         ctrl.Enabled := false
         
-        ; res := pmnAgent.PING()
         res := agent.PING()
         if (!res) {
             connection.set("无响应")
@@ -45,7 +44,6 @@ ServerAgentPanel_Client(App, enabled) {
         showMyOwnPosts := App.getCtrlByName("showMyOwnPosts").Value
         
         ; check pmn posts
-        ; loop files (pmnAgent.pool . "\*.json") {
         loop files (agent.pool . "\*.json") {
             if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
                 continue
@@ -61,7 +59,6 @@ ServerAgentPanel_Client(App, enabled) {
         }
 
         ; check qm posts
-        ; loop files (qmAgent.pool . "\*.json") {
         loop files (agent.qmPool . "\*.json") {
             if (showMyOwnPosts && !A_LoopFileName.includes(A_ComputerName)) {
                 continue
