@@ -11,7 +11,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     serverConnectionStatus := Map(
         "default", "Norm cBlack",
         "后台服务在线", "Bold cGreen",
-        "超时无响应", "Bold cRed"
+        "超时无响应", "Bold cRed",
+        "代行已发送！", "Bold cGreen",
     )
     handleDelegateActivate(ctrl, _) {
         delegate.set(ctrl.Value)
@@ -29,9 +30,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                 ? (
                     serverConnection.set("后台服务在线"), 
                     SetTimer(() => connectionStatus.Visible := false, -2000)
-
-                )
-                : (
+                ) : (
                     delegate.set(false), 
                     ctrl.Value := false, 
                     serverConnection.set("超时无响应")
@@ -286,8 +285,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             return
         }
 
-        App.Hide()
-        sleep 500
+        ( !delegate.value && App.Hide(), Sleep(500) )
 
         LV := App.getCtrlByType("ListView")
         if (LV.GetNext() == 0) {
@@ -317,6 +315,11 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             }
 
             if (delegate.value) {
+                serverConnection.set("代行已发送！")
+                connectionStatus := App.getCtrlByName("connectionStatus")
+                connectionStatus.Visible := true
+                SetTimer(() => (connectionStatus.Visible := false, App.Hide()), -2000)
+
                 SetTimer(() => (
                     agent.delegate({
                         mode: "waterfall",
