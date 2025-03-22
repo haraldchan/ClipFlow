@@ -20,6 +20,13 @@ QM2_Panel(props) {
         moduleComponents[module.name] := module
     }
 
+    effect(selectedModule, moduleName => handleModuleChange(moduleName))
+    handleModuleChange(moduleName) {
+        for module in modules {
+            App.getCtrlByName(module.name . "Action").Opt(module.name = moduleName ? "+Default" : "-Default")
+        }
+    }
+
     resMessage := {}
     form := {}
     delegateQmActions(module) {
