@@ -264,6 +264,13 @@ class PMN_FillIn {
 
         Send "{Tab}"
         utils.waitLoading()
+
+        ; check future reservation popup and resolve it
+        if (PixelSearch(&_, &_, FoundX, FoundY, FoundX + 250, FoundY + 250, "0x000080")) {
+            Send "!o"
+            utils.waitLoading()
+        }
+
         Send Format("{Text}{1}", guestProfileMap["nameFirst"])
 
         loop 2 {
