@@ -106,7 +106,6 @@ class UnifiedAgent extends useServerAgent {
         pmnPosts := this.COLLECT("PENDING")
         qmPosts := this.COLLECT("PENDING", this.qmPool)
 
-        
         if (pmnPosts.Length) {
             this.modifyPostedProfiles(pmnPosts)
         }
@@ -123,9 +122,8 @@ class UnifiedAgent extends useServerAgent {
      * @param {String[]} posts 
     */
    modifyPostedProfiles(posts) {
-        ; this.isListening.set("处理中...")
-
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
+        
         for post in unboxedPosts {
             this.currentHandlingPost := post
             c := post["content"]
@@ -135,8 +133,6 @@ class UnifiedAgent extends useServerAgent {
             this.currentHandlingPost := ""
             this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
-
-        ; this.isListening.set("在线")
     }
 
     /**
@@ -144,9 +140,8 @@ class UnifiedAgent extends useServerAgent {
      * @param {String[]} posts 
      */
     executeQmPostedActions(posts) {
-        ; this.isListening.set("处理中...")
-
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
+        
         for post in unboxedPosts {
             this.currentHandlingPost := post
 
@@ -156,8 +151,6 @@ class UnifiedAgent extends useServerAgent {
             this.currentHandlingPost := ""
             this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
-
-        ; this.isListening.set("在线")
     }
 
     /**
