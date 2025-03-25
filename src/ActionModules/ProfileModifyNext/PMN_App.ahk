@@ -5,6 +5,8 @@
 #include "../../Servers/ProfileModifyNext_Server.ahk"
 
 PMN_App(App, moduleTitle, fdb, db, identifier) {
+    isDateBaseTester := ProfileModifyNext.testers.find(tester => tester == A_ComputerName)
+
     ; server agent delegate
     delegate := signal(false)
     serverConnection := signal("")
@@ -113,7 +115,9 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             incomingGuest["regTime"] := A_Now
             fdb.add(JSON.stringify(incomingGuest))
             ; DateBase
-            ; db.add(JSON.stringify(incomingGuest))
+            if (isDateBaseTester) {
+                db.add(JSON.stringify(incomingGuest))
+            }
 
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
         }
@@ -135,7 +139,9 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                 ; FileDB
                 fdb.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
                 ; DateBase
-                ; db.updateOne(JSON.stringify(captured), queryFilter.value["date"], item => item["tsId"] == guest["tsId"])
+                if (isDateBaseTester) {
+                    db.updateOne(JSON.stringify(captured), queryFilter.value["date"], item => item["tsId"] == guest["tsId"])
+                }
                 return
             }
         }
@@ -167,13 +173,14 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             return
         }
 
-        ; try {
-            ; DateBase
-            ; db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], item => item["tsId"] == matchedGuest.value["tsId"])
-        ; } catch {
-            ; MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
-            ; return
-        ; }
+        if (isDateBaseTester) {
+            try {
+                db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], item => item["tsId"] == matchedGuest.value["tsId"])
+            } catch {
+                MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
+                return
+            }
+        }
 
         return matchedGuest.value
     }
@@ -285,7 +292,15 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             return
         }
 
-        ( !delegate.value && App.Hide(), Sleep(500) )
+        if (delegate.value) {
+            serverConnection.set("代行已发送！")
+            connectionStatus := App.getCtrlByName("connectionStatus")
+            connectionStatus.Visible := true
+            SetTimer(() => (connectionStatus.Visible := false, App.Hide()), -2000)
+        } else {
+            App.Hide() 
+            Sleep 500 
+        }
 
         LV := App.getCtrlByType("ListView")
         if (LV.GetNext() == 0) {
@@ -315,11 +330,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             }
 
             if (delegate.value) {
-                serverConnection.set("代行已发送！")
-                connectionStatus := App.getCtrlByName("connectionStatus")
-                connectionStatus.Visible := true
-                SetTimer(() => (connectionStatus.Visible := false, App.Hide()), -2000)
-
                 SetTimer(() => (
                     agent.delegate({
                         mode: "waterfall",

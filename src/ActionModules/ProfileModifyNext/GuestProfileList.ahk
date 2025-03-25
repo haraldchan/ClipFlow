@@ -1,6 +1,8 @@
 #Include "./GuestProfileDetails.ahk"
 
 GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile) {
+    isDateBaseTester := ProfileModifyNext.testers.find(tester => tester == A_ComputerName)
+
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
         titles: ["房号", "姓名", "性别", "类型", "证件号码", "地址"],
@@ -27,7 +29,9 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
         ; FileDB
         SetTimer(() => fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
         ; DateDase
-        ; db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
+        if (isDateBaseTester) {
+            db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
+        }
     }
 
     showProfileDetails(LV, row, *) {
