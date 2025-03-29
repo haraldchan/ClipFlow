@@ -31,9 +31,9 @@ QM2_Panel(props) {
     form := {}
     delegateQmActions(module) {
         form := App.Submit(false)
-        qmSent := App.getCtrlByName("qmSent")
-        qmSent.visible := true
-        SetTimer(() => qmSent.visible := false, -2000)
+        ; qmSent := App.getCtrlByName("qmSent")
+        ; qmSent.visible := true
+        ; SetTimer(() => qmSent.visible := false, -2000)
 
         SetTimer(() => (
             resMessage := agent.delegate({
@@ -43,7 +43,7 @@ QM2_Panel(props) {
             })
         ), -250)
 
-        return (SetTimer((*) => App.Destroy(), -2100), 0)
+        return (SetTimer((*) => App.Destroy(), -100), 0)
     }
 
     handleBlankShareDelegate(*) {
@@ -124,7 +124,7 @@ QM2_Panel(props) {
     return (
         ; GroupBox frame
         App.AddGroupBox("Section w370 h300 x10 y10", "QM2 Agent").SetFont("s12 Bold"),
-        App.AddText("vqmSent Hidden xs120 yp+2", "代行任务已发送！").SetFont("cGreen Bold"),
+        ; App.AddText("vqmSent Hidden xs120 yp+2", "代行任务已发送！").SetFont("cGreen Bold"),
         ; QM modules
         modules.keys().map(module =>
             App.AddRadio(A_Index == 1 ? "Checked xs10 yp+30 h20" : "xs10 yp+30 h20", modules[module])

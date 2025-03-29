@@ -14,7 +14,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         "default", "Norm cBlack",
         "后台服务在线", "Bold cGreen",
         "超时无响应", "Bold cRed",
-        "代行已发送！", "Bold cGreen",
+        ; "代行已发送！", "Bold cGreen",
     )
     handleDelegateActivate(ctrl, _) {
         delegate.set(ctrl.Value)
@@ -292,16 +292,19 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             return
         }
 
-        if (delegate.value) {
-            serverConnection.set("代行已发送！")
-            connectionStatus := App.getCtrlByName("connectionStatus")
-            connectionStatus.Visible := true
-            SetTimer(() => (connectionStatus.Visible := false, App.Hide()), -2000)
-        } else {
-            App.Hide() 
-            Sleep 500 
-        }
-
+        ; if (delegate.value) {
+        ;     serverConnection.set("代行已发送！")
+        ;     connectionStatus := App.getCtrlByName("connectionStatus")
+        ;     connectionStatus.Visible := true
+        ;     SetTimer(() => (connectionStatus.Visible := false, App.Hide()), -2000)
+        ; } else {
+        ;     App.Hide() 
+        ;     Sleep 500 
+        ; }
+        
+        App.Hide() 
+        Sleep 500 
+        
         LV := App.getCtrlByType("ListView")
         if (LV.GetNext() == 0) {
             return
