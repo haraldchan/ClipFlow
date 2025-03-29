@@ -24,8 +24,29 @@ class useServerAgent {
     }
 
     updatePostStatus(postPath, newStatus) {
-        curStatus := postPath.split("\").at(-1).replace(".json", "").split("==")[1]
-        FileMove(postPath, postPath.replace(curStatus, newStatus))
+        curHeader := postPath.split("\").at(-1).replace(".json", "").split("==")
+        updatedPostHeader := 0
+        err := 0
+
+        try {
+            FileMove(postPath, postPath.replace(curHeader[1], newStatus))
+            updatedPostHeader := {
+                status: newStatus,
+                sender: curHeader[2],
+                id: curHeader[3]
+            }
+        } catch Error as e {
+            err := e
+
+            errLogLine := Format("Time:{1} PostHeader:{2} Error:{3}`r`n", A_Now, curHeader.join("=="), e)
+
+            FileAppend(errLogLine, A_ScriptDir . "\src\Servers\error-log.txt", "UTF-8")
+        }
+
+        return {
+            header: updatedPostHeader, 
+            err: err
+        }
     }
 
     PING() {
