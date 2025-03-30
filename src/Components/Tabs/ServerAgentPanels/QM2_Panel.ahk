@@ -1,4 +1,4 @@
-#Include "../../../../../QM2-for-FrontDesk/src/ActionModules/ActionModuleIndex.ahk"
+#Include "../../../../../QM2-for-FrontDesk-main/src/ActionModules/ActionModuleIndex.ahk"
 
 QM2_Panel(props) {
     App := Gui("+AlwaysOnTop", "ServerAgents - QM2 Agent")
@@ -30,11 +30,6 @@ QM2_Panel(props) {
     resMessage := {}
     form := {}
     delegateQmActions(module) {
-        form := App.Submit(false)
-        ; qmSent := App.getCtrlByName("qmSent")
-        ; qmSent.visible := true
-        ; SetTimer(() => qmSent.visible := false, -2000)
-
         SetTimer(() => (
             resMessage := agent.delegate({
                 module: module,
@@ -101,12 +96,13 @@ QM2_Panel(props) {
     }
 
     onMount() {
-        ; initialize BlankShare values
         roomCountMap := Map()
-        selectedRooms := p.selectedGuests.map(guest => guest["roomNum"])
-        for room in selectedRooms {
-            roomCountMap[room] := (roomCountMap.has(room) ? roomCountMap[room] : -1) + 1
+        for roomProfiles in p.selectedGuests {
+            for roomNum, profiles in roomProfiles {
+                roomCountMap[roomNum] := profiles.Length - 1
+            }
         }
+
         App.getCtrlByName("shareRoomNums").Enabled := false
         App.getCtrlByName("shareRoomNums").Value := roomCountMap.keys().join(" ")
         App.getCtrlByName("shareQty").Value := roomCountMap.values().join(" ")
@@ -124,7 +120,7 @@ QM2_Panel(props) {
     return (
         ; GroupBox frame
         App.AddGroupBox("Section w370 h300 x10 y10", "QM2 Agent").SetFont("s12 Bold"),
-        ; App.AddText("vqmSent Hidden xs120 yp+2", "代行任务已发送！").SetFont("cGreen Bold"),
+
         ; QM modules
         modules.keys().map(module =>
             App.AddRadio(A_Index == 1 ? "Checked xs10 yp+30 h20" : "xs10 yp+30 h20", modules[module])

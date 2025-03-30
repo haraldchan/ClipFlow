@@ -55,6 +55,8 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
             selectedItem["name"] := selectedItem["name"].replace("👤", "")
         }
 
+        LV.Modify(row,,, selectedItem["name"])
+
         ; FileDB
         SetTimer(() => fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
         ; DateDase
@@ -68,7 +70,7 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
            .SetFont("s10.5")
            .OnEvent(
                 "ContextMenu", showProfileDetails,
-                ; "DoubleClick", markAsPrimary,
+                "DoubleClick", markAsPrimary,
                 "ItemEdit", handleUpdateItem
             )
     )

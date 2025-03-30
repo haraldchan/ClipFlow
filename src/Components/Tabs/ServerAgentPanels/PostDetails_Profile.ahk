@@ -3,7 +3,13 @@ PostDetails_Profile(post) {
     App.SetFont(, "微软雅黑")
     App.OnEvent("Close", (*) => App.Destroy())
     
-    profiles := signal(post["content"]["profiles"])
+    profilesList := []
+    for groupedProfiles in post["content"]["profiles"] {
+        for room, profiles in groupedProfiles {
+            profilesList.Push(profiles*)
+        }        
+    }
+    profiles := signal(profilesList)
 
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
@@ -12,7 +18,7 @@ PostDetails_Profile(post) {
     }
 
     options := {
-        lvOptions: "vguestProfileList Grid NoSortHdr -ReadOnly -Multi LV0x4000 w550 r8 y+10",
+        lvOptions: "vguestProfileList Grid NoSortHdr ReadOnly -Multi LV0x4000 w550 r8 y+10",
         itemOptions: ""
     }
 
@@ -23,7 +29,7 @@ PostDetails_Profile(post) {
                 overwrite: post["content"]["overwrite"],
                 rooms: profiles.value.map(p => p["roomNum"]).unique(),
                 party: post["content"]["party"],
-                profiles: profiles.value
+                profiles: post["content"]["profiles"]
             }),
             renameResendPost(post["id"])
         ), -250)

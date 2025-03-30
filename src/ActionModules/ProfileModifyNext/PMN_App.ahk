@@ -2,7 +2,6 @@
 #Include "./Settings.ahk"
 #Include "./PMN_FillIn.ahk"
 #Include "./PMN_Waterfall.ahk"
-#include "../../Servers/ProfileModifyNext_Server.ahk"
 
 PMN_App(App, moduleTitle, fdb, db, identifier) {
     isDateBaseTester := ProfileModifyNext.testers.find(tester => tester == A_ComputerName)
@@ -334,10 +333,11 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
             groupedSelectedGuests := []
             for room in rooms {
-                grouped := selectedGuests.filter(g => g["roomNum"] == room)
+                r := room
+                grouped := selectedGuests.filter(g => g["roomNum"] == r)
                 for guest in grouped {
                     if (guest["name"].includes("👤")) {
-                        grouped.filter(g => g["name"].includes("👤"))
+                        grouped.RemoveAt(A_Index)
                         grouped.InsertAt(1, guest)
                     }
                 }
@@ -352,12 +352,10 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                         overwrite: settings.value["fillOverwrite"],
                         rooms: rooms,
                         party: party,
-                        profiles: selectedGuests,
-                        ; profiles: groupedSelectedGuests
+                        profiles: groupedSelectedGuests
                     })
                 ), -250)
             } else {
-                PMN_Waterfall.cascade(rooms, selectedGuests, settings.value["fillOverwrite"], party)
                 PMN_Waterfall.cascade2(groupedSelectedGuests, settings.value["fillOverwrite"], party)
             }
         } else {
@@ -379,13 +377,28 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         ; pick selected guests
         for checkedRow in LV.getCheckedRowNumbers() {
             if (LV.getCheckedRowNumbers()[1] == "0") {
-                QM2_Panel({ sendPm: false})
+                QM2_Panel({ sendPm: false })
                 return
             }
             selectedGuests.Push(listContent.value[checkedRow])
         }
 
-        QM2_Panel({ selectedGuests: selectedGuests })
+        rooms := StrSplit(queryFilter.value["search"], " ")
+        groupedSelectedGuests := []
+        for room in rooms {
+            r := room
+            grouped := selectedGuests.filter(g => g["roomNum"] == r)
+            for guest in grouped {
+                if (guest["name"].includes("👤")) {
+                    grouped.RemoveAt(A_Index)
+                    grouped.InsertAt(1, guest)
+                }
+            }
+
+            groupedSelectedGuests.Push(Map(room, grouped))
+        }
+
+        QM2_Panel({ selectedGuests: groupedSelectedGuests })
     }
 
 
@@ -464,7 +477,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         App.AddText("x+1 h25 0x200", "分钟"),
         
         ; btns
-        App.AddButton("x+10 w80 h25", "刷 新(&R)").OnEvent("Click", handleListContentUpdate),
+        App.AddButton("vrefresh x+10 w80 h25", "刷 新(&R)").OnEvent("Click", handleListContentUpdate),
         App.ARButton("vfillIn x+5 w80 h25 Default", "{1}", fillBtnText)
            .OnEvent(
                 "Click", fillPmsProfile,
