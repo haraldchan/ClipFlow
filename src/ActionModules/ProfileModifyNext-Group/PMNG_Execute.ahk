@@ -70,10 +70,9 @@ class PMNG_Execute {
     }
 
     static search(roomNum, index, isNewShare) {
-        formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
+        formattedRoom := StrLen(roomNum) == 3 ? "0" . roomNum : roomNum
 
-        MouseMove 329, 196 ; room number field
-        Click 3
+        Send "!r" ; room number field
         utils.waitLoading()
         
         Send formattedRoom
