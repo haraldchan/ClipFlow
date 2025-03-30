@@ -43,22 +43,24 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
         GuestProfileDetails(selectedItem, fillPmsProfile, App)
     }
 
-    showQm2Panel(LV, row, *) {
+    markAsPrimary(LV, row) {
         if (searchBy.value != "waterfall") {
             return
         }
 
-        selectedGuests := []
-        ; pick selected guests
-        for checkedRow in LV.getCheckedRowNumbers() {
-            if (LV.getCheckedRowNumbers()[1] == "0") {
-                QM2_Panel({ selectedGuests: [listContent.value[row]], sendPm: false})
-                return
-            }
-            selectedGuests.Push(listContent.value[checkedRow])
+        selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
+        if (!selectedItem["name"].includes("👤")) {
+            selectedItem["name"] := "👤" . selectedItem["name"]
+        } else {
+            selectedItem["name"] := selectedItem["name"].replace("👤", "")
         }
 
-        QM2_Panel({ selectedGuests: selectedGuests })
+        ; FileDB
+        SetTimer(() => fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
+        ; DateDase
+        if (isDateBaseTester) {
+            db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
+        }
     }
 
     return (    
@@ -66,7 +68,7 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
            .SetFont("s10.5")
            .OnEvent(
                 "ContextMenu", showProfileDetails,
-                ; "DoubleClick", showQm2Panel,
+                ; "DoubleClick", markAsPrimary,
                 "ItemEdit", handleUpdateItem
             )
     )

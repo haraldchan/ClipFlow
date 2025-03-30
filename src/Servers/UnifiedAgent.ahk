@@ -129,6 +129,7 @@ class UnifiedAgent extends useServerAgent {
             c := post["content"]
             if (c["mode"] == "waterfall" || c["mode"] == "single") {
                 PMN_Waterfall.cascade(c["rooms"], c["profiles"], c["overwrite"], c["party"])
+                ; PMN_Waterfall.cascade2(c["profiles"], c["overwrite"], c["party"])
             }
             this.currentHandlingPost := ""
             this.updatePostStatus(posts[A_Index], "MODIFIED")

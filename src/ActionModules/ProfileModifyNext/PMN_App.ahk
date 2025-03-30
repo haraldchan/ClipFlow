@@ -332,6 +332,19 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                 selectedGuests.Push(listContent.value[row])
             }
 
+            groupedSelectedGuests := []
+            for room in rooms {
+                grouped := selectedGuests.filter(g => g["roomNum"] == room)
+                for guest in grouped {
+                    if (guest["name"].includes("👤")) {
+                        grouped.filter(g => g["name"].includes("👤"))
+                        grouped.InsertAt(1, guest)
+                    }
+                }
+
+                groupedSelectedGuests.Push(Map(room, grouped))
+            }
+
             if (delegate.value) {
                 SetTimer(() => (
                     agent.delegate({
@@ -339,11 +352,13 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                         overwrite: settings.value["fillOverwrite"],
                         rooms: rooms,
                         party: party,
-                        profiles: selectedGuests
+                        profiles: selectedGuests,
+                        ; profiles: groupedSelectedGuests
                     })
                 ), -250)
             } else {
                 PMN_Waterfall.cascade(rooms, selectedGuests, settings.value["fillOverwrite"], party)
+                PMN_Waterfall.cascade2(groupedSelectedGuests, settings.value["fillOverwrite"], party)
             }
         } else {
             targetId := LV.GetText(LV.GetNext(), LV.arcWrapper.titleKeys.findIndex(key => key == "idNum"))

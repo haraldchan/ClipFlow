@@ -42,6 +42,37 @@ class PMN_Waterfall {
         MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
     }
 
+    static cascade2(groupedSelectedGuests, isOverwrite, party := "") {
+        PMN_FillIn.start()
+
+        for roomProfiles in groupedSelectedGuests {
+            for guest in roomProfiles {
+                res := this.search(guest["roomNum"], A_Index, party)
+                if (res == "not found") {
+                    continue
+                }
+
+                if (!PMN_FillIn.isRunning) {
+                    msgbox("脚本已终止", popupTitle, "4096 T1")
+                    return
+                }
+                utils.waitLoading()
+
+                if (guest["name"].includes("👤")) {
+                    guest["name"] := guest["name"].replace("👤", "")
+                }
+                this.modify(guest, isOverwrite)
+                if (!PMN_FillIn.isRunning) {
+                    msgbox("脚本已终止", popupTitle, "4096 T1")
+                    return
+                }
+            }
+        }
+
+        PMN_FillIn.end()
+        MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
+    }
+
     static search(roomNum, index, party := "") {
         formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
@@ -68,7 +99,7 @@ class PMN_Waterfall {
         utils.waitLoading()
 
         CoordMode "Pixel", "Screen"
-        if (ImageSearch(&_, &_ ,0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\assets\info.PNG")) {
+        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\assets\info.PNG")) {
             Send "{Enter}"
             return "not found"
         }
@@ -79,12 +110,12 @@ class PMN_Waterfall {
         }
 
         ; sort by Prs.
-        Click 838, 378, "Right" 
+        Click 838, 378, "Right"
         Sleep 200
         Send "{Down}"
         Sleep 200
         Send "{Enter}"
-        utils.waitLoading() 
+        utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -97,10 +128,10 @@ class PMN_Waterfall {
         }
     }
 
-    static modify(guest, isOverwrite) { 
+    static modify(guest, isOverwrite) {
         Send "!p" ; open profile
         utils.waitLoading()
-        
+
         PMN_FillIn.fill(guest, isOverwrite, true)
         utils.waitLoading()
         ; Sleep 1000
