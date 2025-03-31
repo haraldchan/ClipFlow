@@ -30,6 +30,7 @@ QM2_Panel(props) {
     resMessage := {}
     form := {}
     delegateQmActions(module) {
+        form := App.Submit()
         SetTimer(() => (
             resMessage := agent.delegate({
                 module: module,
