@@ -39,7 +39,9 @@ QM2_Panel(props) {
             })
         ), -250)
 
-        return (SetTimer((*) => App.Destroy(), -100), 0)
+        SetTimer((*) => (App.Destroy(), WinHide(popupTitle)), -100)
+
+        return 0
     }
 
     handleBlankShareDelegate(*) {
@@ -104,16 +106,18 @@ QM2_Panel(props) {
             }
         }
 
-        App.getCtrlByName("shareRoomNums").Enabled := false
-        App.getCtrlByName("shareRoomNums").Value := roomCountMap.keys().join(" ")
+        shareRoomNums := App.getCtrlByName("shareRoomNums")
+        shareRoomNums.Enabled := false
+        shareRoomNums.Value := roomCountMap.keys().join(" ")
         App.getCtrlByName("shareQty").Value := roomCountMap.values().join(" ")
 
         ; re-label btns
-        App.getCtrlByName("BlankShareAction").Text := "Share 代行"
-        App.getCtrlByName("BlankShareAction").Opt("+Default")
+        BlankShareAction := App.getCtrlByName("BlankShareAction")
+        BlankShareAction.Text := "Share 代行"
+        BlankShareAction.Opt("+Default")
 
-        ; override actions
-        App.getCtrlByName("BlankShareAction").OnEvent("Click", handleBlankShareDelegate, -1)
+        ; override events
+        BlankShareAction.OnEvent("Click", handleBlankShareDelegate, -1)
         App.getCtrlByName("PaymentRelationAction").OnEvent("Click", handlePaymentRelationDelegate, -1)
     }
 
