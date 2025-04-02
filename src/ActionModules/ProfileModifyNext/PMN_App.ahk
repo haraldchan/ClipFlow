@@ -356,7 +356,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                     })
                 ), -250)
             } else {
-                PMN_Waterfall.cascade2(groupedSelectedGuests, settings.value["fillOverwrite"], party)
+                PMN_Waterfall.cascade(groupedSelectedGuests, settings.value["fillOverwrite"], party)
             }
         } else {
             targetId := LV.GetText(LV.GetNext(), LV.arcWrapper.titleKeys.findIndex(key => key == "idNum"))

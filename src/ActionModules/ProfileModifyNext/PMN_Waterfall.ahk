@@ -1,48 +1,5 @@
 class PMN_Waterfall {
-    static cascade(rooms, selectedGuests, isOverwrite, party := "") {
-        PMN_FillIn.start()
-
-        curRoom := signal(0)
-        index := 1
-
-        for room in rooms {
-            curRoom.set(room)
-
-            for guest in selectedGuests {
-                remaining := selectedGuests.filter(g => g["roomNum"] = curRoom.value).Length
-
-                if (guest["roomNum"] == curRoom.value) {
-                    res := this.search(room, index, party)
-                    if (res == "not found") {
-                        continue
-                    }
-
-                    if (!PMN_FillIn.isRunning) {
-                        msgbox("脚本已终止", popupTitle, "4096 T1")
-                        return
-                    }
-                    utils.waitLoading()
-                    this.modify(guest, isOverwrite)
-                    if (!PMN_FillIn.isRunning) {
-                        msgbox("脚本已终止", popupTitle, "4096 T1")
-                        return
-                    }
-
-                    guest["roomNum"] := ""
-                    index := (remaining == 1) ? 1 : index + 1
-
-                    if (remaining == 1) {
-                        break
-                    }
-                }
-            }
-        }
-
-        PMN_FillIn.end()
-        MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
-    }
-
-    static cascade2(groupedSelectedGuests, isOverwrite, party := "") {
+    static cascade(groupedSelectedGuests, isOverwrite, party := "") {
         PMN_FillIn.start()
 
         for roomProfiles in groupedSelectedGuests {
@@ -56,11 +13,11 @@ class PMN_Waterfall {
                     msgbox("脚本已终止", popupTitle, "4096 T1")
                     return
                 }
-                utils.waitLoading()
 
                 if (guest["name"].includes("👤")) {
                     guest["name"] := guest["name"].replace("👤", "")
                 }
+
                 this.modify(guest, isOverwrite)
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -73,8 +30,8 @@ class PMN_Waterfall {
         MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
     }
 
-    static search(roomNum, index, party := "") {
-        formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
+    static search(roomNum, index, party := 0) {
+        formattedRoom := StrLen(roomNum) == 3 ? "0" . roomNum : roomNum
 
         Send "!r"
         utils.waitLoading()
@@ -86,7 +43,7 @@ class PMN_Waterfall {
         Send formattedRoom
         utils.waitLoading()
 
-        if (party != "") {
+        if (party) {
             loop 16 {
                 Send "{Tab}"
                 Sleep 10
@@ -126,6 +83,8 @@ class PMN_Waterfall {
             Send "{Down}"
             utils.waitLoading()
         }
+
+        utils.waitLoading
     }
 
     static modify(guest, isOverwrite) {
@@ -138,6 +97,6 @@ class PMN_Waterfall {
 
         Send "!o" ; ok
         utils.waitLoading()
-        ; sleep 1000
+        sleep 1000
     }
 }
