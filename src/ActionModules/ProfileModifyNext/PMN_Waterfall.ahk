@@ -3,7 +3,7 @@ class PMN_Waterfall {
         PMN_FillIn.start()
 
         for roomProfiles in groupedSelectedGuests {
-            for guest in roomProfiles {
+            for guest in roomProfiles.values()[1] {            
                 res := this.search(guest["roomNum"], A_Index, party)
                 if (res == "not found") {
                     continue
@@ -12,13 +12,15 @@ class PMN_Waterfall {
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", popupTitle, "4096 T1")
                     return
-                }
+                }                
 
                 if (guest["name"].includes("👤")) {
                     guest["name"] := guest["name"].replace("👤", "")
                 }
 
                 this.modify(guest, isOverwrite)
+                Sleep 1000
+
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", popupTitle, "4096 T1")
                     return
@@ -31,7 +33,7 @@ class PMN_Waterfall {
     }
 
     static search(roomNum, index, party := 0) {
-        formattedRoom := StrLen(roomNum) == 3 ? "0" . roomNum : roomNum
+        formattedRoom := StrLen(roomNum) = 3 ? "0" . roomNum : roomNum
 
         Send "!r"
         utils.waitLoading()
@@ -84,7 +86,7 @@ class PMN_Waterfall {
             utils.waitLoading()
         }
 
-        utils.waitLoading
+        utils.waitLoading()
     }
 
     static modify(guest, isOverwrite) {
