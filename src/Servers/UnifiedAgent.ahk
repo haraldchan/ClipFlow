@@ -100,6 +100,10 @@ class UnifiedAgent extends useServerAgent {
             this.isListening.set("离线")
             return
         }
+
+        if (this.currentHandlingPost) {
+            return
+        }
         
         this.isListening.set("处理中...")
 
@@ -114,6 +118,7 @@ class UnifiedAgent extends useServerAgent {
             this.executeQmPostedActions(qmPosts)
         }
          
+        this.currentHandlingPost := ""
         this.isListening.set("在线")
     }
     
@@ -130,7 +135,6 @@ class UnifiedAgent extends useServerAgent {
             if (c["mode"] == "waterfall" || c["mode"] == "single") {
                 PMN_Waterfall.cascade(c["profiles"], c["overwrite"], c["party"])
             }
-            this.currentHandlingPost := ""
             this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
     }
@@ -148,7 +152,6 @@ class UnifiedAgent extends useServerAgent {
             ; call QM action module
             ObjBindMethod(this.qmModules[post["content"]["module"]], "USE", post["content"]["form"]).Call()
 
-            this.currentHandlingPost := ""
             this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
     }
