@@ -68,8 +68,26 @@ class UnifiedAgent extends useServerAgent {
      * @param status 
      */
     listen(status) {
-        SetTimer(this.res, status != "离线" ? this.interval : 0)
+        ; SetTimer(this.res, status != "离线" ? this.interval : 0, 100)
+        ; if (status == "离线") {
+        ;     SetTimer(this.res, 0)
+        ; } else {
+        ;     SetTimer(this.res, this.interval)
+        ; }
+        
+        ; FileAppend(
+        ;     JSON.stringify({ status: status == "在线" ? "在线 " . A_ComputerName : status }), 
+        ;     A_ScriptDir . "\src\Servers\status.json",
+        ;     "UTF-8"
+        ; )
+
         SetTimer(this.handlePost, status == "在线" ? this.interval : 0)
+        ; if (status == "在线") {
+        ;     SetTimer(this.handlePost, this.interval)
+        ;     SetTimer(() => this.InputBlock(), -100)
+        ; } else {
+        ;     SetTimer(this.handlePost, 0)
+        ; }
 
         ; blocks input while listening
         if (status == "在线") {
@@ -88,6 +106,7 @@ class UnifiedAgent extends useServerAgent {
                 utils.waitLoading()
             }
         }
+        
         this.RESPONSE()
     }
 
@@ -101,15 +120,19 @@ class UnifiedAgent extends useServerAgent {
             return
         }
 
+        ; is handling post at the moment
         if (this.currentHandlingPost) {
             return
         }
+
+        this.keepAlive()
         
         this.isListening.set("处理中...")
 
         pmnPosts := this.COLLECT("PENDING")
         qmPosts := this.COLLECT("PENDING", this.qmPool)
 
+        
         if (pmnPosts.Length) {
             this.modifyPostedProfiles(pmnPosts)
         }
@@ -117,7 +140,7 @@ class UnifiedAgent extends useServerAgent {
         if (qmPosts.Length) {
             this.executeQmPostedActions(qmPosts)
         }
-         
+
         this.currentHandlingPost := ""
         this.isListening.set("在线")
     }
@@ -128,7 +151,7 @@ class UnifiedAgent extends useServerAgent {
     */
    modifyPostedProfiles(posts) {
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
-        
+
         for post in unboxedPosts {
             this.currentHandlingPost := post
             c := post["content"]
@@ -145,7 +168,7 @@ class UnifiedAgent extends useServerAgent {
      */
     executeQmPostedActions(posts) {
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
-        
+
         for post in unboxedPosts {
             this.currentHandlingPost := post
 
