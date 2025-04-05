@@ -68,30 +68,9 @@ class UnifiedAgent extends useServerAgent {
      * @param status 
      */
     listen(status) {
-        ; SetTimer(this.res, status != "离线" ? this.interval : 0, 100)
-        ; if (status == "离线") {
-        ;     SetTimer(this.res, 0)
-        ; } else {
-        ;     SetTimer(this.res, this.interval)
-        ; }
-        
-        ; FileAppend(
-        ;     JSON.stringify({ status: status == "在线" ? "在线 " . A_ComputerName : status }), 
-        ;     A_ScriptDir . "\src\Servers\status.json",
-        ;     "UTF-8"
-        ; )
-
-        SetTimer(this.handlePost, status == "在线" ? this.interval : 0)
-        ; if (status == "在线") {
-        ;     SetTimer(this.handlePost, this.interval)
-        ;     SetTimer(() => this.InputBlock(), -100)
-        ; } else {
-        ;     SetTimer(this.handlePost, 0)
-        ; }
-
-        ; blocks input while listening
         if (status == "在线") {
-            SetTimer(() => this.InputBlock(), -100)
+            SetTimer(() => this.InputBlock(), -1)
+            SetTimer(this.handlePost, this.interval)
         }
     }
 
@@ -126,12 +105,11 @@ class UnifiedAgent extends useServerAgent {
         }
 
         this.keepAlive()
-        
         this.isListening.set("处理中...")
+        SetTimer(, 0)
 
         pmnPosts := this.COLLECT("PENDING")
         qmPosts := this.COLLECT("PENDING", this.qmPool)
-
         
         if (pmnPosts.Length) {
             this.modifyPostedProfiles(pmnPosts)
@@ -153,6 +131,8 @@ class UnifiedAgent extends useServerAgent {
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
 
         for post in unboxedPosts {
+            this.RESPONSE()
+
             this.currentHandlingPost := post
             c := post["content"]
             if (c["mode"] == "waterfall" || c["mode"] == "single") {
@@ -170,8 +150,9 @@ class UnifiedAgent extends useServerAgent {
         unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
 
         for post in unboxedPosts {
-            this.currentHandlingPost := post
+            this.RESPONSE()
 
+            this.currentHandlingPost := post
             ; call QM action module
             ObjBindMethod(this.qmModules[post["content"]["module"]], "USE", post["content"]["form"]).Call()
 
