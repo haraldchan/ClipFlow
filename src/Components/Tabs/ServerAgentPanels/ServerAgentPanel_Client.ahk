@@ -13,6 +13,8 @@ ServerAgentPanel_Client(App, enabled) {
         "ABORTED", "错误终止",
         "RESENT", "已重发",
         "ABANDONED", "超时弃用",
+        "PING", "连接中",
+        "ONLINE", "在线"
     )
 
     connection := signal("未连接")
@@ -43,7 +45,7 @@ ServerAgentPanel_Client(App, enabled) {
         
         ; check pmn posts
         loop files (agent.pool . "\*.json") {
-            if (A_LoopFileName.includes("PING")) {
+            if (A_LoopFileName.includes("PING") || A_LoopFileName.includes("ONLINE")) {
                 continue
             }
 
