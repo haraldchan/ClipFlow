@@ -10,7 +10,7 @@ ServerAgentPanel(App) {
         pool: A_ScriptDir . "\src\Servers\pmn-pool",
         qmPool: A_ScriptDir . "\src\Servers\qm-pool",
         interval: 3000,
-        expiration: 1,
+        expiration: 480,
         collectRange: 15,
         safePost: false,
         isListening: isListening

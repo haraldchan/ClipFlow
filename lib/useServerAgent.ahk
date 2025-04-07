@@ -3,7 +3,7 @@ class useServerAgent {
         s := useProps(serverSettings, {
             pool: "",         ; post pool dir path
             interval: 3000,   ; post checking interval MILLISECONDS
-            expiration: 1,    ; delete posts after (exp) DAYS
+            expiration: 480,    ; delete posts after (exp) MINUTES
             collectRange: 15, ; collect post from recent MINUTES
             safePost: true,   ; whether ping before sending a post
             isListening: serverSettings is Map 

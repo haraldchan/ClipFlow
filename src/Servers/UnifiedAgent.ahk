@@ -28,7 +28,7 @@ class UnifiedAgent extends useServerAgent {
             header := StrSplit(A_LoopFileName, "==")
             method := header[1]
             date := SubStr(header[3], 1, 14)
-            if (DateDiff(A_Now, date, "Days") >= exp) {
+            if (DateDiff(A_Now, date, "Minutes") >= exp) {
                 FileDelete(A_LoopFileFullPath)
             }
         }
@@ -105,8 +105,8 @@ class UnifiedAgent extends useServerAgent {
         }
 
         this.keepAlive()
-        this.isListening.set("处理中...")
         SetTimer(, 0)
+        this.isListening.set("处理中...")
 
         pmnPosts := this.COLLECT("PENDING")
         qmPosts := this.COLLECT("PENDING", this.qmPool)
