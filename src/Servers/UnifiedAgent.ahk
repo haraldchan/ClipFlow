@@ -72,6 +72,10 @@ class UnifiedAgent extends useServerAgent {
             SetTimer(() => this.InputBlock(), -1)
             SetTimer(this.handlePost, this.interval)
         }
+
+        if (status == "离线") {
+            SetTimer(this.handlePost, 0)
+        }
     }
 
     /**
