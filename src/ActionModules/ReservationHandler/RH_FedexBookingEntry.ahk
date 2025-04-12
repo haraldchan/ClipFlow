@@ -195,10 +195,17 @@ class FedexBookingEntry {
         utils.waitLoading()
         Click 3
         utils.waitLoading()
-        Send Format("{Text}{1}", ETA)
-        utils.waitLoading()
-        Send "{Tab}"
-        utils.waitLoading()
+
+        ; check if resv is checked-in already
+        prevClb := A_Clipboard
+        Send "^c"
+        if (A_Clipboard != prevClb) {
+            Send Format("{Text}{1}", ETA)
+            utils.waitLoading()
+            Send "{Tab}"
+            utils.waitLoading()
+        }
+
         MouseMove 454, 599
         utils.waitLoading()
         Click 3
@@ -230,14 +237,6 @@ class FedexBookingEntry {
             comment := Format("Changed to {1}={2}day(s), New Stay:{3}-{4} // Before Update:{5}", infoObj["stayHours"], infoObj["daysActual"], infoObj["ciDate"], infoObj["coDate"], prevComment)
         }
 
-        ; fill-in comment
-
-        ; probably no need to click again (might cause unexpected double click).
-        ; Sleep 100
-        ; MouseMove initX, initY ; 622, 596
-        ; Sleep 500
-        ; Click
-
         utils.waitLoading()
         Send Format("{Text}{1}", comment)
         utils.waitLoading()
@@ -266,6 +265,7 @@ class FedexBookingEntry {
             Send "{Tab}"
             utils.waitLoading()
         }
+
         Send Format("{Text}{1}", sCheckin)
         Sleep 100
         Send "{Tab}"
