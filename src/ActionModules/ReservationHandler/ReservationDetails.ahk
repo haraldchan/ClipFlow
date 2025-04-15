@@ -1,35 +1,38 @@
-ReservationDetails(App, curResv) {
-    fieldIndex := OrderedMap(
-        "resvType", "订单类型",
-        "crewNames", "机组姓名",
-        "tripNum", "Trip No.",
-        "roomQty", "订房数量",
-        "ciDate", "入住日期",
-        "flightIn", "预抵航班",
-        "ETA", "入住时间",
-        "coDate", "退房日期",
-        "flightOut", "离开航班",
-        "ETD", "退房时间",
-        "stayHours", "在住时长",
-        "daysActual", "计费天数",
-        "tracking", "Tracking 单号",
-    )
+#Include "./RH_Models.ahk"
 
-    effect(curResv, cur => handleListUpdate(cur, fieldIndex))
-    handleListUpdate(curResv, fieldIndex) {
+ReservationDetails(App, curResv) {
+
+    effect(curResv, cur => handleListUpdate(cur))
+    handleListUpdate(curResv) {
         LV := App.getCtrlByType("ListView")
         LV.Delete()
 
-        for key, field in fieldIndex {            
-            if (key == "crewNames") {
-                val := curResv[key].join(", ")
-            } else if (key == "ciDate" || key == "coDate") {
-                val := FormatTime(curResv[key], "yyyy/MM/dd")
-            } else {
-                val := curResv[key]
-            }
+        if (curResv["agent"] == "fedex") {
+            for key, field in RH_Models.fedexListFields {
+                if (key == "crewNames") {
+                    val := curResv[key].join(", ")
+                } else if (key == "ciDate" || key == "coDate") {
+                    val := FormatTime(curResv[key], "yyyy/MM/dd")
+                } else {
+                    val := curResv[key]
+                }
 
-            LV.Add(, field, val)
+                LV.Add(, field, val)
+            }
+        } else {
+            for key, field in RH_Models.otaListFields {
+                if (key == "guestNames" || key == "roomRates") {
+                    val := curResv[key].join(", ")
+                } else if (key == "ciDate" || key == "coDate") {
+                    val := FormatTime(curResv[key], "yyyy/MM/dd")
+                } else if (key == "bbf") {
+                    val := curResv[key].map(item => item == 0 ? "无早" : item == 1 ? "单早" : "双早").join(", ")
+                } else {
+                    val := curResv[key]
+                }
+
+                LV.Add(, field, val)
+            }
         }
     }
 
