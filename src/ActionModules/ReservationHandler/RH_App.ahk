@@ -36,7 +36,7 @@ RH_App(App, moduleTitle, identifier) {
         App.AddText("xs20 y+1 w270 h250", README).SetFont("s10"),
 
         ; reservation info
-        App.ARText("x360 y140 w200 h30", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold"),
+        App.ARText("x360 y140 w300 h30", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold"),
         ReservationDetails(App, curResv),
 
         ; entry btns
