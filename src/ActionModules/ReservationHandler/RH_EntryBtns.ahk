@@ -1,23 +1,23 @@
 RH_EntryBtns(App, curResv, resvSource) {
     effect(curResv, cur => handleEntryBtnUpdate(cur))
-    handleEntryBtnUpdate(curResv) {
+    handleEntryBtnUpdate(cur) {
         entryBtns := [App.getCtrlByName("entry1"), App.getCtrlByName("entry2")]
         
-        if (curResv["agent"] == "fedex") {
-            resvSource.set(": " . curResv["resvType"])
-            crewLastNames := curResv["crewNames"].map(name => name.split(" ")[2])
+        if (cur["agent"] == "fedex") {
+            resvSource.set(": " . cur["resvType"])
+            crewLastNames := cur["crewNames"].map(name => name.split(" ")[2])
             
             for btn in entryBtns {
                 exist := crewLastNames.has(A_Index)
-                btn.Text := exist ? curResv["crewNames"][A_Index] : ""
+                btn.Text := exist ? cur["crewNames"][A_Index] : ""
             }
 
             return
         }
 
-        resvSource.set(Format(": {1} - {2}", curResv["agent"].toTitle(), curResv["orderId"]))
-        entryBtns[1] := "录入订单"
-        entryBtns[2] := curResv["roomQty"].Length > 1 ? "录入整个 Party " : ""
+        resvSource.set(Format(": {1} - {2}", cur["agent"].toTitle(), cur["orderId"]))
+        entryBtns[1].Text := "录入订单"
+        entryBtns[2].Text := cur["roomQty"] > 1 ? "录入整个 Party " : ""
     }
 
     handleEntry(ctrl, _) {
@@ -25,7 +25,7 @@ RH_EntryBtns(App, curResv, resvSource) {
             return
         }
 
-        if (curResv["agent"] == "fedex") {
+        if (curResv.value["agent"] == "fedex") {
             FedexBookingEntry.USE(curResv.value, ctrl.name == "entry1" ? 1 : 2)
         } else {
             RH_OTA.USE(curResv.value, ctrl.name == "entry2" ? true : false )
@@ -35,6 +35,6 @@ RH_EntryBtns(App, curResv, resvSource) {
     return (
         App.AddGroupBox("Section y+10 w310 r2 ", "录入订单"),
         App.AddButton("ventry1 xs10 w140 h40 yp+20", "").OnEvent("Click", handleEntry),
-        App.AddButton("ventry2 w140 x+10 h40", "").OnEvent("Click", handleEntry),
+        App.AddButton("ventry2 w140 x+10 h40", "").OnEvent("Click", handleEntry)
     )
 }
