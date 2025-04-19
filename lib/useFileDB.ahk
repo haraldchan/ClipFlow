@@ -92,9 +92,30 @@ class useFileDB {
 	 */
 	loadOneDay(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
 		loadedData := this.findByPeriod(db, queryDate, queryPeriodInput)
-			.map(file => JSON.parse(FileRead(file, "UTF-8")))
+
+		for i, file in loadedData {
+			str := FileRead(file, "UTF-8")
+			try {
+				file := JSON.parse(str)
+			} catch {
+				loadedData.RemoveAt(i)
+				loadedData.InsertAt(i + (A_Index - 1), this._handleMalformedJson(str)*)
+			}
+		}
 
 		return loadedData
+	}
+
+	/**
+	 * @param {String} malformedString
+	 * @returns {Array}
+	 */
+	_handleMalformedJson(malformedString) {
+		if (!malformedString.includes("}{")) {
+			return []
+		}
+
+		return JSON.parse("[" . malformedString.replace("}{", "},{") . "]").unique()
 	}
 
 	/**
