@@ -110,7 +110,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         ; adding guest
         } else {
             ; FileDB
-            incomingGuest["fileName"] := A_Now . A_MSec
+            incomingGuest["fileName"] := A_Now . "_" . Random(1000, 9999)
             incomingGuest["regTime"] := A_Now
             fdb.add(JSON.stringify(incomingGuest))
             ; DateBase
