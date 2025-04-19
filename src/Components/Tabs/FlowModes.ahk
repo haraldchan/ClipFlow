@@ -4,7 +4,6 @@ FlowModes(App) {
 	modules := [
 		ProfileModifyNext,
 		ProfileModifyNext_Group,
-		ShareClip,
 		ReservationHandler,
 	]
 
