@@ -91,19 +91,19 @@ class useFileDB {
 	 * @return {Map[]}
 	 */
 	loadOneDay(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
-		loadedData := this.findByPeriod(db, queryDate, queryPeriodInput)
+		loadedPaths := this.findByPeriod(db, queryDate, queryPeriodInput)
+		parsedProfiles := []
 
-		for i, file in loadedData {
+		for file in loadedPaths {
 			str := FileRead(file, "UTF-8")
 			try {
-				file := JSON.parse(str)
+				parsedProfiles.Push(JSON.parse(str))
 			} catch {
-				loadedData.RemoveAt(i)
-				loadedData.InsertAt(i + (A_Index - 1), this._handleMalformedJson(str)*)
+				parsedProfiles.InsertAt(A_Index, this._handleMalformedJson(str).map(profile => JSON.parse(profile))*)
 			}
 		}
 
-		return loadedData
+		return parsedProfiles
 	}
 
 	/**
@@ -115,7 +115,7 @@ class useFileDB {
 			return []
 		}
 
-		return JSON.parse("[" . malformedString.replace("}{", "},{") . "]").unique()
+		return JSON.parse("[" . malformedString.replace("}{", "}, {") . "]").map(profile => JSON.stringify(profile)).unique()
 	}
 
 	/**
