@@ -50,7 +50,7 @@ class PMN_FillIn {
 
         currentId := this.getCurrentId()
         ; on-screen profile matcheds
-        if (currentId = guest["idNum"]) {
+        if (currentId == guest["idNum"]) {
             MsgBox("当前 Profile 正确", "Profile Modify Next", "T1 4096")
             Sleep 100
             Send "!o"
@@ -185,9 +185,15 @@ class PMN_FillIn {
         ; last/firstname
         isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
         if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
-            fullname := useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
-            parsedInfo["nameLast"] := fullname[1]
-            parsedInfo["nameFirst"] := fullname[2]
+            ; ethinic minority guests
+            if (currentGuest["name"].includes("·")) {
+                parsedInfo["nameLast"] := currentGuest["name"].split("·")[1].split("").map(hanzi => useDict.getPinyin(hanzi)).join(" ")
+                parsedInfo["nameFirst"] := currentGuest["name"].split("·")[2].split("").map(hanzi => useDict.getPinyin(hanzi)).join(" ")
+            } else {
+                fullname := useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
+                parsedInfo["nameLast"] := fullname[1]
+                parsedInfo["nameFirst"] := fullname[2]   
+            }
         } else {
             parsedInfo["nameLast"] := currentGuest["nameLast"]
             parsedInfo["nameFirst"] := currentGuest["nameFirst"]
