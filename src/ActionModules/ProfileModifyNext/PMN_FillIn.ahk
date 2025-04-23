@@ -180,7 +180,7 @@ class PMN_FillIn {
     static parse(currentGuest) {
         parsedInfo := Map()
         ; alt Name
-        parsedInfo["nameAlt"] := currentGuest["guestType"] == "国外旅客" ? " " : currentGuest["name"]
+        parsedInfo["nameAlt"] := currentGuest["guestType"] == "国外旅客" ? " " : currentGuest["name"].replace("👤", "")
 
         ; last/firstname
         isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"

@@ -14,10 +14,6 @@ class PMN_Waterfall {
                     return
                 }                
 
-                if (guest["name"].includes("👤")) {
-                    guest["name"] := guest["name"].replace("👤", "")
-                }
-
                 this.modify(guest, isOverwrite)
                 Sleep 1000
 
