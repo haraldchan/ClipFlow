@@ -214,17 +214,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         }
 
         if (searchBy.value == "nameRoom") {
-                typeConvert(content) {
-                converted := ""
-                try {
-                    converted := Number(content)
-                } catch {
-                    converted := content
-                }
-                return converted
-            }
-
-            if (typeConvert(searchInput) is Number) {
+            if (IsNumber(searchInput)) {
                 ; searching by room number
                 for item in loadedItems {
                     if (InStr(item["roomNum"], searchInput)) {
