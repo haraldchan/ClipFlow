@@ -48,8 +48,8 @@ class useDict {
      */
     static getPinyin(hanzi, useWG := false) {
         for pinyin, hanCharacters in Dict.pinyin {
-            if (InStr(hanCharacters, hanzi)) {
-                return useWG == false ? pinyin : Dict.pinyinWade[pinyin]
+            if (hanCharacters.includes(hanzi)) {
+                return !useWG ? pinyin : Dict.pinyinWade[pinyin]
             }
         }
         ; if not found in Dict, fetch from baidu hanyu
@@ -64,7 +64,9 @@ class useDict {
      */
     static fetchPinyin(hanzi, useWG := false) {
         ; 360国学 
-        url := Format("https://guoxue.baike.so.com/query/view?type=word&title={1}", hanzi)
+        ; url := Format("https://guoxue.baike.so.com/query/view?type=word&title={1}", hanzi)
+        ; 文学网 - 在线新华字典
+        url := Format("https://zd.hwxnet.com/search.do?keyword={1}", hanzi)
         
         whr := ComObject("WinHttp.WinHttpRequest.5.1")
         html := ComObject("HTMLFile")
@@ -76,19 +78,25 @@ class useDict {
         html.Write(page)
 
         Sleep 500
-        pinyinSpans := html.getElementsByTagName("span")
-        loop pinyinSpans.Length {
-            pinyinSpans[A_Index].dataFormatAs := "Text"
-            pinyinField := pinyinSpans[A_Index].InnerText
-            if (InStr(pinyinField, "[")) {
-                toned := Trim(StrReplace(StrReplace(pinyinField, "[ "), "]"))
-                break
-            }
-        }
+        ; 360 国学
+        ; pinyinSpans := html.getElementsByTagName("span")
+        ; loop pinyinSpans.Length {
+        ;     pinyinSpans[A_Index].dataFormatAs := "Text"
+        ;     pinyinField := pinyinSpans[A_Index].InnerText
+        ;     if (InStr(pinyinField, "[")) {
+        ;         toned := pinyinField.replace("[", "").replace("]", "").trim()
+        ;         break
+        ;     }
+        ; }
+
+        ; 文学网 - 在线新华字典
+        pinyinSpan := html.getElementsByTagName("span")[4]
+        pinyinSpan.dataFormatAs := "Text"
+        toned := pinyinSpan.InnerText.trim()
         
         for tonedChar, char in Dict.tone {
-            if (InStr(toned, tonedChar)) {
-                unToned := Trim(StrReplace(toned, tonedChar, char))
+            if (toned.includes(tonedChar)) {
+                unToned := toned.replace(tonedChar, char).trim()
             }
         }
 
@@ -110,22 +118,23 @@ class useDict {
      * @returns {array} [last name, first name]
      */
     static getFullnamePinyin(fullname, useWG := false) {
-        if (Dict.doubleLastName.Has(SubStr(fullname, 1, 2))) {
-            lastname := Dict.doubleLastName[SubStr(fullname, 1, 2)]
+        if (Dict.doubleLastName.Has(fullname.substr(1, 2))) {
+            lastname := Dict.doubleLastName[fullname.substr(1, 2)]
             if (useWG == true) {
-                lastname := StrSplit(lastname, " ").map(pinyin => Dict.pinyinWade[pinyin]).join("-")
+                lastname := lastname.split(" ").map(pinyin => Dict.pinyinWade[pinyin]).join("-")
             }
             lastnameLength := 2
         } else {
-            lastname := this.getPinyin(SubStr(fullname, 1, 1), useWG)
+            lastname := this.getPinyin(fullname.substr(1, 1), useWG)
             lastnameLength := 1
         }
 
-        firstname := StrSplit(SubStr(fullname, lastnameLength + 1), "")
-                     .map(hanzi => this.getPinyin(hanzi, useWG))
-                     .join(useWG == false ? " " : "-")
+        firstName := fullname.substr(lastnameLength + 1)
+                             .split("")
+                             .map(hanzi => this.getPinyin(hanzi, useWG))
+                             .join(useWG == false ? " " : "-")
 
-        return [Trim(lastname), Trim(firstname)]
+        return [lastname.trim(), firstname.trim()]
     }
 
     /**
@@ -135,7 +144,7 @@ class useDict {
      */
     static getCountryCode(country) {
         for region, code in Dict.regionISO {
-            if (country = region) {
+            if (country == region) {
                 return code
             }
         }
@@ -158,7 +167,7 @@ class useDict {
 
         for code, cities in Dict.provinceWithCities {
             for city in cities {
-                if (InStr(address, city)) {
+                if (address.includes(city)) {
                     return code
                 }
             }
