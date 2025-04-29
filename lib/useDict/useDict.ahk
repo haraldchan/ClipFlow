@@ -34,6 +34,8 @@ class Dict {
 
     static provinces := JSON.parse(FileRead(this.DICT_PATH . "\provinces.json", "UTF-8"))
 
+    static provincesById := JSON.parse(FileRead(this.DICT_PATH . "\provinces-by-id.json", "UTF-8"))
+
     static provinceWithCities := JSON.parse(FileRead(this.DICT_PATH . "\province-with-cities.json", "UTF-8"))
 
     static idTypes := JSON.parse(FileRead(this.DICT_PATH . "\id-types.json", "UTF-8"))
@@ -158,7 +160,7 @@ class useDict {
     static getProvince(address) {
 
         for province, code in Dict.provinces {
-            if (InStr(address, province)) {
+            if (address.include(province)) {
                 if (code != "") {
                     return code
                 }
@@ -172,6 +174,10 @@ class useDict {
                 }
             }
         }
+    }
+
+    static getProvinceById(idNum) {
+        return Dict.provincesById[idNum.substr(1, 2)]
     }
 
     static getIdTypeCode(idType) {
