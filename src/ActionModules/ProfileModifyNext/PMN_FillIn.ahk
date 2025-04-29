@@ -219,7 +219,9 @@ class PMN_FillIn {
         
         ; province(mainland & hk/mo/tw)
         if (currentGuest["guestType"] == "内地旅客") {
-            parsedInfo["province"] := useDict.getProvince(currentGuest["addr"])
+            parsedInfo["province"] := currentGuest["idType"] == "身份证" 
+                ? useDict.getProvinceById(currentGuest["idNum"])
+                : useDict.getProvince(currentGuest["addr"])
         } else if (currentGuest["guestType"] == "港澳台旅客") {
             parsedInfo["province"] := useDict.getProvince(currentGuest["region"])
         } else {
