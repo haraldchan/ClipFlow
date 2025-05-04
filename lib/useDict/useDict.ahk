@@ -73,6 +73,7 @@ class useDict {
         whr := ComObject("WinHttp.WinHttpRequest.5.1")
         html := ComObject("HTMLFile")
 
+        whr.Option[6] := true
         whr.Open("POST", url, false)
         whr.Send()
         whr.WaitForResponse()
@@ -95,7 +96,7 @@ class useDict {
         pinyinSpan := html.getElementsByTagName("span")[4]
         pinyinSpan.dataFormatAs := "Text"
         toned := pinyinSpan.InnerText.trim()
-        
+
         for tonedChar, char in Dict.tone {
             if (toned.includes(tonedChar)) {
                 unToned := toned.replace(tonedChar, char).trim()
@@ -145,11 +146,12 @@ class useDict {
      * @returns {any} 
      */
     static getCountryCode(country) {
-        for region, code in Dict.regionISO {
-            if (country == region) {
-                return code
-            }
-        }
+        ; for region, code in Dict.regionISO {
+        ;     if (country == region) {
+        ;         return code
+        ;     }
+        ; }
+        return Dict.regionISO[country]
     }
 
     /**
