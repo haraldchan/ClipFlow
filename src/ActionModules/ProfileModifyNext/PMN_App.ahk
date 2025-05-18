@@ -13,7 +13,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         "default", "Norm cBlack",
         "后台服务在线", "Bold cGreen",
         "超时无响应", "Bold cRed",
-        ; "代行已发送！", "Bold cGreen",
     )
     handleDelegateActivate(ctrl, _) {
         delegate.set(ctrl.Value)
@@ -68,7 +67,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         "地址", "addr",
         "电话", "tel",
         "生日", "birthday",
-        "时间戳 ID", "tsId"
+        "时间戳 ID", "tsId",
     )
     effect(searchBy, curSearchBy => handleSearchByChange(curSearchBy))
     handleSearchByChange(cur) {
@@ -110,7 +109,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         ; adding guest
         } else {
             ; FileDB
-            incomingGuest["fileName"] := A_Now . "_" . Random(1000, 9999)
+            incomingGuest["fileName"] := A_Now . "==" . Random(10000, 99999)
             incomingGuest["regTime"] := A_Now
             fdb.add(JSON.stringify(incomingGuest))
             ; DateBase
@@ -122,6 +121,13 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         }
 
         currentGuest.set(JSON.parse(A_Clipboard))
+
+        ; uodate date if not today
+        if (queryFilter.value["date"] != FormatTime(A_Now, "yyyyMMdd")) {
+            queryFilter.update("date", FormatTime(A_Now, "yyyyMMdd"))
+            App.getCtrlByName("date").Value := FormatTime(A_Now, "yyyyMMdd")
+        }
+
         handleListContentUpdate()
 
         ; restore previous clip to clb
@@ -437,6 +443,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     }
 
 
+
+
     return (
         App.AddGroupBox("Section R18 w685 y+20", ""),
         App.AddText("xp15", moduleTitle . " ⓘ ").OnEvent("Click", (*) => PMN_Settings(settings)),
@@ -479,13 +487,13 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile),
 
         ; waterfall controls
-        App.ARCheckBox("$selectAllBtn Hidden w50 h20 xp6 y+5", "全选"),
+        App.ARCheckBox("$selectAllBtn Hidden w80 h20 xp6 y+5", "全选 (&A)"),
         shareCheckStatus(
             App.getCtrlByName("$selectAllBtn"), 
             App.getCtrlByName("$guestProfileList"), 
             { checkStatus: lvIsCheckedAll }
         ),
-        App.AddText("Hidden h20 x+10 0x200", "Party: "),
+        App.AddText("Hidden h20 x+15 0x200", "Party: "),
         App.AddEdit("vpartyNum Hidden x+1 w100 h20", ""),
 
         ; hotkey setup
