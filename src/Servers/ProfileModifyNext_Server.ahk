@@ -1,7 +1,7 @@
 class ProfileModifyNext_Agent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
-        effect(this.isListening, cur => this.listen(cur)) 
+        effect(this.isListening, this.listen) 
 
         ; ongoing post
         this.currentHandlingPost := ""

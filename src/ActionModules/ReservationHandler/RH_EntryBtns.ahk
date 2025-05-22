@@ -1,5 +1,5 @@
 RH_EntryBtns(App, curResv, resvSource) {
-    effect(curResv, cur => handleEntryBtnUpdate(cur))
+    effect(curResv, handleEntryBtnUpdate)
     handleEntryBtnUpdate(cur) {
         entryBtns := [App.getCtrlByName("entry1"), App.getCtrlByName("entry2")]
         

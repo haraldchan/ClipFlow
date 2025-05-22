@@ -2,7 +2,7 @@
 
 ReservationDetails(App, curResv) {
 
-    effect(curResv, cur => handleListUpdate(cur))
+    effect(curResv, handleListUpdate)
     handleListUpdate(curResv) {
         LV := App.getCtrlByType("ListView")
         LV.Delete()

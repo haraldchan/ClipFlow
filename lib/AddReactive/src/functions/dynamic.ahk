@@ -44,7 +44,7 @@ class Dynamic {
 
         ; show components conditionally
         this._renderDynamic(this.signal.value)
-        effect(this.signal, cur => this._renderDynamic(cur))
+        effect(this.signal, this._renderDynamic)
     }
 
     _renderDynamic(currentValue) {

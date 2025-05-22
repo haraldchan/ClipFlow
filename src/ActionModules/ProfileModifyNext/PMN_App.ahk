@@ -69,8 +69,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         "生日", "birthday",
         "时间戳 ID", "tsId",
     )
-    effect(searchBy, curSearchBy => handleSearchByChange(curSearchBy))
-    handleSearchByChange(cur) {
+    effect(searchBy, handleSearchByChange)
+    handleSearchByChange(curSearchBy) {
         App.getCtrlByType("ListView").Opt(cur == "waterfall" ? "+Checked +Multi" : "-Checked -Multi")
         App.getCtrlByName("delegateCheckBox").Enabled := cur == "waterfall"
         App.getCtrlByName("$selectAllBtn").ctrl.visible := cur == "waterfall"

@@ -10,7 +10,7 @@ PMNG_App(App, popupTitle, db) {
     fetchPeriod := signal(5)
     loadedGuests := signal([])
 
-    effect(selectedGroup, cur => handleGroupSelect(cur))
+    effect(selectedGroup, handleGroupSelect)
     handleGroupSelect(curSelectedGroup) {
         if (!FileExist(A_MyDocuments . "\" . curSelectedGroup["blockCode"] . ".XML")) {
             useListPlaceholder(loadedGuests, ["roomNum", "name"], "No Data")
