@@ -2,7 +2,7 @@ class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
         this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : A_ScriptDir . "\Servers\qm-pool"
-        effect(this.isListening, this.listen)
+        effect(this.isListening, cur => this.listen(cur))
 
         ; ongoing post
         this.currentHandlingPost := ""
