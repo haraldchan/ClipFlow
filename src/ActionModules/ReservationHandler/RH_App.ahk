@@ -1,6 +1,6 @@
 #Include "./ReservationDetails.ahk"
+#Include "./EntryBtns.ahk"
 #Include "./RH_FedexBookingEntry.ahk"
-#Include "./RH_EntryBtns.ahk"
 #Include "./RH_OTA.ahk"
 
 RH_App(App, moduleTitle, identifier) {
