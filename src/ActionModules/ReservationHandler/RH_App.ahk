@@ -40,7 +40,7 @@ RH_App(App, moduleTitle, identifier) {
         ReservationDetails(App, curResv),
 
         ; entry btns
-        RH_EntryBtns(App, curResv, resvSource)
+        EntryBtns(App, curResv, resvSource)
 
         onMount()
     )
