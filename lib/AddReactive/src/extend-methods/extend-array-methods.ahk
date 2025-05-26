@@ -92,15 +92,17 @@ defineArrayMethods(arr) {
 
     arr.Prototype.with := with
     with(arr, index, newValue) {
-        if (index > arr.Length) {
+        if (Abs(index) > arr.Length || index == 0) {
             throw ValueError("Index out of range")
         }
 
-        newArray := []
-        for item in arr {
-            newArray.Push(item)
+        newArray := [arr*]
+        if (index < 0) {
+            newArray[arr.Length + 1 + index] := newValue
+        } else {
+            newArray[index] := newValue
         }
-        newArray[index] := newValue
+
         return newArray
     }
 
@@ -123,8 +125,7 @@ defineArrayMethods(arr) {
         newArray := [arr*]
 
         if (val is Array) {
-
-            for item in val.toReversed() {
+            for item in val.reverse() {
                 newArray.InsertAt(1, item)
             }
         } else {
@@ -133,8 +134,8 @@ defineArrayMethods(arr) {
         return newArray
     }
 
-    arr.Prototype.toReversed := toReversed
-    toReversed(arr) {
+    arr.Prototype.reverse := reverse
+    reverse(arr) {
         newArray := []
         index := arr.Length
 
@@ -195,37 +196,47 @@ defineArrayMethods(arr) {
     }
 
     arr.Prototype.slice := slice
-    slice(arr, start := 1, end := arr.Length) {
+    slice(arr, start := 1, end := arr.Length + 1) {
         newArray := []
 
-        for item in arr {
-            if (A_Index < start) {
-                continue
-            }
+        if (start < 1 || start > arr.length || end < 1 || end > arr.length + 1) {
+            return false
+        }
 
-            if (A_Index == end && end != arr.Length) {
-                break
-            }
-
-            newArray.Push(item)
+        index := start
+        loop (end == arr.Length + 1 ? arr.Length + 1 : end) - start {
+            newArray.Push(arr[index])
+            index++
         }
 
         return newArray
     }
 
-    arr.Prototype.at := at
-    at(arr, index) {
-        if (Abs(index) > arr.Length || index == 0) {
-            throw ValueError("Index out of range.")
+    arr.Prototype.sort := _sort
+    _merge(arr1, arr2, compareFn) {
+        mergedList := []
+
+        while (arr1.Length && arr2.Length) {
+            mergedList.Push(
+                compareFn(arr1[1], arr2[1]) < 0 ? arr1.RemoveAt(1) : arr2.RemoveAt(1)
+            )
         }
 
-        if (index > 0) {
-            return arr[index]
+        ( arr1.Length && mergedList.Push(arr1*) )
+        ( arr2.Length && mergedList.Push(arr2*) )
+
+        return mergedList
+    }
+    _sort(arr, compareFn := default(a, b) => a - b) {
+        if (arr.Length == 1) {
+            return arr
         }
 
-        if (index < 0) {
-            return arr[arr.Length + 1 - index]
-        }
+        mid := Integer(arr.Length / 2 + 1)
+        left := arr.slice(, mid)
+        right := arr.slice(mid)
+
+        return _merge(_sort(left, compareFn), _sort(right, compareFn), compareFn)
     }
 }
 
