@@ -2,10 +2,13 @@ class RH_OtaBookingEntry {
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, initX := 193, initY := 182) {
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
-        rateCode := "WHLRN"
+        rateCode := matchCase(curResv["agent"], {
+            kingsley: "WHLRN",
+            jielv: "WHJL"
+        })
 
         if (!isCheckedIn) {
-            ; this.profileEntry(pmsGuestNames[1])
+            this.profileEntry(pmsGuestNames[1])
 
             this.roomQtyEntry(curResv["roomQty"])
         }
@@ -18,7 +21,7 @@ class RH_OtaBookingEntry {
 
         this.commentOrderIdEntry(curResv["orderId"], comment)
 
-        this.roomRatesEntry(rateCode, curResv["roomRates"], isCheckedIn)
+        this.roomRatesEntry(rateCode, curResv["roomRates"], DateDiff(curResv["coDate"], curResv["ciDate"], "Days"), isCheckedIn)
 
         if (!curResv["bbf"].every(item => item == 0)) {
             this.breakfastEntry(curResv["bbf"])
@@ -30,6 +33,7 @@ class RH_OtaBookingEntry {
 
         MsgBox("Completed.", "Reservation Handler", "T1 4096")
     }
+
 
     static profileEntry(guestName, initX := 471, initY := 217) {
         MouseMove initX, initY ;471, 217
@@ -63,6 +67,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
+
     static roomQtyEntry(roomQty, initX := 294, initY := 441) {
         MouseMove initX, initY
         utils.waitLoading()
@@ -78,6 +83,43 @@ class RH_OtaBookingEntry {
         }
         utils.waitLoading()
     }
+
+
+    static routingEntry(agent, initX := 895, initY := 218) {
+        agent := matchCase(agent, {
+            kingsley: "Guangzhou Kingsley Business Consultant",
+            jielv: "Shenzhen jielv holiday"
+        })
+
+        MouseMove initX, initY
+        utils.waitLoading()
+        Click 3
+        utils.waitLoading()
+        Send "{Delete}"
+        utils.waitLoading()
+        Send "!s"
+        utils.waitLoading()
+        loop 5 {
+            Send "{Esc}"
+            utils.waitLoading()
+        }
+        Click
+        Send "{Text}" . agent
+        utils.waitLoading()
+        Send "!s"
+        utils.waitLoading()
+        Send "!o"
+        utils.waitLoading()
+        loop 5 {
+            Send "{Esc}"
+            utils.waitLoading()
+        }
+        Send "{Space}"
+        utils.waitLoading()
+        Send "!o" 
+        utils.waitLoading()
+    }
+
 
     static roomTypeEntry(roomType, isCheckedIn, initX := 472, initY := 465) {
         MouseMove 500, 469 ; RTC btn
@@ -108,6 +150,7 @@ class RH_OtaBookingEntry {
         }
         utils.waitLoading()
     }
+
 
     static dateTimeEntry(checkin, checkout, isCheckedIn, initX := 332, initY := 356) {
         pmsCiDate := FormatTime(checkin, "MMddyyyy")
@@ -147,6 +190,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
+
     static commentOrderIdEntry(orderId, comment, initX := 622, initY := 596) {
         MouseMove initX, initY ;622, 596
         utils.waitLoading()
@@ -177,17 +221,17 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
-    static roomRatesEntry(rateCode, roomRates, isCheckedIn, initX := 372, initY := 524) {
+    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, initX := 372, initY := 524) {
         ; ratecode 
-        MouseClickDrag "left", 326, 510, 260, 510
-        utils.waitLoading()
-        Send "{Text}" . rateCode
-        utils.waitLoading()
-        Send "{Tab}"
-        loop 5 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        ; MouseClickDrag "left", 326, 510, 260, 510
+        ; utils.waitLoading()
+        ; Send "{Text}" . rateCode
+        ; utils.waitLoading()
+        ; Send "{Tab}"
+        ; loop 5 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
 
         ; mkt/src code
         MouseMove 646, 380
@@ -205,57 +249,72 @@ class RH_OtaBookingEntry {
         Send "{Tab}"
         utils.waitLoading()
 
-        ; daily details
-        MouseMove initX, initY ;372, 504
-        utils.waitLoading()
-        Click
-        utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
+        if (nts == 1) {
+            MouseClickDrag "left", 325, 506, 256, 506
             utils.waitLoading()
-        }
-        utils.waitLoading()
-        Send "!d"
-        utils.waitLoading()
-        loop roomRates.Length {
-            index := A_Index
-            Send "!e"
-            utils.waitLoading()
-            loop (isCheckedIn ? 4 : 6) {
-                Send "{Tab}"
-                utils.waitLoading()
-            }
             Send "{Text}" . rateCode
-            utils.waitLoading()
-            loop 2 {
-                utils.waitLoading()
-                Send "{Tab}"       
-            }
-            Send "{Text}" . roomRates[index]
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
+            loop 3 {
+                Send "{Esc}"
+                utils.waitLoading()
+            }
+            Send "{Text}" . roomRates[1]
+            utils.waitLoading()
+            Send "{Tab}"
+            utils.waitLoading()
+        } else {
+            ; daily details
+            MouseMove initX, initY ;372, 504
+            utils.waitLoading()
+            Click
+            utils.waitLoading()
+            loop 5 {
+                Send "{Esc}"
+                utils.waitLoading()
+            }
+            utils.waitLoading()
+            Send "!d"
+            utils.waitLoading()
+            loop roomRates.Length {
+                index := A_Index
+                Send "!e"
+                utils.waitLoading()
+                loop (isCheckedIn ? 4 : 6) {
+                    Send "{Tab}"
+                    utils.waitLoading()
+                }
+                Send "{Text}" . rateCode
+                utils.waitLoading()
+                loop 2 {
+                    utils.waitLoading()
+                    Send "{Tab}"       
+                }
+                Send "{Text}" . roomRates[index]
+                utils.waitLoading()
+                Send "{Tab}"
+                utils.waitLoading()
+                Send "!o"
+                utils.waitLoading()
+                Send "{Down}"
+            }
+            utils.waitLoading()
             Send "!o"
             utils.waitLoading()
-            Send "{Down}"
-        }
-        utils.waitLoading()
-        Send "!o"
-        utils.waitLoading()
-        ; Send "{Esc}"
-        ; utils.waitLoading()
-        ; Send "!o"
-        utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
+            ; Send "{Esc}"
+            ; utils.waitLoading()
+            ; Send "!o"
             utils.waitLoading()
+            loop 5 {
+                Send "{Esc}"
+                utils.waitLoading()
+            }
         }
     }
 
+
     static breakfastEntry(bbf, initX := 352, initY := 548) {
-        trayTip "录入中：早餐"
-        Sleep 100
-        
         ;entry bbf package
         MouseMove initX, initY
         utils.waitLoading()
@@ -287,11 +346,13 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
+
     ; WIP
     static saveBooking(initX, initY) {
         ;TODO: action: save modified booking, handle popups.
 
     }
+
 
     ; WIP
     static splitPartyEntry(guestNames, roomQty, initX := 456, initY := 482) {
@@ -311,32 +372,5 @@ class RH_OtaBookingEntry {
         Sleep 100
         ; Send "!r"
         ; Sleep 1000
-    }
-
-    static routingEntry(agent, initX := 895, initY := 218) {
-        A_Clipboard := ""
-        agent := matchCase(agent, {
-            kingsley: "Guangzhou Kingsley Business Consultant",
-            jielv: "Shenzhen jielv holiday"
-        })
-
-        MouseMove initX, initY
-        utils.waitLoading()
-        Click 3
-        utils.waitLoading()
-        Send "^c"
-        utils.waitLoading()
-
-        if (!A_Clipboard) {
-            Send "{Text}" . agent
-            utils.waitLoading()
-            Send "!s"
-            utils.waitLoading()
-            Send "!o"
-            utils.waitLoading()
-            Send "{Space}"
-            utils.waitLoading()
-            Send "!o" 
-        }
     }
 }
