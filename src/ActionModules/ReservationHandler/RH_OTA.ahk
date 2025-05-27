@@ -2,7 +2,7 @@
 
 class RH_OTA {
     static USE(curResv, splitParty := false) {
-        if (curResv["agent"] == "kingsley") {
+        if (curResv["agent"] == "kingsley" || curResv["agent"] == "jielv") {
             this.WholeSale(curResv, splitParty)
         }
 
@@ -39,7 +39,7 @@ class RH_OTA {
 
     static WholeSale(curResv, splitParty) {
         ; convert roomType
-        roomType := this.roomTypeRefs[curResv["agent"]]
+        roomType := this.roomTypeRefs[curResv["agent"]][curResv["roomType"]]
 
         ; define breakfast comment
         breakfastType := (SubStr(roomType, 1, 1) = "C") ? "CBF" : "BBF"
