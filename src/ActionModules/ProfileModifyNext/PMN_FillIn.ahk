@@ -1,5 +1,6 @@
 class PMN_FillIn {
     static AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
+    static ErrorImage := A_ScriptDir . "\src\Assets\error.PNG"
     static FOUND := "0x000080"
     static NOT_FOUND := "0x008080"
     static isRunning := false
@@ -31,8 +32,37 @@ class PMN_FillIn {
         BlockInput false
     }
 
+    static errorFallback() {
+        Send "^c"
+        utils.waitLoading()
+        Send "{Space}"
+        WinActivate "ahk_class SunAwtFrame"
+        Sleep 300
+
+        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, this.ErrorImage)) {
+            Send "!o"
+            utils.waitLoading()
+            Send "!c"
+            utils.waitLoading()
+
+            return true
+        } else {
+            Send "{BackSpace}"
+            utils.waitLoading()
+            Send "^v"
+            utils.waitLoading()
+            return false
+        }
+    }
+
     static fill(currentGuest, isOverwrite := false, keepGoing := false) {
         this.start({ setOnTop: true, blockInput: true })
+        err := this.errorFallback()
+        if (err) {
+            this.end()
+            return
+        }
+
         guest := this.parse(currentGuest)
 
         ; force overwrite
@@ -180,7 +210,8 @@ class PMN_FillIn {
     static parse(currentGuest) {
         parsedInfo := Map()
         ; alt Name
-        parsedInfo["nameAlt"] := currentGuest["guestType"] == "国外旅客" ? " " : currentGuest["name"].replace("👤", "")
+        currentGuest["name"] := currentGuest["name"].replace("👤", "")
+        parsedInfo["nameAlt"] := currentGuest["guestType"] == "国外旅客" ? " " : currentGuest["name"]
 
         ; last/firstname
         isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
