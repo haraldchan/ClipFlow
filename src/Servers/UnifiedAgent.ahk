@@ -2,7 +2,7 @@ class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
         this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : A_ScriptDir . "\Servers\qm-pool"
-        effect(this.isListening, cur => this.listen(cur))
+        effect(this.isListening, (cur) => this.listen(cur))
 
         ; ongoing post
         this.currentHandlingPost := ""
@@ -114,6 +114,7 @@ class UnifiedAgent extends useServerAgent {
 
         pmnPosts := this.COLLECT("PENDING")
         qmPosts := this.COLLECT("PENDING", this.qmPool)
+        retryPmnPosts := this.COLLECT("RETRY")
         
         if (pmnPosts.Length) {
             this.modifyPostedProfiles(pmnPosts)
@@ -121,6 +122,10 @@ class UnifiedAgent extends useServerAgent {
         
         if (qmPosts.Length) {
             this.executeQmPostedActions(qmPosts)
+        }
+
+        if (retryPmnPosts.Length) {
+            this.modifyPostedProfiles(retryPmnPosts)
         }
 
         this.currentHandlingPost := ""
@@ -139,10 +144,12 @@ class UnifiedAgent extends useServerAgent {
 
             this.currentHandlingPost := post
             c := post["content"]
-            if (c["mode"] == "waterfall" || c["mode"] == "single") {
-                PMN_Waterfall.cascade(c["profiles"], c["overwrite"], c["party"])
+            res := PMN_Waterfall.cascade(c["profiles"], c["overwrite"], c["party"])
+            if (res == "Ended Unexpectedly") {
+                this.updatePostStatus(posts[A_Index], "RETRY")
+            } else {
+                this.updatePostStatus(posts[A_Index], "MODIFIED")
             }
-            this.updatePostStatus(posts[A_Index], "MODIFIED")
         }
     }
 

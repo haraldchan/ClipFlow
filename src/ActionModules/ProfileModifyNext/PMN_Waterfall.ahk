@@ -11,7 +11,7 @@ class PMN_Waterfall {
 
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", popupTitle, "4096 T1")
-                    return
+                    return "Ended Unexpectedly"
                 }                
 
                 this.modify(guest, isOverwrite)
@@ -19,7 +19,7 @@ class PMN_Waterfall {
 
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", popupTitle, "4096 T1")
-                    return
+                    return "Ended Unexpectedly"
                 }
             }
         }
