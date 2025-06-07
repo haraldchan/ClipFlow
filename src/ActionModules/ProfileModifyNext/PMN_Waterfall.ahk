@@ -6,7 +6,7 @@ class PMN_Waterfall {
             for guest in roomProfiles.values()[1] {            
                 res := this.search(guest["roomNum"], A_Index, party)
                 if (res == "not found") {
-                    continue
+                    return "Room not found"
                 }
 
                 if (!PMN_FillIn.isRunning) {
@@ -56,6 +56,7 @@ class PMN_Waterfall {
         CoordMode "Pixel", "Screen"
         if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\assets\info.PNG")) {
             Send "{Enter}"
+            PMN_FillIn.end()
             return "not found"
         }
 
