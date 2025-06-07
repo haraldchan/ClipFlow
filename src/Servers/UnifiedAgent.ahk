@@ -2,6 +2,8 @@ class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
         this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : A_ScriptDir . "\Servers\qm-pool"
+        this.popupTitle := "Server Agent"
+
         effect(this.isListening, (cur) => this.listen(cur))
 
         ; ongoing post
@@ -57,7 +59,7 @@ class UnifiedAgent extends useServerAgent {
         }
 
         BlockInput true
-        if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务", "Server Agent", "4096") == "OK") {
+        if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务", this.popupTitle, "4096") == "OK") {
             this.isListening.set("离线")
             BlockInput false
         }
@@ -110,11 +112,16 @@ class UnifiedAgent extends useServerAgent {
 
         this.keepAlive()
         SetTimer(, 0)
+
         this.isListening.set("处理中...")
 
         pmnPosts := this.COLLECT("PENDING")
         qmPosts := this.COLLECT("PENDING", this.qmPool)
         retryPmnPosts := this.COLLECT("RETRY")
+
+        if (pmnPosts.Length || qmPosts.Length || retryPmnPosts.Length) {
+            WinHide(this.popupTitle)
+        }
         
         if (pmnPosts.Length) {
             this.modifyPostedProfiles(pmnPosts)
@@ -130,6 +137,8 @@ class UnifiedAgent extends useServerAgent {
 
         this.currentHandlingPost := ""
         this.isListening.set("在线")
+
+        WinShow(this.popupTitle)
     }
     
     /**
@@ -147,6 +156,8 @@ class UnifiedAgent extends useServerAgent {
             res := PMN_Waterfall.cascade(c["profiles"], c["overwrite"], c["party"])
             if (res == "Ended Unexpectedly") {
                 this.updatePostStatus(posts[A_Index], "RETRY")
+            } else if (res == "Room not found") {
+                this.updatePostStatus(posts[A_Index], "NOTFOUND")
             } else {
                 this.updatePostStatus(posts[A_Index], "MODIFIED")
             }
