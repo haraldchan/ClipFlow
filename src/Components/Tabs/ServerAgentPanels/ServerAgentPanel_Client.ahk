@@ -14,6 +14,7 @@ ServerAgentPanel_Client(App, enabled) {
         "RETRY", "重试中",
         "RESENT", "已重发",
         "ABANDONED", "超时弃用",
+        "NOTFOUND", "无效房号",
         "PING", "连接中",
         "ONLINE", "在线"
     )
