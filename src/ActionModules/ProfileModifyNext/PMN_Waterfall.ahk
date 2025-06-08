@@ -3,7 +3,7 @@ class PMN_Waterfall {
         PMN_FillIn.start()
 
         for roomProfiles in groupedSelectedGuests {
-            for guest in roomProfiles.values()[1] {            
+            for guest in roomProfiles.values()[1] {
                 res := this.search(guest["roomNum"], A_Index, party)
                 if (res == "not found") {
                     return "Room not found"
@@ -12,7 +12,7 @@ class PMN_Waterfall {
                 if (!PMN_FillIn.isRunning) {
                     msgbox("脚本已终止", popupTitle, "4096 T1")
                     return "Ended Unexpectedly"
-                }                
+                }
 
                 this.modify(guest, isOverwrite)
                 Sleep 1000
@@ -26,6 +26,41 @@ class PMN_Waterfall {
 
         PMN_FillIn.end()
         MsgBox("已完成全部选中 Profile 录入。", "Waterfall cascaded", "4096 T1")
+    }
+
+    static handleWindowError() {
+        PMN_FillIn.end()
+        ; clear err popup
+        loop 2 {
+            Send "!o"
+            utils.waitLoading()
+        }
+
+        ; close all windows
+        loop {
+            Send "!w"
+            Sleep 100
+            Send "{Up}"
+            Sleep 100
+            Send "{Enter}"
+            Sleep 100
+            Send "!c"
+            utils.waitLoading()
+            Send "{Esc}"
+            utils.waitLoading()
+
+            if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-logo.PNG")) {
+                break
+            }
+        }
+
+        ; restore In-house window
+        Send "!f"
+        utils.waitLoading()
+        Send "{Down}"
+        Sleep 100
+        Send "{Enter}"
+        utils.waitLoading()
     }
 
     static search(roomNum, index, party := 0) {
@@ -75,6 +110,9 @@ class PMN_Waterfall {
         if (!PMN_FillIn.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
+        }
+        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, PMN_FillIn.ErrorImage)) {
+            return this.handleWindowError()
         }
 
         ; choose resv
