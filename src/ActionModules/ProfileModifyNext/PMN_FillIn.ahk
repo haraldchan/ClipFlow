@@ -32,7 +32,7 @@ class PMN_FillIn {
         BlockInput false
     }
 
-    static errorFallback() {
+    static handleProfileOccupiedFallback() {
         Send "^c"
         utils.waitLoading()
         Send "{Space}"
@@ -57,7 +57,7 @@ class PMN_FillIn {
 
     static fill(currentGuest, isOverwrite := false, keepGoing := false) {
         this.start({ setOnTop: true, blockInput: true })
-        err := this.errorFallback()
+        err := this.handleProfileOccupiedFallback()
         if (err) {
             this.end()
             return
