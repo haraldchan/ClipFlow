@@ -2,7 +2,7 @@ class RH_OtaBookingEntry {
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, initX := 193, initY := 182) {
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
-        rateCode := matchCase(curResv["agent"], {
+        rateCode := match(curResv["agent"], {
             kingsley: "WHLRN",
             jielv: "WHJL"
         })
@@ -86,7 +86,7 @@ class RH_OtaBookingEntry {
 
 
     static routingEntry(agent, initX := 895, initY := 218) {
-        agent := matchCase(agent, {
+        agent := match(agent, {
             kingsley: "Guangzhou Kingsley Business Consultant",
             jielv: "Shenzhen jielv holiday"
         })
