@@ -14,8 +14,12 @@ RH_App(App, moduleTitle, identifier) {
             return
         }
 
-        curResv.set(JSON.parse(A_Clipboard))
-        config.write("JSON", A_Clipboard)
+        incommingResv := JSON.parse(A_Clipboard)
+        incommingResv["ciDate"] := incommingResv["ciDate"].replace("-", "")
+        incommingResv["coDate"] := incommingResv["coDate"].replace("-", "")
+
+        curResv.set(incommingResv)
+        config.write("JSON", JSON.stringify(incommingResv))
     }
 
     onMount() {

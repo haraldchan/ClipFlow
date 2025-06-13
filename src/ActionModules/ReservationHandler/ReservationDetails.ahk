@@ -12,7 +12,7 @@ ReservationDetails(App, curResv) {
                 if (key == "crewNames") {
                     val := curResv[key].join(", ")
                 } else if (key == "ciDate" || key == "coDate") {
-                    val := FormatTime(curResv[key], "yyyy/MM/dd")
+                    val := FormatTime(curResv[key], "yyyy年MM月dd日")
                 } else {
                     val := curResv[key]
                 }
@@ -24,7 +24,7 @@ ReservationDetails(App, curResv) {
                 if (key == "guestNames" || key == "roomRates") {
                     val := curResv[key].join(", ")
                 } else if (key == "ciDate" || key == "coDate") {
-                    val := FormatTime(curResv[key], "yyyy/MM/dd")
+                    val := FormatTime(curResv[key], "yyyy年MM月dd日")
                 } else if (key == "bbf") {
                     val := curResv[key].map(item => item == 0 ? "无早" : item == 1 ? "单早" : "双早").join(", ")
                 } else {
