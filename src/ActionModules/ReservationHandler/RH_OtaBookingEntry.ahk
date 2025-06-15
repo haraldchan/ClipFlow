@@ -1,4 +1,34 @@
 class RH_OtaBookingEntry {
+    static profileAnchorImage := A_ScriptDir . "\src\Assets\opera-active-win.PNG"
+    static isRunning := false
+
+    static start(config := {}) {
+        c := useProps(config, {
+            setOnTop: false,
+            blockInput: false
+        })
+
+        this.isRunning := true
+        HotIf (*) => this.isRunning
+        Hotkey("F12", (*) => this.end(), "On")
+
+        CoordMode "Pixel", "Screen"
+        CoordMode "Mouse", "Screen"
+
+        WinActivate "ahk_class SunAwtFrame"
+        WinSetAlwaysOnTop c.setOnTop, "ahk_class SunAwtFrame"
+
+        BlockInput c.blockInput
+    }
+
+    static end() {
+        this.isRunning := false
+        Hotkey("F12", "Off")
+
+        WinSetAlwaysOnTop false, "ahk_class SunAwtFrame"
+        BlockInput false
+    }
+
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, initX := 193, initY := 182) {
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
@@ -7,28 +37,67 @@ class RH_OtaBookingEntry {
             jielv: "WHJL"
         })
 
+        ; workflow start
+        this.start()
+
         if (!isCheckedIn) {
             this.profileEntry(pmsGuestNames[1])
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
 
             this.roomQtyEntry(curResv["roomQty"])
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
         }
 
         this.routingEntry(curResv["agent"])
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         this.roomTypeEntry(roomType, isCheckedIn)
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         this.dateTimeEntry(curResv["ciDate"], curResv["coDate"], isCheckedIn)
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         this.commentOrderIdEntry(curResv["orderId"], comment)
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         this.roomRatesEntry(rateCode, curResv["roomRates"], DateDiff(curResv["coDate"], curResv["ciDate"], "Days"), isCheckedIn)
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
+        }
 
         if (!curResv["bbf"].every(item => item == 0)) {
             this.breakfastEntry(curResv["bbf"])
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
         }
 
         if (splitParty) {
             this.splitPartyEntry(pmsGuestNames, curResv["roomQty"])
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
         }
 
         MsgBox("Completed.", "Reservation Handler", "T1 4096")
@@ -36,8 +105,21 @@ class RH_OtaBookingEntry {
 
 
     static profileEntry(guestName, initX := 471, initY := 217) {
-        MouseMove initX, initY ;471, 217
+        ; open profile
+        loop 10 {
+            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.profileAnchorImage)) {
+                anchorX := FoundX + 270
+                anchorY := FoundY + 36
+                break
+            }
+            Sleep 100
+        }
+        MouseMove anchorX, anchorY
+        utils.waitLoading()
         Click
+        utils.waitLoading()
+        ; MouseMove initX, initY ;471, 217
+        ; Click
         utils.waitLoading()
         Send "!n"
         utils.waitLoading()
@@ -116,7 +198,7 @@ class RH_OtaBookingEntry {
         }
         Send "{Space}"
         utils.waitLoading()
-        Send "!o" 
+        Send "!o"
         utils.waitLoading()
     }
 
@@ -159,7 +241,7 @@ class RH_OtaBookingEntry {
         if (!isCheckedIn) {
             MouseMove 349, 363
             utils.waitLoading()
-            Click 
+            Click
             utils.waitLoading()
             Send "!c"
             utils.waitLoading()
@@ -175,7 +257,7 @@ class RH_OtaBookingEntry {
 
         MouseMove 350, 404
         utils.waitLoading()
-        Click 
+        Click
         utils.waitLoading()
         Send "!c"
         utils.waitLoading()
@@ -222,7 +304,7 @@ class RH_OtaBookingEntry {
     }
 
     static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, initX := 372, initY := 524) {
-        ; ratecode 
+        ; ratecode
         ; MouseClickDrag "left", 326, 510, 260, 510
         ; utils.waitLoading()
         ; Send "{Text}" . rateCode
@@ -289,7 +371,7 @@ class RH_OtaBookingEntry {
                 utils.waitLoading()
                 loop 2 {
                     utils.waitLoading()
-                    Send "{Tab}"       
+                    Send "{Tab}"
                 }
                 Send "{Text}" . roomRates[index]
                 utils.waitLoading()
