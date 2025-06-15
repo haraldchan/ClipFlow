@@ -1,5 +1,5 @@
 class FedexBookingEntry {
-    static AnchorImage := A_ScriptDir . "\src\Assets\opera-active-win.PNG"
+    static profileAnchorImage := A_ScriptDir . "\src\Assets\opera-active-win.PNG"
     static isRunning := false
 
     static start(config := {}) {
@@ -31,6 +31,8 @@ class FedexBookingEntry {
 
 
     static USE(infoObj, index := 1, bringForwardTime := 10, initX := 194, initY := 183) {
+        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
+
         schdCiDate := infoObj["ciDate"]
         schdCoDate := infoObj["coDate"]
 
@@ -48,12 +50,12 @@ class FedexBookingEntry {
         ; workflow start
         this.start()
 
-        this.profileEntry(infoObj["crewNames"], index)
+        ,!isCheckedIn && this.profileEntry(infoObj["crewNames"], index)
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
         }
-        
+
         this.dateTimeEntry(pmsCiDate, pmsCoDate, infoObj["ETA"], infoObj["ETD"])
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -103,7 +105,7 @@ class FedexBookingEntry {
 
         ; open profile
         loop 10 {
-            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
+            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.profileAnchorImage)) {
                 anchorX := FoundX + 270
                 anchorY := FoundY + 36
                 break
@@ -219,25 +221,33 @@ class FedexBookingEntry {
         comment := ""
 
         ; select current comment
-        MouseMove initX, initY ; 622, 596
-        utils.waitLoading()
-        Click "Down"
-        MouseMove initX + 518, initY + 36 ; 1140, 605
-        utils.waitLoading()
-        Click "Up"
+        MouseClickDrag "Left", initY, initY, initX + 518, initY + 36 ;622, 596 -> 1140, 605
         utils.waitLoading()
         Send "^x"
         utils.waitLoading()
 
         ; set new comment
         if (infoObj["resvType"] == "ADD") {
-            comment := Format("RM INCL 1BBF TO CO,Hours@Hotel: {1}={2}day(s), ActualStay: {3}-{4}", infoObj["stayHours"], infoObj["daysActual"], infoObj["ciDate"], infoObj["coDate"])
+            comment := Format(
+                "RM INCL 1BBF TO CO,Hours@Hotel: {1}={2}day(s), ActualStay: {3}-{4}",
+                infoObj["stayHours"],
+                infoObj["daysActual"],
+                infoObj["ciDate"],
+                infoObj["coDate"]
+            )
         } else {
-            prevComment := A_Clipboard
-            comment := Format("Changed to {1}={2}day(s), New Stay:{3}-{4} // Before Update:{5}", infoObj["stayHours"], infoObj["daysActual"], infoObj["ciDate"], infoObj["coDate"], prevComment)
+            prevComment := A_Clipboard.split(',').map(c => c.trim())
+            comment := Format(
+                "{1}, {2}, CHANGE:{3}={4}day(s), ActualStay: {5}-{6}",
+                prevComment[1],
+                prevComment[2],
+                infoObj["stayHours"],
+                infoObj["daysActual"],
+                infoObj["ciDate"],
+                infoObj["coDate"]
+            )
         }
 
-        utils.waitLoading()
         Send Format("{Text}{1}", comment)
         utils.waitLoading()
 
@@ -314,7 +324,7 @@ class FedexBookingEntry {
             Send "^c"
             utils.waitLoading()
             if (A_Clipboard == "FEDEXN")
-            break
+                break
         }
         Send "{Text}NRR"
         utils.waitLoading()
