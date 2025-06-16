@@ -97,6 +97,7 @@ class FedexBookingEntry {
             return
         }
 
+        MsgBox("Completed.", "Reservation Handler", "T1 4096")
         this.end()
     }
 
@@ -380,39 +381,34 @@ class FedexBookingEntry {
         utils.waitLoading()
         Click
         utils.waitLoading()
-        Send "!n"
-        utils.waitLoading()
-        MouseMove initX - 29, initY - 99
-        utils.waitLoading()
-        Click
-        utils.waitLoading()
-        Send "{Down}"
-        utils.waitLoading()
-        Send "!o"
-        utils.waitLoading()
-        Send Format("{Text}{1}", tracking)
-        utils.waitLoading()
-        Send "!o"
-        utils.waitLoading()
 
-        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\error.PNG")) {
-            Send "!o"
+        ; check if record exists
+        Send "!e"
+        utils.waitLoading()
+        if (PixelGetColor(initX - 278, initY - 105) == "0xD7D7D7") {
+
+            Send "{Tab}"
             utils.waitLoading()
-            Send "!c"
+            loop 10 {
+                Send "^{Left}"
+            }
+            Send "{Text}" . tracking . "/"
             utils.waitLoading()
-            Send "{Esc}"
-            utils.waitLoading()
-            Send "!e"
+        } else{
+            Send "!n"
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
-            Send "^{Right}"
+            Send "{Text}MIGRATION"
             utils.waitLoading()
-            Send "{Text}" . "\" . tracking
+            Send "{Tab}"
             utils.waitLoading()
-            Send "!o"
+            Send "{Text}" . tracking
+            utils.waitLoading()
         }
 
+        Send "!o"
+        utils.waitLoading()
 
         Send "!c"
         utils.waitLoading()
