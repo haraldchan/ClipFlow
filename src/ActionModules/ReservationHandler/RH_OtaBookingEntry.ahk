@@ -34,7 +34,7 @@ class RH_OtaBookingEntry {
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
         rateCode := match(curResv["agent"], {
             kingsley: "WHLRN",
-            jielv: "WHJL"
+            jielv: "WHLRN"
         })
 
         ; workflow start
@@ -84,7 +84,7 @@ class RH_OtaBookingEntry {
             return
         }
 
-        if (!curResv["bbf"].every(item => item == 0)) {
+        if (!curResv["bbf"].every(item => item == 0) && !comment.includes("CBF")) {
             this.breakfastEntry(curResv["bbf"])
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -294,6 +294,18 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send Format("{Text}{1}", orderId)
         utils.waitLoading()
+
+        if (comment.includes("CBF")) {
+            Send "{Tab}"
+            utils.waitLoading()
+
+            A_Clipboard := ""
+            Send "^c"
+            utils.waitLoading()
+            Send "{Text}CBF," . A_Clipboard
+            utils.waitLoading()
+        }
+
         Send "{Tab}"
         utils.waitLoading()
         loop 5 {
@@ -304,21 +316,15 @@ class RH_OtaBookingEntry {
     }
 
     static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, initX := 372, initY := 524) {
-        ; ratecode
-        ; MouseClickDrag "left", 326, 510, 260, 510
-        ; utils.waitLoading()
-        ; Send "{Text}" . rateCode
-        ; utils.waitLoading()
-        ; Send "{Tab}"
-        ; loop 5 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
 
         ; mkt/src code
-        MouseMove 646, 380
+        MouseMove 636, 361
         utils.waitLoading()
         Click 3
+        utils.waitLoading()
+        Send "{Text}TRAVEL AGENT GTD"
+        utils.waitLoading()
+        Send "{Tab}"
         utils.waitLoading()
         Send "{Text}WHL"
         utils.waitLoading()
@@ -331,7 +337,7 @@ class RH_OtaBookingEntry {
         Send "{Tab}"
         utils.waitLoading()
 
-        if (nts == 1) {
+        if (nts == 1 || roomRates.every(rate => rate == roomRates[1])) {
             MouseClickDrag "left", 325, 506, 256, 506
             utils.waitLoading()
             Send "{Text}" . rateCode
@@ -370,8 +376,10 @@ class RH_OtaBookingEntry {
                 Send "{Text}" . rateCode
                 utils.waitLoading()
                 loop 2 {
-                    utils.waitLoading()
                     Send "{Tab}"
+                    utils.waitLoading()
+                    Send "{Esc}"
+                    utils.waitLoading()
                 }
                 Send "{Text}" . roomRates[index]
                 utils.waitLoading()
