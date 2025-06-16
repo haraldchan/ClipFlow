@@ -318,14 +318,21 @@ class RH_OtaBookingEntry {
     static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, initX := 372, initY := 524) {
 
         ; mkt/src code
-        MouseMove 636, 361
-        utils.waitLoading()
-        Click 3
-        utils.waitLoading()
-        Send "{Text}TRAVEL AGENT GTD"
-        utils.waitLoading()
-        Send "{Tab}"
-        utils.waitLoading()
+        if (isCheckedIn) {
+            MouseMove 636, 361
+            utils.waitLoading()
+            Click 3
+            utils.waitLoading()
+            Send "{Text}TRAVEL AGENT GTD"
+            utils.waitLoading()
+            Send "{Tab}"
+            utils.waitLoading()
+        } else {
+            MouseMove 636, 381
+            utils.waitLoading()
+            Click 3
+            utils.waitLoading()
+        }
         Send "{Text}WHL"
         utils.waitLoading()
         Send "{Tab}"
