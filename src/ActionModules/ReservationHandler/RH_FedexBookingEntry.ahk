@@ -56,7 +56,7 @@ class FedexBookingEntry {
             return
         }
 
-        this.dateTimeEntry(pmsCiDate, pmsCoDate, infoObj["ETA"], infoObj["ETD"])
+        this.dateTimeEntry(pmsCiDate, pmsCoDate, infoObj["ETA"], infoObj["ETD"], isCheckedIn)
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -162,22 +162,24 @@ class FedexBookingEntry {
         utils.waitLoading()
     }
 
-    static dateTimeEntry(checkin, checkout, ETA, ETD, initX := 323, initY := 506) {
+    static dateTimeEntry(checkin, checkout, ETA, ETD, isCheckedIn, initX := 323, initY := 506) {
         ; fill-in checkin/checkout
-        MouseMove 345, initY - 150 ; 332, 356
-        utils.waitLoading()
-        Click 1
-        utils.waitLoading()
-        Send "!c"
-        utils.waitLoading()
-        Send Format("{Text}{1}", checkin)
-        utils.waitLoading()
-        MouseMove initX + 2, initY - 108 ; 325, 398
-        utils.waitLoading()
-        Click
-        loop 5 {
-            Send "{Esc}"
+        if (!isCheckedIn) {
+            MouseMove 345, initY - 150 ; 332, 356
             utils.waitLoading()
+            Click 1
+            utils.waitLoading()
+            Send "!c"
+            utils.waitLoading()
+            Send Format("{Text}{1}", checkin)
+            utils.waitLoading()
+            MouseMove initX + 2, initY - 108 ; 325, 398
+            utils.waitLoading()
+            Click
+            loop 5 {
+                Send "{Esc}"
+                utils.waitLoading()
+            }
         }
         MouseMove 345, initY - 101 ; 335, 405
         utils.waitLoading()
@@ -193,6 +195,7 @@ class FedexBookingEntry {
             Send "{Esc}"
             utils.waitLoading()
         }
+        
         ; fill in ETA & ETD
         MouseMove 320, 599
         utils.waitLoading()
