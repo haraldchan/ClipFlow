@@ -144,6 +144,14 @@ class PMN_FillIn {
         utils.waitLoading()
         Send "!s"
         utils.waitLoading()
+        Sleep 500
+
+        ; check if gender select modal exist
+        if (PixelGetColor(517, 506) == "0xFFFFFF") {
+            Send "!o"
+            utils.waitLoading()
+        }
+
         Send "{Enter}"
         utils.waitLoading()
 
@@ -173,6 +181,14 @@ class PMN_FillIn {
 
         Send "!h"
         utils.waitLoading()
+        Sleep 500
+        ; check if gender select modal exist
+        if (PixelGetColor(517, 506) == "0xFFFFFF") {
+            Send "!o"
+            utils.waitLoading()
+            Sleep 500
+        }
+
         Send "{Esc}" ; cancel the "save changes msgbox"
         utils.waitLoading()
         if (!this.isRunning) {
