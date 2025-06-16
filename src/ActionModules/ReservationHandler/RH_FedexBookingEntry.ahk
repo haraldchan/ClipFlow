@@ -221,7 +221,7 @@ class FedexBookingEntry {
         comment := ""
 
         ; select current comment
-        MouseClickDrag "Left", initY, initY, initX + 518, initY + 36 ;622, 596 -> 1140, 605
+        MouseClickDrag "Left", initX, initY, initX + 518, initY + 36 ;622, 596 -> 1140, 605
         utils.waitLoading()
         Send "^x"
         utils.waitLoading()
