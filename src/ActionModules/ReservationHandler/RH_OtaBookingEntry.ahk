@@ -318,7 +318,7 @@ class RH_OtaBookingEntry {
     static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, initX := 372, initY := 524) {
 
         ; mkt/src code
-        if (isCheckedIn) {
+        if (!isCheckedIn) {
             MouseMove 636, 361
             utils.waitLoading()
             Click 3
