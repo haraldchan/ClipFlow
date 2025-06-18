@@ -29,6 +29,21 @@ class FedexBookingEntry {
         BlockInput false
     }
 
+    static dismissPopup() {
+        loop {
+            if (
+                ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\alert.png")
+                || ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\info.png")
+            ) {
+                Send "{Escape}"
+                utils.waitLoading()
+                Sleep 200
+            } else {
+                utils.waitLoading()
+                break
+            }
+        }
+    }
 
     static USE(infoObj, index := 1, bringForwardTime := 10, initX := 194, initY := 183) {
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
@@ -176,10 +191,12 @@ class FedexBookingEntry {
             MouseMove initX + 2, initY - 108 ; 325, 398
             utils.waitLoading()
             Click
-            loop 5 {
-                Send "{Esc}"
-                utils.waitLoading()
-            }
+            utils.waitLoading()
+            ; loop 5 {
+            ;     Send "{Esc}"
+            ;     utils.waitLoading()
+            ; }
+            this.dismissPopup()
         }
         MouseMove 345, initY - 101 ; 335, 405
         utils.waitLoading()
@@ -191,11 +208,12 @@ class FedexBookingEntry {
         utils.waitLoading()
         Send "{Enter}"
         utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
-        
+        ; loop 5 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
+        this.dismissPopup()
+
         ; fill in ETA & ETD
         MouseMove 320, 599
         utils.waitLoading()
@@ -334,17 +352,19 @@ class FedexBookingEntry {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        loop 3 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        ; loop 3 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
+        this.dismissPopup()
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        ; loop 5 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
+        this.dismissPopup()
         utils.waitLoading()
     }
 
