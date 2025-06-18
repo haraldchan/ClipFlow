@@ -29,6 +29,22 @@ class RH_OtaBookingEntry {
         BlockInput false
     }
 
+    static dismissPopup() {
+        loop {
+            if (
+                ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\alert.png")
+                || ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\info.png")
+            ) {
+                Send "{Escape}"
+                utils.waitLoading()
+                Sleep 200
+            } else {
+                utils.waitLoading()
+                break
+            }
+        }
+    }
+
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, initX := 193, initY := 182) {
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
@@ -159,10 +175,11 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        ; loop 5 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
+        this.dismissPopup()
         utils.waitLoading()
     }
 
@@ -192,10 +209,11 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        ; loop 5 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
+        this.dismissPopup()
         Send "{Space}"
         utils.waitLoading()
         Send "!o"
@@ -212,10 +230,11 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        loop 3 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        ; loop 3 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
+        this.dismissPopup()
         if (!isCheckedIn) {
             MouseMove 350, 469 ; Room Type btn
             utils.waitLoading()
@@ -249,10 +268,11 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
-            loop 5 {
-                Send "{Esc}"
-                utils.waitLoading()
-            }
+            ; loop 5 {
+            ;     Send "{Esc}"
+            ;     utils.waitLoading()
+            ; }
+            this.dismissPopup()
         }
 
         MouseMove 350, 404
@@ -265,10 +285,11 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "{Enter}"
         utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        ; loop 5 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
+        this.dismissPopup()
         utils.waitLoading()
     }
 
@@ -308,10 +329,11 @@ class RH_OtaBookingEntry {
 
         Send "{Tab}"
         utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        ; loop 5 {
+        ;     Send "{Esc}"
+        ;     utils.waitLoading()
+        ; }
+        this.dismissPopup()
         utils.waitLoading()
     }
 
@@ -351,10 +373,11 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
-            loop 3 {
-                Send "{Esc}"
-                utils.waitLoading()
-            }
+            ; loop 3 {
+            ;     Send "{Esc}"
+            ;     utils.waitLoading()
+            ; }
+            this.dismissPopup()
             Send "{Text}" . roomRates[1]
             utils.waitLoading()
             Send "{Tab}"
@@ -365,10 +388,11 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Click
             utils.waitLoading()
-            loop 5 {
-                Send "{Esc}"
-                utils.waitLoading()
-            }
+            ; loop 5 {
+            ;     Send "{Esc}"
+            ;     utils.waitLoading()
+            ; }
+            this.dismissPopup()
             utils.waitLoading()
             Send "!d"
             utils.waitLoading()
@@ -403,10 +427,11 @@ class RH_OtaBookingEntry {
             ; utils.waitLoading()
             ; Send "!o"
             utils.waitLoading()
-            loop 5 {
-                Send "{Esc}"
-                utils.waitLoading()
-            }
+            ; loop 5 {
+            ;     Send "{Esc}"
+            ;     utils.waitLoading()
+            ; }
+            this.dismissPopup()
         }
     }
 
@@ -435,11 +460,11 @@ class RH_OtaBookingEntry {
         Send Format("{Text}{1}", bbf[1])
         ; Send "1"
         utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
-            Sleep 100
-        }
-
+        ; loop 5 {
+        ;     Send "{Esc}"
+        ;     Sleep 100
+        ; }
+        this.dismissPopup()
         utils.waitLoading()
     }
 
@@ -455,18 +480,16 @@ class RH_OtaBookingEntry {
     static splitPartyEntry(guestNames, roomQty, initX := 456, initY := 482) {
         ;TODO: action: split party
         Send "!t"
-        Sleep 100
-        MouseMove initX, initY
-        Sleep 100
-        Send Click
-        Sleep 100
+        utils.waitLoading()
+        Send "{Text}party"
+        utils.waitLoading()
         ; !s: Split; !a: Split All
-        if (roomQty = 2) {
+        if (roomQty == 2) {
             Send "!s"
         } else {
             Send "!a"
         }
-        Sleep 100
+        utils.waitLoading()
         ; Send "!r"
         ; Sleep 1000
     }
