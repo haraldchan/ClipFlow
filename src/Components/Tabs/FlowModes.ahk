@@ -10,6 +10,11 @@ FlowModes(App) {
 	moduleNames := modules.map(module => module.name)
 
 	moduleSelectedStored := config.read("moduleSelected")
+	if (!moduleSelectedStored) {
+		moduleSelectedStored := 1
+		config.write("moduleSelected", 1)
+	}
+
     moduleSelected := moduleSelectedStored > modules.Length ? 1 : moduleSelectedStored
 
 	return (
