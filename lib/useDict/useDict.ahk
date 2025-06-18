@@ -33,8 +33,7 @@ class Dict {
     static regionISO := JSON.parse(FileRead(this.DICT_PATH . "\region-iso.json", "UTF-8"))
 
     static provinces := JSON.parse(FileRead(this.DICT_PATH . "\provinces.json", "UTF-8"))
-
-    static provincesById := JSON.parse(FileRead(this.DICT_PATH . "\provinces-by-id.json", "UTF-8"))
+    static provincesById := JSON.parse(FileRead(this.DICT_PATH . "\province-by-id.json", "UTF-8"))
 
     static provinceWithCities := JSON.parse(FileRead(this.DICT_PATH . "\province-with-cities.json", "UTF-8"))
 
@@ -66,36 +65,16 @@ class useDict {
      */
     static fetchPinyin(hanzi, useWG := false) {
         ; 360国学 
-        ; url := Format("https://guoxue.baike.so.com/query/view?type=word&title={1}", hanzi)
-        ; 文学网 - 在线新华字典
-        url := Format("https://zd.hwxnet.com/search.do?keyword={1}", hanzi)
+        url := Format("https://guoxue.baike.so.com/query/view?type=word&title={1}", hanzi)
         
         whr := ComObject("WinHttp.WinHttpRequest.5.1")
-        html := ComObject("HTMLFile")
 
-        whr.Option[6] := true
         whr.Open("POST", url, false)
         whr.Send()
         whr.WaitForResponse()
         page := whr.ResponseText
-        html.Write(page)
-
         Sleep 500
-        ; 360 国学
-        ; pinyinSpans := html.getElementsByTagName("span")
-        ; loop pinyinSpans.Length {
-        ;     pinyinSpans[A_Index].dataFormatAs := "Text"
-        ;     pinyinField := pinyinSpans[A_Index].InnerText
-        ;     if (InStr(pinyinField, "[")) {
-        ;         toned := pinyinField.replace("[", "").replace("]", "").trim()
-        ;         break
-        ;     }
-        ; }
-
-        ; 文学网 - 在线新华字典
-        pinyinSpan := html.getElementsByTagName("span")[4]
-        pinyinSpan.dataFormatAs := "Text"
-        toned := pinyinSpan.InnerText.trim()
+        toned := page.split('<span class="pinyin">')[2].split("</span>")[1].replace("[", "").replace("]", "").trim()
 
         for tonedChar, char in Dict.tone {
             if (toned.includes(tonedChar)) {
@@ -103,7 +82,6 @@ class useDict {
             }
         }
 
-        html := ""
         whr := ""
 
         ; update pinyin dictionary
