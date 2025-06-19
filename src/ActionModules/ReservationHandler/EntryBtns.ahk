@@ -4,7 +4,7 @@ EntryBtns(App, curResv, resvSource) {
         entryBtns := [App.getCtrlByName("entry1"), App.getCtrlByName("entry2")]
 
         if (cur["agent"] == "fedex") {
-            resvSource.set(": " . cur["resvType"])
+            resvSource.set("FEDEX: " . cur["resvType"])
             crewLastNames := cur["crewNames"].map(name => name.split(" ")[2])
 
             for btn in entryBtns {
