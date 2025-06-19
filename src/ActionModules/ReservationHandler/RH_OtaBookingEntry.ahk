@@ -47,7 +47,6 @@ class RH_OtaBookingEntry {
 
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, initX := 193, initY := 182) {
-        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
         rateCode := match(curResv["agent"], {
             kingsley: "WHLRN",
             jielv: "WHLRN"
@@ -55,6 +54,8 @@ class RH_OtaBookingEntry {
 
         ; workflow start
         this.start()
+        
+        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
 
         if (!isCheckedIn) {
             this.profileEntry(pmsGuestNames[1])
