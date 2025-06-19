@@ -39,20 +39,23 @@ RH_App(App, moduleTitle, identifier) {
         App.AddText("xp15", moduleTitle),
 
         ; read me info
-        App.AddText("xs20 y+10 w150 h35 ", "使用说明").SetFont("s10.5 Bold"),
-        App.AddText("xs20 y+1 w270 h150", README).SetFont("s10"),
+        App.AddGroupBox("Section yp+25 w320 h220"),
+        App.AddText("xp10 h35 w80 0x1", "使用说明").SetFont("s10.5 Bold"),
+        App.AddText("xp yp+30 w270 h180", README).SetFont("s10"),
         
         ; options
         ; append remarks to comment
-        App.AddText("xs20 y+10 w150 h35 ", "设置选项").SetFont("s10.5 Bold"),
-        App.AddCheckbox("vwithRemarks xs20 y+10 h30", "将备注添加到 Comment"),
+        App.AddGroupBox("Section xp-10 y+15 w320 h190"),
+        App.AddText("xp10 w80 h35 0x1", "设置选项").SetFont("s10.5 Bold"),
+        App.AddCheckbox("vwithRemarks xp yp+30 h25", "将备注添加到 Comment"),
+        
         ; add extra packages
-        App.AddText("xs20 y+10 h30 0x200", "需添加的外 Package (不包括早餐；以空格分隔)"),
-        App.AddText("xs20 y+10 h30 0x200", "Pkg Code."),
-        App.AddEdit("vpackages x+5 h30"),
+        App.AddText("xp y+5 h25 0x200", "需添加的外 Package (不包括早餐；以空格分隔)"),
+        App.AddText("xp y+1 h25 0x200", "Pkg Code."),
+        App.AddEdit("vpackages x+5 w200 h25"),
         
         ; reservation details
-        App.ARText("x360 y140 w300 h30", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold"),
+        App.ARText("x380 y140 w300 h25", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold"),
         ReservationDetails(App, curResv),
         
         ; entry btns
