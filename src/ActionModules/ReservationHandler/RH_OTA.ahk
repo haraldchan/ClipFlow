@@ -1,9 +1,9 @@
 #Include "./RH_OtaBookingEntry.ahk"
 
 class RH_OTA {
-    static USE(curResv, splitParty := false) {
+    static USE(curResv, splitParty := false, withRemarks := false, packages := "") {
         if (curResv["agent"] == "kingsley" || curResv["agent"] == "jielv") {
-            this.WholeSale(curResv, splitParty)
+            this.WholeSale(curResv, splitParty, withRemarks, packages)
         }
 
     }
@@ -37,7 +37,7 @@ class RH_OTA {
         )
     )
 
-    static WholeSale(curResv, splitParty) {
+    static WholeSale(curResv, splitParty, withRemarks, packages) {
         ; convert roomType
         roomType := this.roomTypeRefs[curResv["agent"]][curResv["roomType"]]
 
@@ -45,6 +45,9 @@ class RH_OTA {
         breakfastType := (SubStr(roomType, 1, 1) = "C") ? "CBF" : "BBF"
         breakfastQty := curResv["bbf"][1]
         comment := (breakfastQty == 0) ? "RM TO TA" : Format("RM INCL {1}{2} TO TA", breakfastQty, breakfastType)
+        if (withRemarks) {
+            comment .= ", " . curResv["remarks"]
+        }
 
         ; reformat guest names
         pmsGuestNames := []
@@ -65,7 +68,8 @@ class RH_OTA {
             roomType,
             comment,
             pmsGuestNames,
-            splitParty
+            splitParty,
+            packages
         )
     }
 }

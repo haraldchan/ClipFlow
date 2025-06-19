@@ -6,10 +6,11 @@
 RH_App(App, moduleTitle, identifier) {
     README := FileRead(A_ScriptDir . "\src\ActionModules\ReservationHandler\README.txt", "UTF-8")
 
-    curResv := signal({})
+    r := {}
+    curResv := signal(RH_Models.otaListFields.keys().map(key => r.DefineProp(key, { Value: "" })))
     resvSource := signal("")
     OnClipboardChange (*) => handleCaptured(identifier)
-    handleCaptured(identifier){
+    handleCaptured(identifier) {
         if (!A_Clipboard.includes(identifier)) {
             return
         }
@@ -26,8 +27,10 @@ RH_App(App, moduleTitle, identifier) {
         LV := App.getCtrlByType("ListView")
         LV.ModifyCol(1, 100)
         LV.ModifyCol(2, 200)
-        try {
-            curResv.set(JSON.parse(config.read("JSON")))       
+
+        storedResv := config.read("JSON")
+        if (storedResv) {
+            curResv.set(JSON.parse(storedResv))
         }
     }
 
@@ -37,15 +40,23 @@ RH_App(App, moduleTitle, identifier) {
 
         ; read me info
         App.AddText("xs20 y+10 w150 h35 ", "使用说明").SetFont("s10.5 Bold"),
-        App.AddText("xs20 y+1 w270 h250", README).SetFont("s10"),
-
-        ; reservation info
+        App.AddText("xs20 y+1 w270 h150", README).SetFont("s10"),
+        
+        ; options
+        ; append remarks to comment
+        App.AddText("xs20 y+10 w150 h35 ", "设置选项").SetFont("s10.5 Bold"),
+        App.AddCheckbox("vwithRemarks xs20 y+10 h30", "将备注添加到 Comment"),
+        ; add extra packages
+        App.AddText("xs20 y+10 h30 0x200", "需添加的外 Package (不包括早餐；以空格分隔)"),
+        App.AddText("xs20 y+10 h30 0x200", "Pkg Code."),
+        App.AddEdit("vpackages x+5 h30"),
+        
+        ; reservation details
         App.ARText("x360 y140 w300 h30", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold"),
         ReservationDetails(App, curResv),
-
+        
         ; entry btns
-        EntryBtns(App, curResv, resvSource)
-
+        EntryBtns(App, curResv, resvSource),
         onMount()
     )
 }

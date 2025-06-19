@@ -2,11 +2,11 @@ EntryBtns(App, curResv, resvSource) {
     effect(curResv, handleEntryBtnUpdate)
     handleEntryBtnUpdate(cur) {
         entryBtns := [App.getCtrlByName("entry1"), App.getCtrlByName("entry2")]
-        
+
         if (cur["agent"] == "fedex") {
             resvSource.set(": " . cur["resvType"])
             crewLastNames := cur["crewNames"].map(name => name.split(" ")[2])
-            
+
             for btn in entryBtns {
                 exist := crewLastNames.has(A_Index)
                 btn.Text := exist ? cur["crewNames"][A_Index] : ""
@@ -28,7 +28,15 @@ EntryBtns(App, curResv, resvSource) {
         if (curResv.value["agent"] == "fedex") {
             FedexBookingEntry.USE(curResv.value, ctrl.name == "entry1" ? 1 : 2)
         } else {
-            RH_OTA.USE(curResv.value, ctrl.name == "entry2" ? true : false )
+            RH_OTA.USE(
+                curResv.value,
+                ctrl.name == "entry2" ? true : false,
+                App["withRemarks"].Value,
+                App["packages"].Value.trim()
+            )
+
+            App["withRemarks"].Value := false
+            App["packages"].Value := ""
         }
     }
 

@@ -46,7 +46,7 @@ class RH_OtaBookingEntry {
     }
 
     ; the initX, initY for USE() should be top-left corner of current booking window
-    static USE(curResv, roomType, comment, pmsGuestNames, splitParty, initX := 193, initY := 182) {
+    static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, initX := 193, initY := 182) {
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
         rateCode := match(curResv["agent"], {
             kingsley: "WHLRN",
@@ -108,6 +108,14 @@ class RH_OtaBookingEntry {
             }
         }
 
+        if (packages) {
+            packages.split(" ").map(package => this.packageEntry(package))
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
+        }
+
         if (splitParty) {
             this.splitPartyEntry(pmsGuestNames, curResv["roomQty"])
             if (!this.isRunning) {
@@ -163,6 +171,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
+        this.dismissPopup()
     }
 
 
@@ -175,10 +184,6 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
-        ; loop 5 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
         this.dismissPopup()
         utils.waitLoading()
     }
@@ -209,10 +214,6 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        ; loop 5 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
         this.dismissPopup()
         Send "{Space}"
         utils.waitLoading()
@@ -230,10 +231,6 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        ; loop 3 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
         this.dismissPopup()
         if (!isCheckedIn) {
             MouseMove 350, 469 ; Room Type btn
@@ -268,10 +265,6 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
-            ; loop 5 {
-            ;     Send "{Esc}"
-            ;     utils.waitLoading()
-            ; }
             this.dismissPopup()
         }
 
@@ -285,10 +278,6 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "{Enter}"
         utils.waitLoading()
-        ; loop 5 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
         this.dismissPopup()
         utils.waitLoading()
     }
@@ -329,10 +318,6 @@ class RH_OtaBookingEntry {
 
         Send "{Tab}"
         utils.waitLoading()
-        ; loop 5 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
         this.dismissPopup()
         utils.waitLoading()
     }
@@ -373,10 +358,6 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
-            ; loop 3 {
-            ;     Send "{Esc}"
-            ;     utils.waitLoading()
-            ; }
             this.dismissPopup()
             Send "{Text}" . roomRates[1]
             utils.waitLoading()
@@ -388,10 +369,6 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Click
             utils.waitLoading()
-            ; loop 5 {
-            ;     Send "{Esc}"
-            ;     utils.waitLoading()
-            ; }
             this.dismissPopup()
             utils.waitLoading()
             Send "!d"
@@ -427,14 +404,9 @@ class RH_OtaBookingEntry {
             ; utils.waitLoading()
             ; Send "!o"
             utils.waitLoading()
-            ; loop 5 {
-            ;     Send "{Esc}"
-            ;     utils.waitLoading()
-            ; }
             this.dismissPopup()
         }
     }
-
 
     static breakfastEntry(bbf, initX := 352, initY := 548) {
         ;entry bbf package
@@ -460,21 +432,33 @@ class RH_OtaBookingEntry {
         Send Format("{Text}{1}", bbf[1])
         ; Send "1"
         utils.waitLoading()
-        ; loop 5 {
-        ;     Send "{Esc}"
-        ;     Sleep 100
-        ; }
         this.dismissPopup()
         utils.waitLoading()
     }
 
+    static packageEntry(package, initX := 352, initY := 548) {
+        ;entry bbf package
+        MouseMove initX, initY
+        utils.waitLoading()
+        Click
+        utils.waitLoading()
+        Send "!n"
+        utils.waitLoading()
+        Send "{Text}" . package
+        utils.waitLoading()
+        Send "!o"
+        utils.waitLoading()
+        Send "!o"
+        utils.waitLoading()
+        Send "{Esc}"
+        utils.waitLoading()
+    }
 
     ; WIP
     static saveBooking(initX, initY) {
         ;TODO: action: save modified booking, handle popups.
 
     }
-
 
     ; WIP
     static splitPartyEntry(guestNames, roomQty, initX := 456, initY := 482) {
@@ -490,7 +474,21 @@ class RH_OtaBookingEntry {
             Send "!a"
         }
         utils.waitLoading()
-        ; Send "!r"
+
+        ; Fill guest names
         ; Sleep 1000
+        for guestName in guestNames {
+            Send "!r"
+            utils.waitLoading()
+            this.profileEntry(guestName)
+            utils.waitLoading()
+            Send "!o"
+            utils.waitLoading()
+            Send "{Down}"
+            Sleep 500
+        }
+
+        Send "!o"
+        utils.waitLoading()
     }
 }
