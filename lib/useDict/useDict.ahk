@@ -140,7 +140,7 @@ class useDict {
     static getProvince(address) {
 
         for province, code in Dict.provinces {
-            if (address.include(province)) {
+            if (address.includes(province)) {
                 if (code != "") {
                     return code
                 }
