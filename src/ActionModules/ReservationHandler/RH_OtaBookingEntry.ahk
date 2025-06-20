@@ -49,7 +49,11 @@ class RH_OtaBookingEntry {
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, initX := 193, initY := 182) {
         rateCode := match(curResv["agent"], {
             kingsley: "WHLRN",
-            jielv: "WHLRN"
+            jielv: match(curResv["bbf"][1], Map(
+                x => x == 0, "WHJL",
+                x => x == 1, "WHJB1",
+                X => X == 2, "WHJB2"
+            ))
         })
 
         ; workflow start
@@ -95,14 +99,14 @@ class RH_OtaBookingEntry {
             return
         }
 
-        this.roomRatesEntry(rateCode, curResv["roomRates"], DateDiff(curResv["coDate"], curResv["ciDate"], "Days"), isCheckedIn)
+        this.roomRatesEntry(rateCode, curResv["roomRates"], DateDiff(curResv["coDate"], curResv["ciDate"], "Days"), isCheckedIn, curResv["bbf"])
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
         }
 
         if (!curResv["bbf"].every(item => item == 0) && !comment.includes("CBF")) {
-            this.breakfastEntry(curResv["bbf"])
+            this.breakfastEntry(curResv["bbf"], curResv["roomRates"])
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
                 return
@@ -118,7 +122,7 @@ class RH_OtaBookingEntry {
         }
 
         if (splitParty) {
-            this.splitPartyEntry(pmsGuestNames, curResv["roomQty"])
+            this.splitPartyEntry(pmsGuestNames)
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
                 return
@@ -323,7 +327,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
-    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, initX := 372, initY := 524) {
+    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, initX := 372, initY := 524) {
 
         ; mkt/src code
         if (!isCheckedIn) {
@@ -375,41 +379,39 @@ class RH_OtaBookingEntry {
             Send "!d"
             utils.waitLoading()
             loop roomRates.Length {
-                index := A_Index
                 Send "!e"
                 utils.waitLoading()
-                loop (isCheckedIn ? 4 : 6) {
-                    Send "{Tab}"
+
+                ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-active-win.png")
+                if (bbf[1] == 2) {
+                    MouseMove FoundX + 143, FoundY + 69
+                    Click 3
+                    Send "{Text}2"
                     utils.waitLoading()
                 }
+
+                MouseMove FoundX + 226, FoundY + 142
+                Click 3
                 Send "{Text}" . rateCode
                 utils.waitLoading()
-                loop 2 {
-                    Send "{Tab}"
-                    utils.waitLoading()
-                    Send "{Esc}"
-                    utils.waitLoading()
-                }
-                Send "{Text}" . roomRates[index]
-                utils.waitLoading()
-                Send "{Tab}"
-                utils.waitLoading()
+
+                MouseMove FoundX + 176, FoundY + 165
+                Click 3
+                Send "{Text}" . roomRates[A_Index]
+
                 Send "!o"
                 utils.waitLoading()
                 Send "{Down}"
+                utils.waitLoading()
             }
             utils.waitLoading()
             Send "!o"
-            utils.waitLoading()
-            ; Send "{Esc}"
-            ; utils.waitLoading()
-            ; Send "!o"
             utils.waitLoading()
             this.dismissPopup()
         }
     }
 
-    static breakfastEntry(bbf, initX := 352, initY := 548) {
+    static breakfastEntry(bbf, roomRates, initX := 352, initY := 548) {
         ;entry bbf package
         MouseMove initX, initY
         utils.waitLoading()
@@ -431,10 +433,9 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Click 3
         Send Format("{Text}{1}", bbf[1])
-        ; Send "1"
         utils.waitLoading()
+
         this.dismissPopup()
-        utils.waitLoading()
     }
 
     static packageEntry(package, initX := 352, initY := 548) {
@@ -453,6 +454,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "{Esc}"
         utils.waitLoading()
+        this.dismissPopup()
     }
 
     ; WIP
@@ -477,7 +479,6 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
 
         ; Fill guest names
-        ; Sleep 1000
         for guestName in guestNames {
             Send "!r"
             utils.waitLoading()
