@@ -288,38 +288,31 @@ class RH_OtaBookingEntry {
     }
 
 
-    static commentOrderIdEntry(orderId, comment, initX := 622, initY := 596) {
-        MouseMove initX, initY ;622, 596
-        utils.waitLoading()
-        Click "Down"
-        MouseMove initX + 518, initY + 9 ;1140, 605
-        Sleep 100
-        Click "Up"
-        utils.waitLoading()
-        Send Format("{Text}{1}", comment)
-        utils.waitLoading()
-
+    static commentOrderIdEntry(orderId, comment, initX := 839, initY := 555) {
         ; fill-in orderId
-        MouseMove initX + 217, initY - 41 ;839, 555
+        MouseMove initX, initY ; 839, 555
         utils.waitLoading()
-        Click "Down"
-        MouseMove initX + 485, initY - 33 ;1107, 563
-        Sleep 100
-        Click "Up"
+        Click 3
         utils.waitLoading()
         Send Format("{Text}{1}", orderId)
         utils.waitLoading()
+        Send "{Tab}"
+        utils.waitLoading()
 
+        ; send specials: CBF
         if (comment.includes("CBF")) {
-            Send "{Tab}"
-            utils.waitLoading()
-
             A_Clipboard := ""
             Send "^c"
             utils.waitLoading()
             Send "{Text}CBF," . A_Clipboard
             utils.waitLoading()
         }
+
+        ; send comment
+        Send "{Tab}"
+        utils.waitLoading()
+        Send Format("{Text}{1}", comment)
+        utils.waitLoading()
 
         Send "{Tab}"
         utils.waitLoading()
@@ -328,7 +321,6 @@ class RH_OtaBookingEntry {
     }
 
     static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, initX := 372, initY := 524) {
-
         ; mkt/src code
         if (!isCheckedIn) {
             MouseMove 636, 361
@@ -457,13 +449,6 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
     }
 
-    ; WIP
-    static saveBooking(initX, initY) {
-        ;TODO: action: save modified booking, handle popups.
-
-    }
-
-    ; WIP
     static splitPartyEntry(guestNames, roomQty, initX := 456, initY := 482) {
         ;TODO: action: split party
         Send "!t"
@@ -480,6 +465,11 @@ class RH_OtaBookingEntry {
 
         ; Fill guest names
         for guestName in guestNames {
+            if (A_Index == 1) {
+                Send "{Down}"
+                utils.waitLoading()
+                continue
+            }
             Send "!r"
             utils.waitLoading()
             this.profileEntry(guestName)
