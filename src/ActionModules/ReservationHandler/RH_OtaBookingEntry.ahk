@@ -122,7 +122,7 @@ class RH_OtaBookingEntry {
         }
 
         if (splitParty) {
-            this.splitPartyEntry(pmsGuestNames)
+            this.splitPartyEntry(pmsGuestNames, curResv["roomQty"])
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
                 return
