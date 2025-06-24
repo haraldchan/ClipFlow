@@ -2,10 +2,7 @@
 
 class RH_OTA {
     static USE(curResv, splitParty := false, withRemarks := false, packages := "") {
-        if (curResv["agent"] == "kingsley" || curResv["agent"] == "jielv") {
-            this.WholeSale(curResv, splitParty, withRemarks, packages)
-        }
-
+        this.parseReservation(curResv, splitParty, withRemarks, packages)
     }
 
     static roomTypeRefs := Map(
@@ -34,17 +31,45 @@ class RH_OTA {
             "行政豪华江景大床房", "CKR",
             "行政豪华江景双床房", "CTR",
             "行政尊贵套房", "CSK"
-        )
+        ),
+        "ctrip", Map(
+            "标准大床房", "SKC",
+            "标准双床房", "STC",
+            "豪华城景大床房", "DKC",
+            "豪华城景双床房", "DTC",
+            "豪华江景大床房", "DKR",
+            "豪华江景双床房", "DTR",
+            "行政豪华城景大床房", "CKC",
+            "行政豪华城景双床房", "CTC",
+            "行政豪华江景大床房", "CKR",
+            "行政豪华江景双床房", "CTR",
+            "行政尊贵套房", "CSK"
+        ),
     )
 
-    static WholeSale(curResv, splitParty, withRemarks, packages) {
+    static parseReservation(curResv, splitParty, withRemarks, packages) {
         ; convert roomType
         roomType := this.roomTypeRefs[curResv["agent"]][curResv["roomType"]]
 
-        ; define breakfast comment
-        breakfastType := (SubStr(roomType, 1, 1) = "C") ? "CBF" : "BBF"
+        ; define breakfast type
+        breakfastType := (roomType.substr(1, 1) == "C") ? "CBF" : "BBF"
         breakfastQty := curResv["bbf"][1]
-        comment := (breakfastQty == 0) ? "RM TO TA" : Format("RM INCL {1}{2} TO TA", breakfastQty, breakfastType)
+
+        ; comment formatting
+        comment := ""
+        if (curResv["payment"] == "预付") {
+            comment := (breakfastQty == 0) ? "RM TO TA" : Format("RM INCL {1}{2} TO TA", breakfastQty, breakfastType)
+        } else {
+            for roomRate in curResv["roomRates"] {
+                comment .= Format("{1}: RMB{2}net{3}; ",
+                    FormatTime(DateAdd(curResv["ciDate"], A_Index - 1, "Days"), "MM/dd"),
+                    breakfastQty > 0 ? Format(" INCL {1}{2}", breakfastQty, breakfastType) : ""
+                )
+            }
+
+            comment := Format("Total:RMB{1}net {2}", curResv["roomRates"].reduce((acc, cur) => acc + cur), comment)
+        }
+
         if (withRemarks) {
             comment .= ", " . curResv["remarks"]
         }
@@ -53,7 +78,7 @@ class RH_OTA {
         pmsGuestNames := []
         loop curResv["guestNames"].Length {
             curGuestName := curResv["guestNames"][A_Index]
-            if (RegExMatch(curGuestName, "^[a-zA-Z/]+$") > 0) {
+            if (RegExMatch(curGuestName, "^[a-zA-Z/ ]+$") > 0) {
                 ; if only includes English alphabet, push [lastName, firstName]
                 pmsGuestNames.Push(StrSplit(curGuestName, "/"))
             } else {
