@@ -93,7 +93,7 @@ class RH_OtaBookingEntry {
             return
         }
 
-        this.commentOrderIdEntry(curResv["orderId"], comment)
+        this.commentOrderIdSpecialEntry(curResv["orderId"], comment)
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -288,7 +288,7 @@ class RH_OtaBookingEntry {
     }
 
 
-    static commentOrderIdEntry(orderId, comment, initX := 839, initY := 555) {
+    static commentOrderIdSpecialEntry(orderId, comment, initX := 839, initY := 555) {
         ; fill-in orderId
         MouseMove initX, initY ; 839, 555
         utils.waitLoading()
@@ -464,7 +464,8 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
 
         ; Fill guest names
-        for guestName in guestNames {
+        loop roomQty {
+            guestName := A_Index > guestNames.Length ? guestNames[1] : guestNames[A_Index]
             if (A_Index == 1) {
                 Send "{Down}"
                 utils.waitLoading()
