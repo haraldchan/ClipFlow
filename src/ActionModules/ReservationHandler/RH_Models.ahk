@@ -20,6 +20,7 @@ class RH_Models {
     static otaListFields := OrderedMap(
         "agent", "来源 OTA",
         "orderId", "订单号",
+        "payment", "支付方式",
         "guestNames", "住客姓名",
         "roomType", "房间类型",
         "roomQty", "房间数量",
