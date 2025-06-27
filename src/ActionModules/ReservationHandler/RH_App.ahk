@@ -47,12 +47,20 @@ RH_App(App, moduleTitle, identifier) {
         ; append remarks to comment
         App.AddGroupBox("Section xp-10 y+15 w320 h190"),
         App.AddText("xp10 w80 h35 0x1", "设置选项").SetFont("s10.5 Bold"),
-        App.AddCheckbox("vwithRemarks xp yp+30 h25", "将备注添加到 Comment"),
+        App.AddButton("x+10 h23", "更多"),
+
+        ; add remarks to comment
+        App.AddCheckbox("vwithRemarks xs10 yp+30 h25", "将备注添加到 Comment"),
         
         ; add extra packages
-        App.AddText("xp y+5 h25 0x200", "需添加的外 Package (不包括早餐；以空格分隔)"),
-        App.AddText("xp y+1 h25 0x200", "Pkg Code."),
+        App.AddText("xs10 y+5 h25 0x200", "需添加的外 Package (不包括早餐；以空格分隔)"),
+        App.AddText("xs10 y+1 h25 0x200", "Pkg Code.").SetFont("Bold"),
         App.AddEdit("vpackages x+5 w200 h25"),
+
+        ; override ratecode
+        App.AddText("xs10 y+5 h25 0x200", "覆盖 RateCode (不使用默认)"),
+        App.AddText("xs10 y+1 h25 0x200", "RateCode.").SetFont("Bold"),
+        App.AddEdit("voverrideRateCode x+5 w200 h25"),
         
         ; reservation details
         App.ARText("x380 y140 w300 h25", "订单详情  {1}", resvSource).SetFont("s13 q5 Bold"),
