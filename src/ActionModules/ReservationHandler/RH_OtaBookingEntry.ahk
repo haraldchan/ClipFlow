@@ -47,14 +47,11 @@ class RH_OtaBookingEntry {
 
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, initX := 193, initY := 182) {
-        rateCode := match(curResv["agent"], {
-            kingsley: "WHLRN",
-            jielv: match(curResv["bbf"][1], Map(
-                x => x == 0, "WHJL",
-                x => x == 1, "WHJB1",
-                X => X == 2, "WHJB2"
-            ))
-        })
+        rateCode := match(curResv["agent"], Map(
+            "kingsley",  "WHLRN",
+            "jielv",     "WHLJN",
+            "ctrip-ota", "OTARN",
+        ))
 
         ; workflow start
         this.start()
@@ -75,7 +72,7 @@ class RH_OtaBookingEntry {
             }
         }
 
-        this.routingEntry(curResv["agent"])
+        this.routingEntry(curResv["agent"], curResv["payment"])
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -99,7 +96,14 @@ class RH_OtaBookingEntry {
             return
         }
 
-        this.roomRatesEntry(rateCode, curResv["roomRates"], DateDiff(curResv["coDate"], curResv["ciDate"], "Days"), isCheckedIn, curResv["bbf"])
+        this.roomRatesEntry(
+            rateCode, 
+            curResv["roomRates"], 
+            DateDiff(curResv["coDate"], curResv["ciDate"], "Days"), 
+            isCheckedIn, 
+            curResv["bbf"], 
+            curResv["payment"]
+        )
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -190,15 +194,16 @@ class RH_OtaBookingEntry {
         Send "{Tab}"
         utils.waitLoading()
         this.dismissPopup()
-        utils.waitLoading()
     }
 
 
-    static routingEntry(agent, initX := 895, initY := 218) {
-        agent := match(agent, {
-            kingsley: "Guangzhou Kingsley Business Consultant",
-            jielv: "Shenzhen jielv holiday"
-        })
+    static routingEntry(agent, payment, initX := 895, initY := 218) {
+        agent := match(agent, Map(
+            "kingsley", "Guangzhou Kingsley Business Consultant",
+            "jielv",    "Shenzhen jielv holiday",
+            ; ctrip
+            a => a == "ctrip-ota" && payment == "现付", "%Ctrip Ctrip Computer"
+        ))
 
         MouseMove initX, initY
         utils.waitLoading()
@@ -208,10 +213,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "!s"
         utils.waitLoading()
-        loop 5 {
-            Send "{Esc}"
-            utils.waitLoading()
-        }
+        this.dismissPopup()
         Click
         Send "{Text}" . agent
         utils.waitLoading()
@@ -219,11 +221,13 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        this.dismissPopup()
-        Send "{Space}"
-        utils.waitLoading()
-        Send "!o"
-        utils.waitLoading()
+        if (payment == "预付") {
+            this.dismissPopup()
+            Send "{Space}"
+            utils.waitLoading()
+            Send "!o"
+            utils.waitLoading()
+        }
     }
 
 
@@ -320,14 +324,14 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
-    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, initX := 372, initY := 524) {
+    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, payment, initX := 372, initY := 524) {
         ; mkt/src code
         if (!isCheckedIn) {
             MouseMove 636, 361
             utils.waitLoading()
             Click 3
             utils.waitLoading()
-            Send "{Text}TRAVEL AGENT GTD"
+            Send "{Text}" . (payment == "现付") ? "OTA GTD" : "TRAVEL AGENT GTD"
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
@@ -337,13 +341,13 @@ class RH_OtaBookingEntry {
             Click 3
             utils.waitLoading()
         }
-        Send "{Text}WHL"
+        Send "{Text}" . (payment == "现付") ? "DIS" : "WHL"
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
         Send "!y"
         utils.waitLoading()
-        Send "{Text}WHO"
+        Send "{Text}" . (payment == "现付") ? "OTA" : "WHO"
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
