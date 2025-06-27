@@ -84,7 +84,9 @@ class RH_OTA {
             comment := (breakfastQty == 0) ? "RM TO TA" : Format("RM INCL {1}{2} TO TA", breakfastQty, breakfastType)
         } else {
             comments := []
-            roomTotal := Format("Total:RMB{} || ", curResv["roomRates"].reduce((acc, cur) => acc + cur, 0))
+            roomTotal := curResv["roomRates"].Length > 1 
+                ? Format("Total:RMB{} || ", curResv["roomRates"].reduce((acc, cur) => acc + cur, 0))
+                : ""
 
             loop curResv["roomRates"].Length {
                 date := FormatTime(DateAdd(curResv["ciDate"], A_Index - 1, "Days"), "MM/dd")
