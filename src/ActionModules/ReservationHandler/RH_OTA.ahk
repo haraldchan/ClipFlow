@@ -4,7 +4,9 @@ class RH_OTA {
     static supportList := [
         "jielv", 
         "kingsley",
-        "ctrip-ota"
+        "ctrip-ota",
+        ; "ctrip-business",
+        ; "meituan"
     ]
 
     static USE(curResv, splitParty := false, withRemarks := false, packages := "") {
@@ -125,14 +127,18 @@ class RH_OTA {
             }
         }
 
-        ; Main booking modification
+        agentConfigName := (curResv["agent"] == "ctrip-ota" && curResv["payment"].includes("商旅")) ? "ctrip-ota-shanglv" : curResv["agent"]
+        configFields := config.read(agentConfigName)
+
+        ; apply booking modification
         RH_OtaBookingEntry.USE(
             curResv,
             roomType,
             comment,
             pmsGuestNames,
             splitParty,
-            packages
+            packages,
+            configFields
         )
     }
 }
