@@ -15,7 +15,7 @@ EntryBtns(App, curResv, resvSource) {
             return
         }
 
-        resvSource.set(Format(": {1} - {2}", cur["agent"].toTitle(), cur["orderId"]))
+        resvSource.set(Format(": {1}  {2}", cur["agent"].toTitle(), cur["orderId"]))
         entryBtns[1].Text := "录入订单"
         entryBtns[2].Text := cur["roomQty"] > 1 ? "录入整个 Party " : ""
     }
@@ -25,6 +25,9 @@ EntryBtns(App, curResv, resvSource) {
             return
         }
 
+        App.Hide()
+        Sleep 200
+
         if (curResv.value["agent"] == "fedex") {
             FedexBookingEntry.USE(curResv.value, ctrl.name == "entry1" ? 1 : 2)
         } else {
@@ -32,11 +35,13 @@ EntryBtns(App, curResv, resvSource) {
                 curResv.value,
                 ctrl.name == "entry2" ? true : false,
                 App["withRemarks"].Value,
-                App["packages"].Value.trim()
+                App["extraPackages"].Value.trim(),
+                App["overridenRateCode"].Value.trim()
             )
 
             App["withRemarks"].Value := false
-            App["packages"].Value := ""
+            App["extraPackages"].Value := ""
+            App["overridenRateCode"].Value := ""
         }
     }
 
