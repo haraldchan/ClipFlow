@@ -21,6 +21,7 @@ class RH_Models {
         "agent", "来源 OTA",
         "orderId", "订单号",
         "payment", "支付方式",
+        "packages", "包含套餐",
         "guestNames", "住客姓名",
         "roomType", "房间类型",
         "roomQty", "房间数量",
