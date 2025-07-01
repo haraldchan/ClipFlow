@@ -46,12 +46,11 @@ class RH_OtaBookingEntry {
     }
 
     ; the initX, initY for USE() should be top-left corner of current booking window
-    static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, initX := 193, initY := 182) {
-        rateCode := match(curResv["agent"], Map(
-            "kingsley",  "WHLRN",
-            "jielv",     "WHLJN",
-            "ctrip-ota", "OTARN",
-        ))
+    static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, configFields) {
+        rateCode := configFields["ratecode"][curResv["bbf"][1] + 1]
+        if (!rateCode) {
+            rateCode := configFields["ratecode"][1]
+        }
 
         ; workflow start
         this.start()
@@ -72,7 +71,7 @@ class RH_OtaBookingEntry {
             }
         }
 
-        this.routingEntry(curResv["agent"], curResv["payment"])
+        this.routingEntry(curResv["payment"], configFields)
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -102,7 +101,7 @@ class RH_OtaBookingEntry {
             DateDiff(curResv["coDate"], curResv["ciDate"], "Days"), 
             isCheckedIn, 
             curResv["bbf"], 
-            curResv["payment"]
+            configFields
         )
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -110,7 +109,7 @@ class RH_OtaBookingEntry {
         }
 
         if (!curResv["bbf"].every(item => item == 0) && !comment.includes("CBF")) {
-            this.breakfastEntry(curResv["bbf"], curResv["roomRates"])
+            this.breakfastEntry(curResv["bbf"], rateCode != configFields["ratecode"][1])
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
                 return
@@ -197,31 +196,35 @@ class RH_OtaBookingEntry {
     }
 
 
-    static routingEntry(agent, payment, initX := 895, initY := 218) {
-        agent := match(agent, Map(
-            "kingsley", "Guangzhou Kingsley Business Consultant",
-            "jielv",    "Shenzhen jielv holiday",
-            ; ctrip
-            a => a == "ctrip-ota" && payment == "现付", "%Ctrip Ctrip Computer"
-        ))
-
+    static routingEntry(payment, configFields, initX := 895, initY := 218) {
+        ; clear fields: Agent, Company
         MouseMove initX, initY
         utils.waitLoading()
         Click 3
         utils.waitLoading()
         Send "{Delete}"
         utils.waitLoading()
+        Send "{Tab}"
+        utils.waitLoading()
+        Send "{Delete}"
+        utils.waitLoading()
         Send "!s"
         utils.waitLoading()
         this.dismissPopup()
-        Click
-        Send "{Text}" . agent
+        
+        if (configFields["profileType"] == "Travel Agent") {
+            MouseMove initX, initY
+        } 
+        utils.waitLoading()
+
+        Send "{Text}" . (payment.includes("现付") ? configFields["profileNamePoa"] : configFields["profileName"])
         utils.waitLoading()
         Send "!s"
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        if (payment == "预付") {
+        ; TODO: add manual routing when no associated routing. like 商旅预付 Ctrip
+        if (payment == "预付") { 
             this.dismissPopup()
             Send "{Space}"
             utils.waitLoading()
@@ -324,14 +327,14 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
-    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, payment, initX := 372, initY := 524) {
+    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, configFields, initX := 372, initY := 524) {
         ; mkt/src code
         if (!isCheckedIn) {
             MouseMove 636, 361
             utils.waitLoading()
             Click 3
             utils.waitLoading()
-            Send "{Text}" . (payment == "现付") ? "OTA GTD" : "TRAVEL AGENT GTD"
+            Send "{Text}" . configFIelds["resType"]
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
@@ -341,13 +344,13 @@ class RH_OtaBookingEntry {
             Click 3
             utils.waitLoading()
         }
-        Send "{Text}" . (payment == "现付") ? "DIS" : "WHL"
+        Send "{Text}" . configFields["market"]
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
         Send "!y"
         utils.waitLoading()
-        Send "{Text}" . (payment == "现付") ? "OTA" : "WHO"
+        Send "{Text}" . configFields["source"]
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
@@ -407,22 +410,25 @@ class RH_OtaBookingEntry {
         }
     }
 
-    static breakfastEntry(bbf, roomRates, initX := 352, initY := 548) {
-        ;entry bbf package
-        MouseMove initX, initY
-        utils.waitLoading()
-        Click
-        utils.waitLoading()
-        Send "!n"
-        utils.waitLoading()
-        Send "{Text}BFNP"
-        utils.waitLoading()
-        Send "!o"
-        utils.waitLoading()
-        Send "!o"
-        utils.waitLoading()
-        Send "{Esc}"
-        utils.waitLoading()
+    static breakfastEntry(bbf, isUsingBoundRateCode, initX := 352, initY := 548) {
+        ; if ratecode is bound with packages(blue text), skip adding BFNP
+        if (!isUsingBoundRateCode) {
+            ;entry bbf package
+            MouseMove initX, initY
+            utils.waitLoading()
+            Click
+            utils.waitLoading()
+            Send "!n"
+            utils.waitLoading()
+            Send "{Text}BFNP"
+            utils.waitLoading()
+            Send "!o"
+            utils.waitLoading()
+            Send "!o"
+            utils.waitLoading()
+            Send "{Esc}"
+            utils.waitLoading()
+        }
 
         ; change "Adults"
         MouseMove initX - 67, initY - 124 ; 285, 424
