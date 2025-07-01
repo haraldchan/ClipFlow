@@ -1,78 +1,78 @@
 {
-	"app": {
-		"moduleSelected": 1,
-		"tabPos": 1
-	},
-	"clipHistory": [" ", " "],
-	"dbSettings": {
-		"main": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfiles",
-		"archive": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfilesArchive",
-		"backup": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\GuestProfilesBackup",
-		"cleanPeriod": 180
-	},
-	"resvHandler": {
-		"currentReservation": "",
-		"entryParams": {
-			"jielv": {
-				"agent": "jielv",
-				"profileName": "Shenzhen jielv holiday",
-				"profileType": "Travel Agent",
-				"ratecode": ["WHJL", "WHJB1", "WHJB2"],
-				"resType": "TRAVEL AGENT GTD",
-				"market": "WHL",
-				"source": "WHO"
-			},
-			"kingsley": {
-				"agent": "kingsley",
-				"profileName": "Guangzhou Kingsley Business Consultant",
-				"profileType": "Travel Agent",
-				"ratecode": ["WHLRN", "", ""],
-				"resType": "TRAVEL AGENT GTD",
-				"market": "WHL",
-				"source": "WHO"
-			},
-			"ctrip-ota": {
-				"agent": "ctrip-ota",
-				"profileNamePoa": "(现付)Ctrip Ctrip Computer Techn",
-				"profileName": "(月结)Ctrip Computer Technology",
-				"profileType": "Travel Agent",
-				"ratecode": ["OTARN", "", ""],
-				"resType": "OTA GTD",
-				"market": "DIS",
-				"source": "OTA"
-			},
-			"ctrip-ota-shanglv": {
-				"agent": "ctrip-ota-shanglv",
-				"profileNamePoa": "(商旅现付)Ctrip Computer Technolo",
-				"profileName": "（商旅月结）Ctrip Corporate Travel",
-				"profileType": "Company",
-				"ratecode": ["CORS", "", ""],
-				"resType": "COMPANY GTD",
-				"market": "RFP",
-				"source": "OTA"
-			},
-			"ctrip-business": {
-				"agent": "ctrip-business",
-				"profileName": "",
-				"profileType": "Company",
-				"ratecode": ["CORS", "", ""],
-				"resType": "COMPANY GTD",
-				"market": "COR",
-				"source": "COS"
-			},
-			"meituan": {
-				"agent": "meituan",
-				"profileName": "MEI TUAN",
-				"profileType": "Travel Agent",
-				"ratecode": ["OTAR", "", ""],
-				"resType": "OTA GTD",
-				"market": "DIS",
-				"source": "OTA"
-			}
-		}
-	},
-	"serverAgent": {
-		"agentEnabled": false,
-		"clientEnabled": true
-	}
+  "app":{
+    "moduleSelected":1,
+    "tabPos":1
+  },
+  "clipHistory":[" "," "],
+  "dbSettings": {
+    "main": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfiles",
+    "archive": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfilesArchive",
+    "backup": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\GuestProfilesBackup",
+    "cleanPeriod": 180
+  },
+  "resvHandler":{
+    "currentReservation":"",
+"entryParams": {
+      "jielv": {
+        "agent": "jielv",
+        "profileName": "Shenzhen jielv holiday",
+        "profileType": "Travel Agent",
+        "ratecode": ["WHJL", "WHJB1", "WHJB2"],
+        "resType": "TRAVEL AGENT GTD",
+        "market": "WHL",
+        "source": "WHO"
+      },
+      "kingsley": {
+        "agent": "kingsley",
+        "profileName": "Guangzhou Kingsley Business Consultant",
+        "profileType": "Travel Agent",
+        "ratecode": ["WHLRN", "", ""],
+        "resType": "TRAVEL AGENT GTD",
+        "market": "WHL",
+        "source": "WHO"
+      },
+      "ctrip-ota": {
+        "agent": "ctrip-ota",
+        "profileNamePoa": "%Ctrip Ctrip Computer Techn",
+        "profileName": "%Ctrip Computer Technology",
+        "profileType": "Travel Agent",
+        "ratecode": ["OTAR", "", ""],
+        "resType": "OTA GTD",
+        "market": "DIS",
+        "source": "OTA"
+      },
+      "ctrip-ota-shanglv": {
+        "agent": "ctrip-ota-shanglv",
+        "profileNamePoa": "%商旅现付",
+        "profileName": "%商旅月结",
+        "profileType": "Company",
+        "ratecode": ["CORS", "", ""],
+        "resType": "COMPANY GTD",
+        "market": "RFP",
+        "source": "OTA"
+      },
+      "ctrip-business": {
+        "agent": "ctrip-business",
+        "profileName": "",
+        "profileType": "Company",
+        "ratecode": ["CORS", "", ""],
+        "resType": "COMPANY GTD",
+        "market": "COR",
+        "source": "COS"
+      },
+      "meituan": {
+        "agent": "meituan",
+        "profileName": "MEI TUAN",
+        "profileType": "Travel Agent",
+        "ratecode": ["OTAR", "", ""],
+        "resType": "OTA GTD",
+        "market": "DIS",
+        "source": "OTA"
+      }
+    }
+  },
+  "serverAgent": {
+    "agentEnabled": false,
+    "clientEnabled": true
+  }
 }
