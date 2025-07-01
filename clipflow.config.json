@@ -1,20 +1,78 @@
 {
-  "app":{
-    "moduleSelected":1,
-    "tabPos":1
-  },
-  "clipHistory":[" "," "],
-  "dbSettings": {
-    "main": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfiles",
-    "archive": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfilesArchive",
-    "backup": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\GuestProfilesBackup",
-    "cleanPeriod": 180
-  },
-  "resvHandler":{
-    "JSON":""
-  },
-  "serverAgent": {
-    "agentEnabled": false,
-    "clientEnabled": true
-  }
+	"app": {
+		"moduleSelected": 1,
+		"tabPos": 1
+	},
+	"clipHistory": [" ", " "],
+	"dbSettings": {
+		"main": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfiles",
+		"archive": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\AHK_Scripts\\ClipFlow\\src\\ActionModules\\ProfileModifyNext\\GuestProfilesArchive",
+		"backup": "\\\\10.0.2.13\\fd\\19-个人文件夹\\HC\\Software - 软件及脚本\\GuestProfilesBackup",
+		"cleanPeriod": 180
+	},
+	"resvHandler": {
+		"currentReservation": "",
+		"entryParams": {
+			"jielv": {
+				"agent": "jielv",
+				"profileName": "",
+				"profileType": "Travel Agent",
+				"ratecode": ["WHJL", "WHJB1", "WHJB2"],
+				"resType": "TRAVEL AGENT GTD",
+				"market": "WHO",
+				"source": "WHL"
+			},
+			"kingsley": {
+				"agent": "kingsley",
+				"profileName": "",
+				"profileType": "Travel Agent",
+				"ratecode": ["WHLRN", "", ""],
+				"resType": "TRAVEL AGENT GTD",
+				"market": "WHO",
+				"source": "WHL"
+			},
+			"ctrip-ota": {
+				"agent": "ctrip-ota",
+				"profileNamePoa": "",
+				"profileName": "",
+				"profileType": "Company",
+				"ratecode": ["OTARN", "", ""],
+				"resType": "OTA GTD",
+				"market": "DIS",
+				"source": "OTA"
+			},
+			"ctrip-ota-shanglv": {
+				"agent": "ctrip-ota-shanglv",
+				"profileNamePoa": "",
+				"profileName": "",
+				"profileType": "Company",
+				"ratecode": ["CORS", "", ""],
+				"resType": "COMPANY GTD",
+				"market": "COR",
+				"source": "COS"
+			},
+			"ctrip-business": {
+				"agent": "ctrip-business",
+				"profileName": "",
+				"profileType": "Company",
+				"ratecode": ["CORS", "", ""],
+				"resType": "COMPANY GTD",
+				"market": "COR",
+				"source": "COS"
+			},
+			"meituan": {
+				"agent": "meituan",
+				"profileName": "",
+				"profileType": "Travel Agent",
+				"ratecode": ["OTARN", "", ""],
+				"resType": "TRAVEL AGENT GTD",
+				"market": "DIS",
+				"source": "OTA"
+			}
+		}
+	},
+	"serverAgent": {
+		"agentEnabled": false,
+		"clientEnabled": true
+	}
 }
