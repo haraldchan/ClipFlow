@@ -4,8 +4,8 @@ RH_SettingsCtrip(App, params) {
         form := JSON.parse(JSON.stringify(App.Submit(false)))
         config.write(agent, {
             agent: agent,
-            profileName: form[agent . "-profileNamePoa"],
-            profileNamePrepaid: form[agent . "-profileName"],
+            profileNamePoa: form[agent . "-profileNamePoa"],
+            profileName: form[agent . "-profileName"],
             profileType: form[agent . "-isTA"] == true ? "Travel Agent" : "Company",
             ratecode: [form[agent . "-bbf0"], form[agent . "-bbf1"], form[agent . "-bbf2"]],
             resType: form[agent . "-resType"],
@@ -16,16 +16,16 @@ RH_SettingsCtrip(App, params) {
 
     return (
         ; profile
-        App.AddGroupBox("Section x35 y+20 w330 r5", "基本信息").SetFont("bold"),
+        App.AddGroupBox("Section x35 y+20 w330 r4.5", "基本信息").SetFont("bold"),
         ; profile name
         App.AddText("xs10 yp+25 w65 h25 0x200", agent == "ctrip-ota" ? "OTA现付" : "商旅现付"),
-        App.AddEdit("v" . agent . "-profileNamePoa" . " x+10 h25 w230", ""),
+        App.AddEdit("v" . agent . "-profileNamePoa" . " x+10 h25 w230", params["profileNamePoa"]),
         App.AddText("xs10 y+10 w65 h25 0x200", agent == "ctrip-ota" ? "OTA预付" : "商旅预付"),
-        App.AddEdit("v" . agent . "-profileName" . " x+10 h25 w230", ""),
+        App.AddEdit("v" . agent . "-profileName" . " x+10 h25 w230", params["profileName"]),
 
         App.AddText("xs10 y+10 w65 h25 0x200", "Profile 类型"),
-        App.AddRadio("v" . agent . "-isTA" . "x+20 h25 Checked", "Travel Agent"),
-        App.AddRadio("x+10 h25", "Company"),
+        App.AddRadio("v" . agent . "-isTA" . " x+20 h25 " . (params["profileType"] == "Travel Agent" ? "Checked" : ""), "Travel Agent"),
+        App.AddRadio("x+10 h25 " . (params["profileType"] == "Company" ? "Checked" : ""), "Company"),
 
         ; related fields
         App.AddGroupBox("Section x35 y+30 w330 r5", "预订填入内容").SetFont("bold"),
