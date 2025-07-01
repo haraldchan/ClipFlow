@@ -54,7 +54,6 @@ class RH_OtaBookingEntry {
 
         ; workflow start
         this.start()
-        
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
 
         if (!isCheckedIn) {
@@ -109,7 +108,7 @@ class RH_OtaBookingEntry {
         }
 
         if (!curResv["bbf"].every(item => item == 0) && !comment.includes("CBF")) {
-            this.breakfastEntry(curResv["bbf"], rateCode != configFields["ratecode"][1])
+            this.breakfastEntry(curResv["bbf"], rateCode != configFields["ratecode"][1] || rateCode == "CORS")
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
                 return
@@ -214,22 +213,56 @@ class RH_OtaBookingEntry {
         
         if (configFields["profileType"] == "Travel Agent") {
             MouseMove initX, initY
-        } 
-        utils.waitLoading()
+        } else {
+            MouseMove initX, initY + 20
+        }
 
+        utils.waitLoading()
+        Click
+        utils.waitLoading()
         Send "{Text}" . (payment.includes("现付") ? configFields["profileNamePoa"] : configFields["profileName"])
         utils.waitLoading()
         Send "!s"
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        ; TODO: add manual routing when no associated routing. like 商旅预付 Ctrip
-        if (payment == "预付") { 
-            this.dismissPopup()
+        this.dismissPopup()
+
+        ; check if default routing exist
+        if (PixelGetColor(585, 388) == "0x000080") {
             Send "{Space}"
             utils.waitLoading()
             Send "!o"
             utils.waitLoading()
+        } else if (payment.includes("预付")) {
+            Send "!t"
+            utils.waitLoading()
+            Send "!i"
+            utils.waitLoading()
+            Send "!w"
+            utils.waitLoading()
+            loop 9 {
+                Send "{Tab}"
+                Sleep 100
+            }
+            Send "{Text}" . configFields["profileName"]
+            utils.waitLoading()
+            Send "{Enter}"
+            utils.waitLoading()
+            this.dismissPopup()
+            loop 4 {
+                Send "{Tab}"
+                Sleep 100
+            }
+            Send "!o"
+            utils.waitLoading()
+            Send "!o"
+            utils.waitLoading()
+            Send "!c"
+            utils.waitLoading()
+            Send "!c"
+            utils.waitLoading()
+            this.dismissPopup()
         }
     }
 
@@ -406,13 +439,13 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Send "!o"
             utils.waitLoading()
-            this.dismissPopup()
         }
+        this.dismissPopup()
     }
 
-    static breakfastEntry(bbf, isUsingBoundRateCode, initX := 352, initY := 548) {
+    static breakfastEntry(bbf, packageBounded, initX := 352, initY := 548) {
         ; if ratecode is bound with packages(blue text), skip adding BFNP
-        if (!isUsingBoundRateCode) {
+        if (!packageBounded) {
             ;entry bbf package
             MouseMove initX, initY
             utils.waitLoading()
@@ -436,7 +469,8 @@ class RH_OtaBookingEntry {
         Click 3
         Send Format("{Text}{1}", bbf[1])
         utils.waitLoading()
-
+        Send "{Tab}"
+        utils.waitLoading()
         this.dismissPopup()
     }
 
@@ -460,7 +494,6 @@ class RH_OtaBookingEntry {
     }
 
     static splitPartyEntry(guestNames, roomQty, initX := 456, initY := 482) {
-        ;TODO: action: split party
         Send "!t"
         utils.waitLoading()
         Send "{Text}party"

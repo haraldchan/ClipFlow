@@ -9,12 +9,12 @@ class RH_OTA {
         ; "meituan"
     ]
 
-    static USE(curResv, splitParty := false, withRemarks := false, packages := "") {
+    static USE(curResv, splitParty := false, withRemarks := false, extraPackages := "", overridenRateCode := "") {
         if (!this.supportList.find(agent => agent == curResv["agent"])) {
             return
         }
-
-        this.parseReservation(curResv, splitParty, withRemarks, packages)
+        
+        this.parseReservation(curResv, splitParty, withRemarks, extraPackages, overridenRateCode)
     }
 
     static roomTypeRefs := Map(
@@ -72,7 +72,7 @@ class RH_OTA {
         ),
     )
 
-    static parseReservation(curResv, splitParty, withRemarks, packages) {
+    static parseReservation(curResv, splitParty, withRemarks, extraPackages, overridenRateCode) {
         ; convert roomType
         roomType := this.roomTypeRefs[curResv["agent"]][curResv["roomType"]]
 
@@ -80,9 +80,14 @@ class RH_OTA {
         breakfastType := (roomType.substr(1, 1) == "C") ? "CBF" : "BBF"
         breakfastQty := curResv["bbf"][1]
 
+        ; suite exception
+        if (roomType == "CSK") {
+            breakfastQty := 2
+        }
+
         ; comment formatting
         comment := ""
-        if (curResv["payment"] == "预付") {
+        if (curResv["payment"].includes("预付")) {
             comment := (breakfastQty == 0) ? "RM TO TA" : Format("RM INCL {1}{2} TO TA", breakfastQty, breakfastType)
         } else {
             comments := []
@@ -130,6 +135,11 @@ class RH_OTA {
         agentConfigName := (curResv["agent"] == "ctrip-ota" && curResv["payment"].includes("商旅")) ? "ctrip-ota-shanglv" : curResv["agent"]
         configFields := config.read(agentConfigName)
 
+        if (overridenRateCode) {
+            msgbox "over-ride"
+            configFields["ratecode"] := [overridenRateCode, overridenRateCode, overridenRateCode]
+        }
+
         ; apply booking modification
         RH_OtaBookingEntry.USE(
             curResv,
@@ -137,7 +147,7 @@ class RH_OTA {
             comment,
             pmsGuestNames,
             splitParty,
-            packages,
+            extraPackages,
             configFields
         )
     }

@@ -46,8 +46,6 @@ class FedexBookingEntry {
     }
 
     static USE(infoObj, index := 1, bringForwardTime := 10, initX := 194, initY := 183) {
-        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
-
         schdCiDate := infoObj["ciDate"]
         schdCoDate := infoObj["coDate"]
 
@@ -64,6 +62,7 @@ class FedexBookingEntry {
 
         ; workflow start
         this.start()
+        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
 
         ,!isCheckedIn && this.profileEntry(infoObj["crewNames"], index)
         if (!this.isRunning) {
