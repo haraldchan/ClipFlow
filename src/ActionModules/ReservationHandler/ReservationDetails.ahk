@@ -28,9 +28,7 @@ ReservationDetails(App, curResv) {
                 } else if (key == "bbf") {
                     val := curResv[key].map(item => item == 0 ? "无早" : item == 1 ? "单早" : "双早").join(", ")
                 } else {
-                    if (curResv.has(key)) {
-                        val := curResv[key]
-                    }
+                    val := curResv.has(key) ? curResv[key] : ""
                 }
 
                 LV.Add(, field, val)
