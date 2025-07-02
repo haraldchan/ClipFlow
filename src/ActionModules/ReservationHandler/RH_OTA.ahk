@@ -9,12 +9,12 @@ class RH_OTA {
         ; "meituan"
     ]
 
-    static USE(curResv, splitParty := false, withRemarks := false, extraPackages := "", overridenRateCode := "") {
+    static USE(curResv, splitParty := false, withRemarks := false, withTrace := false, extraPackages := "", overridenRateCode := "") {
         if (!this.supportList.find(agent => agent == curResv["agent"])) {
             return
         }
         
-        this.parseReservation(curResv, splitParty, withRemarks, extraPackages, overridenRateCode)
+        this.parseReservation(curResv, splitParty, withRemarks, withTrace, extraPackages, overridenRateCode)
     }
 
     static roomTypeRefs := Map(
@@ -72,7 +72,7 @@ class RH_OTA {
         ),
     )
 
-    static parseReservation(curResv, splitParty, withRemarks, extraPackages, overridenRateCode) {
+    static parseReservation(curResv, splitParty, withRemarks, withTrace, extraPackages, overridenRateCode) {
         ; convert roomType
         roomType := this.roomTypeRefs[curResv["agent"]][curResv["roomType"]]
 
@@ -148,7 +148,8 @@ class RH_OTA {
             pmsGuestNames,
             splitParty,
             extraPackages,
-            configFields
+            configFields,
+            withTrace
         )
     }
 }

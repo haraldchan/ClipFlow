@@ -40,18 +40,21 @@ RH_App(App, moduleTitle, identifier) {
         App.AddText("xp15", moduleTitle),
 
         ; read me info
-        App.AddGroupBox("Section yp+25 w320 h220"),
+        App.AddGroupBox("Section yp+25 w320 h200"),
         App.AddText("xp10 h35 w80 0x1", "使用说明").SetFont("s10.5 Bold"),
-        App.AddText("xp yp+30 w270 h180", README).SetFont("s10"),
+        App.AddText("xp yp+30 w270 h150", README).SetFont("s10"),
         
         ; options
         ; append remarks to comment
-        App.AddGroupBox("Section xp-10 y+15 w320 h190"),
+        App.AddGroupBox("Section xp-10 y+25 w320 h209"),
         App.AddText("xp10 w80 h35 0x1", "设置选项").SetFont("s10.5 Bold"),
         App.AddButton("x+10 h23", "更多").OnEvent("Click", RH_Settings),
 
         ; add remarks to comment
         App.AddCheckbox("vwithRemarks xs10 yp+30 h25", "将备注添加到 Comment"),
+
+        ; add remarks to trace
+        App.AddCheckbox("vwithTrace xs10 yp+30 h25", "将备注添加到 Trace"),
         
         ; add extra packages
         App.AddText("xs10 y+5 h25 0x200", "需添加的额外 Package (不包括早餐；以空格分隔)"),
