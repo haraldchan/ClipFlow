@@ -45,8 +45,33 @@ class RH_OtaBookingEntry {
         }
     }
 
+    static getRequests(remarks) {
+        requestMap := Map(
+            "NSR", ["无烟", "不抽烟", "烟味"],
+            "SMR", ["吸烟", "可以抽烟"],
+            "QRM", ["静"],
+            "ADJ", ["相邻", "隔壁"],
+            "SFL", ["同楼层", "同层"],
+            "HFR", ["高层", "高楼层"],
+            "AER", ["远离电梯"],
+            "NER", ["近电梯"]
+        )
+
+        requests := []
+        for special, keywords in requestMap {
+            for keyword in keywords {
+                if (remarks.includes(keyword)) {
+                    requests.Push(special)
+                    break
+                }
+            }
+        }
+
+        return requests.join(",")
+    }
+
     ; the initX, initY for USE() should be top-left corner of current booking window
-    static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, configFields) {
+    static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, configFields, sendTrace) {
         rateCode := configFields["ratecode"][curResv["bbf"][1] + 1]
         if (!rateCode) {
             rateCode := configFields["ratecode"][1]
@@ -88,7 +113,7 @@ class RH_OtaBookingEntry {
             return
         }
 
-        this.commentOrderIdSpecialEntry(curResv["orderId"], comment)
+        this.commentOrderIdSpecialEntry(curResv["orderId"], comment, curResv["remarks"])
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -117,6 +142,14 @@ class RH_OtaBookingEntry {
 
         if (packages) {
             packages.split(" ").map(package => this.packageEntry(package))
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
+        }
+
+        if (sendTrace) {
+            this.traceEntry(curResv["remarks"])
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
                 return
@@ -328,7 +361,7 @@ class RH_OtaBookingEntry {
     }
 
 
-    static commentOrderIdSpecialEntry(orderId, comment, initX := 839, initY := 555) {
+    static commentOrderIdSpecialEntry(orderId, comment, remarks, initX := 839, initY := 555) {
         ; fill-in orderId
         MouseMove initX, initY ; 839, 555
         utils.waitLoading()
@@ -339,14 +372,13 @@ class RH_OtaBookingEntry {
         Send "{Tab}"
         utils.waitLoading()
 
-        ; send specials: CBF
-        if (comment.includes("CBF")) {
-            A_Clipboard := ""
-            Send "^c"
-            utils.waitLoading()
-            Send "{Text}CBF," . A_Clipboard
-            utils.waitLoading()
-        }
+        A_Clipboard := ""
+        Send "^c"
+        Sleep 100
+
+        specials := (comment.includes("CBF") ? "CBF," : "") . this.getRequests(remarks) . (!A_Clipboard ? "" : "," . A_Clipboard)
+        Send "{Text}" . specials
+        utils.waitLoading()
 
         ; send comment
         Send "{Tab}"
@@ -491,6 +523,29 @@ class RH_OtaBookingEntry {
         Send "{Esc}"
         utils.waitLoading()
         this.dismissPopup()
+    }
+
+    static traceEntry(traceText) {
+        Send "!t"
+        utils.waitLoading()
+        Send "!t"
+        utils.waitLoading()
+        loop 3 {
+            Send "{Tab}"
+            Sleep 100
+        }
+        Send "{Text}FD"
+        Sleep 100
+        Send "{Tab}"
+        utils.waitLoading()
+        Send "{Text}" . traceText
+        utils.waitLoading()
+        Send "!o"
+        utils.waitLoading()
+        Send "!c"
+        utils.waitLoading()
+        Send "!c"
+        utils.waitLoading()
     }
 
     static splitPartyEntry(guestNames, roomQty, initX := 456, initY := 482) {
