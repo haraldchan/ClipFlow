@@ -71,7 +71,7 @@ class UnifiedAgent extends useServerAgent {
      */
     listen(status) {
         if (status == "在线") {
-            SetTimer(() => this.InputBlock(), -1)
+            SetTimer(() => this.InputBlock(), -100)
             SetTimer(this.handlePost, this.interval)
         }
 
@@ -136,9 +136,8 @@ class UnifiedAgent extends useServerAgent {
         }
 
         this.currentHandlingPost := ""
-        this.isListening.set("在线")
-
         WinShow(this.popupTitle)
+        this.isListening.set("在线")
     }
     
     /**
