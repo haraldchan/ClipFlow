@@ -191,10 +191,6 @@ class FedexBookingEntry {
             utils.waitLoading()
             Click
             utils.waitLoading()
-            ; loop 5 {
-            ;     Send "{Esc}"
-            ;     utils.waitLoading()
-            ; }
             this.dismissPopup()
         }
         MouseMove 345, initY - 101 ; 335, 405
@@ -207,10 +203,6 @@ class FedexBookingEntry {
         utils.waitLoading()
         Send "{Enter}"
         utils.waitLoading()
-        ; loop 5 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
         this.dismissPopup()
 
         ; fill in ETA & ETD
@@ -339,30 +331,30 @@ class FedexBookingEntry {
         }
         Send "!e"
         utils.waitLoading()
-        loop {
-            Send "{Tab}"
-            utils.waitLoading()
-            Send "^c"
-            utils.waitLoading()
-            if (A_Clipboard == "FEDEXN")
-                break
-        }
+
+        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-active-win.png")
+        MouseMove FoundX + 226, FoundY + 142
+        Click 3
         Send "{Text}NRR"
+        utils.waitLoading()
+        Send "{Tab}"
+        utils.waitLoading()
+        this.dismissPopup()
+        MouseMove FoundX + 176, FoundY + 165
+        Click 3
+        Send "{Text}0"
+        utils.waitLoading()
+        Send "{Tab}"
+        utils.waitLoading()
+        this.dismissPopup()
+
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        ; loop 3 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
         this.dismissPopup()
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
-        ; loop 5 {
-        ;     Send "{Esc}"
-        ;     utils.waitLoading()
-        ; }
         this.dismissPopup()
         utils.waitLoading()
     }

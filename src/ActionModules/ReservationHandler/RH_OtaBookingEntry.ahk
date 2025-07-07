@@ -383,6 +383,7 @@ class RH_OtaBookingEntry {
         ; send comment
         Send "{Tab}"
         utils.waitLoading()
+        this.dismissPopup()
         Send Format("{Text}{1}", comment)
         utils.waitLoading()
 
@@ -432,6 +433,7 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Send "{Tab}"
             utils.waitLoading()
+            this.dismissPopup()
         } else {
             ; daily details
             MouseMove initX, initY ;372, 504
@@ -452,16 +454,24 @@ class RH_OtaBookingEntry {
                     Click 3
                     Send "{Text}2"
                     utils.waitLoading()
+                    this.dismissPopup()
                 }
 
                 MouseMove FoundX + 226, FoundY + 142
                 Click 3
                 Send "{Text}" . rateCode
                 utils.waitLoading()
+                Send "{Tab}"
+                utils.waitLoading()
+                this.dismissPopup()
 
                 MouseMove FoundX + 176, FoundY + 165
                 Click 3
                 Send "{Text}" . roomRates[A_Index]
+                utils.waitLoading()
+                Send "{Tab}"
+                utils.waitLoading()
+                this.dismissPopup()
 
                 Send "!o"
                 utils.waitLoading()
