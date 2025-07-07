@@ -88,12 +88,10 @@ class FedexBookingEntry {
             return
         }
 
-        if (infoObj["daysActual"] < pmsNts) {
-            this.dailyDetailsEntry(infoObj["daysActual"])
-            if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
-                return
-            }
+        this.dailyDetailsEntry(infoObj["daysActual"], pmsNts)
+        if (!this.isRunning) {
+            msgbox("脚本已终止", popupTitle, "4096 T1")
+            return
         }
 
         ; post Alert reminder when room charge needs to be post manually
@@ -318,7 +316,7 @@ class FedexBookingEntry {
         utils.waitLoading()
     }
 
-    static dailyDetailsEntry(daysActual, initX := 372, initY := 524) {
+    static dailyDetailsEntry(daysActual, pmsNts, initX := 372, initY := 524) {
         MouseMove initX, initY ; 372, 524
         utils.waitLoading()
         Click
@@ -335,28 +333,29 @@ class FedexBookingEntry {
         ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-active-win.png")
         MouseMove FoundX + 226, FoundY + 142
         Click 3
-        Send "{Text}NRR"
+        Send "{Text}" . (daysActual < pmsNts ? "NRR" : "FEDEXN")
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
         this.dismissPopup()
-        MouseMove FoundX + 176, FoundY + 165
-        Click 3
-        Send "{Text}0"
-        utils.waitLoading()
-        Send "{Tab}"
-        utils.waitLoading()
-        this.dismissPopup()
+        
+        if (daysActual < pmsNts) {
+            MouseMove FoundX + 176, FoundY + 165
+            Click 3
+            Send "{Text}0"
+            utils.waitLoading()
+            Send "{Tab}"
+            utils.waitLoading()
+            this.dismissPopup()
+        }
 
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
         this.dismissPopup()
-        utils.waitLoading()
         Send "!o"
         utils.waitLoading()
         this.dismissPopup()
-        utils.waitLoading()
     }
 
     static postRoomChargeAlertEntry(pmsNts, daysActual, initX := 759, initY := 266) {
