@@ -2,7 +2,7 @@
 
 class RH_OTA {
     static supportList := [
-        "jielv", 
+        "jielv",
         "kingsley",
         "ctrip-ota",
         ; "ctrip-business",
@@ -13,68 +13,29 @@ class RH_OTA {
         if (!this.supportList.find(agent => agent == curResv["agent"])) {
             return
         }
-        
+
         this.parseReservation(curResv, splitParty, withRemarks, withTrace, extraPackages, overridenRateCode)
     }
 
-    static roomTypeRefs := Map(
-        "kingsley", Map(
-            "标准大床房", "SKC",
-            "标准双床房", "STC",
-            "豪华城景大床房", "DKC",
-            "豪华城景双床房", "DTC",
-            "豪华江景大床房", "DKR",
-            "豪华江景双床房", "DTR",
-            "行政豪华城景大床房", "CKC",
-            "行政豪华城景双床房", "CTC",
-            "行政豪华江景大床房", "CKR",
-            "行政豪华江景双床房", "CTR",
-            "行政尊贵套房", "CSK"
-        ),
-        "jielv", Map(
-            "城市景观标准大床房", "SKC",
-            "城市景观标准双床房", "STC",
-            "豪华城景大床房", "DKC",
-            "豪华城景双床房", "DTC",
-            "江景豪华大床房", "DKR",
-            "江景豪华双床房", "DTR",
-            "行政豪华城景大床房", "CKC",
-            "行政豪华城景双床房", "CTC",
-            "行政豪华江景大床房", "CKR",
-            "行政豪华江景双床房", "CTR",
-            "行政尊贵套房", "CSK"
-        ),
-        "ctrip-ota", Map(
-            "标准大床房", "SKC",
-            "标准双床房", "STC",
-            "豪华城景大床房", "DKC",
-            "豪华城景双床房", "DTC",
-            "豪华江景大床房", "DKR",
-            "豪华江景双床房", "DTR",
-            "行政豪华城景大床房", "CKC",
-            "行政豪华城景双床房", "CTC",
-            "行政豪华江景大床房", "CKR",
-            "行政豪华江景双床房", "CTR",
-            "行政尊贵套房", "CSK"
-        ),
-        "ctrip-business", Map(
-            "标准大床房", "SKC",
-            "标准双床房", "STC",
-            "豪华城景大床房", "DKC",
-            "豪华城景双床房", "DTC",
-            "豪华江景大床房", "DKR",
-            "豪华江景双床房", "DTR",
-            "行政豪华城景大床房", "CKC",
-            "行政豪华城景双床房", "CTC",
-            "行政豪华江景大床房", "CKR",
-            "行政豪华江景双床房", "CTR",
-            "行政尊贵套房", "CSK"
-        ),
+    static roomTypeMap := OrderedMap(
+        "SKC", "标准大床房",
+        "SKC", "城市景观标准大床房",
+        "DKC", "豪华城景大床房",
+        "CKC", "行政豪华城景大床房",
+        "DKR", "豪华江景大床房",
+        "CKR", "行政豪华江景大床房",
+        "CSK", "行政尊贵套房",
+        "STC", "标准双床房",
+        "STC", "城市景观标准双床房",
+        "DTC", "豪华城景双床房",
+        "CTC", "行政豪华城景双床房",
+        "DTR", "豪华江景双床房",
+        "CTR", "行政豪华江景双床房",
     )
 
     static parseReservation(curResv, splitParty, withRemarks, withTrace, extraPackages, overridenRateCode) {
         ; convert roomType
-        roomType := this.roomTypeRefs[curResv["agent"]][curResv["roomType"]]
+        roomType := this.roomTypeMap.keyOf(curResv["roomType"])
 
         ; define breakfast type
         breakfastType := (roomType.substr(1, 1) == "C") ? "CBF" : "BBF"
@@ -91,9 +52,9 @@ class RH_OTA {
             comment := (breakfastQty == 0) ? "RM TO TA" : Format("RM INCL {1}{2} TO TA", breakfastQty, breakfastType)
         } else {
             comments := []
-            roomTotal := curResv["roomRates"].Length > 1 
+            roomTotal := curResv["roomRates"].Length > 1
                 ? Format("Total:RMB{} || ", curResv["roomRates"].reduce((acc, cur) => acc + cur, 0))
-                : ""
+                    : ""
 
             loop curResv["roomRates"].Length {
                 date := FormatTime(DateAdd(curResv["ciDate"], A_Index - 1, "Days"), "MM/dd")
@@ -102,10 +63,10 @@ class RH_OTA {
 
                 if (A_Index > 1 && rate == curResv["roomRates"][A_Index - 1]) {
                     prevDate := comments.at(-1)[1]
-                    datePrint := prevDate.includes("-") 
+                    datePrint := prevDate.includes("-")
                         ? prevDate.split("-")[1] . "-" . date
                         : prevDate . "-" . date
-                    
+
                     comments[comments.Length][1] := datePrint
                 } else {
                     comments.Push([date, rate])
