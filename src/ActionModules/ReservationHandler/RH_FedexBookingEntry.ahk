@@ -63,8 +63,7 @@ class FedexBookingEntry {
         ; workflow start
         this.start()
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
-
-        ,!isCheckedIn && this.profileEntry(infoObj["crewNames"], index)
+        , !isCheckedIn && this.profileEntry(infoObj["crewNames"], index)
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -338,7 +337,7 @@ class FedexBookingEntry {
         Send "{Tab}"
         utils.waitLoading()
         this.dismissPopup()
-        
+
         if (daysActual < pmsNts) {
             MouseMove FoundX + 176, FoundY + 165
             Click 3
@@ -402,12 +401,16 @@ class FedexBookingEntry {
 
             Send "{Tab}"
             utils.waitLoading()
-            loop 10 {
-                Send "^{Left}"
-            }
-            Send "{Text}" . tracking . "/"
+            Send "^c"
             utils.waitLoading()
-        } else{
+            if (!A_Clipboard.includes(tracking)) {
+                loop 10 {
+                    Send "^{Left}"
+                }
+                Send "{Text}" . tracking . "/"
+                utils.waitLoading()
+            }
+        } else {
             Send "!n"
             utils.waitLoading()
             Send "{Tab}"
