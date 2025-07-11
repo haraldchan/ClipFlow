@@ -86,7 +86,13 @@ class RH_OTA {
             curGuestName := curResv["guestNames"][A_Index].trim()
             if (RegExMatch(curGuestName, "^[a-zA-Z/ ]+$") > 0) {
                 ; if only includes English alphabet, push [lastName, firstName]
-                pmsGuestNames.Push(StrSplit(curGuestName, "/"))
+                if (curGuestName.includes("/")) {
+                    pmsGuestNames.Push(StrSplit(curGuestName, "/"))
+                } else {
+                    splittedName := curGuestName.split(" ")
+                    lastName := splittedName.Pop()
+                    pmsGuestNames.Push([lastName, splittedName.join(" ")])
+                }
             } else {
                 unpack([&lastName, &firstName], useDict.getFullnamePinyin(curGuestName))
                 pmsGuestNames.Push([lastName, firstName, curGuestName])
@@ -97,7 +103,6 @@ class RH_OTA {
         configFields := config.read(agentConfigName)
 
         if (overridenRateCode) {
-            msgbox "over-ride"
             configFields["ratecode"] := [overridenRateCode, overridenRateCode, overridenRateCode]
         }
 
