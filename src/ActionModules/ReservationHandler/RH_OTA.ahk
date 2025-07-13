@@ -39,7 +39,7 @@ class RH_OTA {
 
         ; define breakfast type
         breakfastType := (roomType.substr(1, 1) == "C") ? "CBF" : "BBF"
-        breakfastQty := curResv["bbf"][1]
+        breakfastQty := curResv["bbf"]
 
         ; suite exception
         if (roomType == "CSK") {

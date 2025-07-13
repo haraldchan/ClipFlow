@@ -26,7 +26,7 @@ ReservationDetails(App, curResv) {
                 } else if (key == "ciDate" || key == "coDate") {
                     val := FormatTime(curResv[key], "yyyy-MM-dd")
                 } else if (key == "bbf") {
-                    val := curResv[key].map(item => item == 0 ? "无早" : item == 1 ? "单早" : "双早").join(", ")
+                    val := match(curResv[key], { 0: "不含早", 1: "单早", 2: "双早" })
                 } else {
                     val := curResv.has(key) ? curResv[key] : ""
                 }

@@ -72,7 +72,7 @@ class RH_OtaBookingEntry {
 
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, configFields, sendTrace) {
-        rateCode := configFields["ratecode"][curResv["bbf"][1] + 1]
+        rateCode := configFields["ratecode"][curResv["bbf"] + 1]
         if (!rateCode) {
             rateCode := configFields["ratecode"][1]
         }
@@ -132,7 +132,7 @@ class RH_OtaBookingEntry {
             return
         }
 
-        if (!curResv["bbf"].every(item => item == 0) && !comment.includes("CBF")) {
+        if (curResv["bbf"] && !comment.includes("CBF")) {
             this.breakfastEntry(curResv["bbf"], rateCode != configFields["ratecode"][1] || rateCode == "CORS")
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -449,10 +449,10 @@ class RH_OtaBookingEntry {
                 utils.waitLoading()
 
                 ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-active-win.png")
-                if (bbf[1] == 2) {
+                if (bbf > 1) {
                     MouseMove FoundX + 143, FoundY + 69
                     Click 3
-                    Send "{Text}2"
+                    Send "{Text}" . bbf
                     utils.waitLoading()
                     this.dismissPopup()
                 }
@@ -509,7 +509,7 @@ class RH_OtaBookingEntry {
         MouseMove initX - 67, initY - 124 ; 285, 424
         utils.waitLoading()
         Click 3
-        Send Format("{Text}{1}", bbf[1])
+        Send "{Text}" . bbf
         utils.waitLoading()
         Send "{Tab}"
         utils.waitLoading()
@@ -517,7 +517,7 @@ class RH_OtaBookingEntry {
     }
 
     static packageEntry(package, initX := 352, initY := 548) {
-        ;entry bbf package
+        ;entry extra package
         MouseMove initX, initY
         utils.waitLoading()
         Click
