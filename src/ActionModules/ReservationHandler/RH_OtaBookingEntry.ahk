@@ -72,6 +72,8 @@ class RH_OtaBookingEntry {
 
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, configFields, sendTrace) {
+        wf := config.read("workflow-ota")
+
         rateCode := configFields["ratecode"][curResv["bbf"] + 1]
         if (!rateCode) {
             rateCode := configFields["ratecode"][1]
@@ -81,7 +83,7 @@ class RH_OtaBookingEntry {
         this.start()
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
 
-        if (!isCheckedIn) {
+        if (!isCheckedIn && wf.profile) {
             this.profileEntry(pmsGuestNames[1])
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -95,10 +97,12 @@ class RH_OtaBookingEntry {
             }
         }
 
-        this.routingEntry(curResv["payment"], configFields)
-        if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
-            return
+        if (wf.routing) {
+            this.routingEntry(curResv["payment"], configFields)
+            if (!this.isRunning) {
+                msgbox("脚本已终止", popupTitle, "4096 T1")
+                return
+            }
         }
 
         this.roomTypeEntry(roomType, isCheckedIn)
@@ -120,12 +124,13 @@ class RH_OtaBookingEntry {
         }
 
         this.roomRatesEntry(
-            rateCode, 
-            curResv["roomRates"], 
-            DateDiff(curResv["coDate"], curResv["ciDate"], "Days"), 
-            isCheckedIn, 
-            curResv["bbf"], 
-            configFields
+            rateCode,
+            curResv["roomRates"],
+            DateDiff(curResv["coDate"], curResv["ciDate"], "Days"),
+            isCheckedIn,
+            curResv["bbf"],
+            configFields,
+            wf
         )
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -243,7 +248,7 @@ class RH_OtaBookingEntry {
         Send "!s"
         utils.waitLoading()
         this.dismissPopup()
-        
+
         if (configFields["profileType"] == "Travel Agent") {
             MouseMove initX, initY
         } else {
@@ -393,33 +398,48 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
-    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, configFields, initX := 372, initY := 524) {
-        ; mkt/src code
-        if (!isCheckedIn) {
-            MouseMove 636, 361
-            utils.waitLoading()
-            Click 3
-            utils.waitLoading()
-            Send "{Text}" . configFIelds["resType"]
-            utils.waitLoading()
-            Send "{Tab}"
-            utils.waitLoading()
-        } else {
+    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, configFields, wf, initX := 372, initY := 524) {
+        if (wf.resType) {
+            ; mkt/src code
+            if (!isCheckedIn) {
+                MouseMove 636, 361
+                utils.waitLoading()
+                Click 3
+                utils.waitLoading()
+                Send "{Text}" . configFIelds["resType"]
+                utils.waitLoading()
+                Send "{Tab}"
+                utils.waitLoading()
+            } 
+            ; else {
+            ;     MouseMove 636, 381
+            ;     utils.waitLoading()
+            ;     Click 3
+            ;     utils.waitLoading()
+            ; }
+        }
+        if (wf.market) {
             MouseMove 636, 381
             utils.waitLoading()
             Click 3
             utils.waitLoading()
+            Send "{Text}" . configFields["market"]
+            utils.waitLoading()
+            Send "{Tab}"
+            utils.waitLoading()
+            Send "!y"
+            utils.waitLoading()
         }
-        Send "{Text}" . configFields["market"]
-        utils.waitLoading()
-        Send "{Tab}"
-        utils.waitLoading()
-        Send "!y"
-        utils.waitLoading()
-        Send "{Text}" . configFields["source"]
-        utils.waitLoading()
-        Send "{Tab}"
-        utils.waitLoading()
+        if (wf.source) {
+            MouseMove 636, 401
+            utils.waitLoading()
+            Click 3
+            utils.waitLoading()
+            Send "{Text}" . configFields["source"]
+            utils.waitLoading()
+            Send "{Tab}"
+            utils.waitLoading()
+        }
 
         if (nts == 1 || roomRates.every(rate => rate == roomRates[1])) {
             MouseClickDrag "left", 325, 506, 256, 506
@@ -570,6 +590,9 @@ class RH_OtaBookingEntry {
             Send "!a"
         }
         utils.waitLoading()
+        if (guestNames.length == 1) {
+            return
+        }
 
         ; Fill guest names
         loop roomQty {
