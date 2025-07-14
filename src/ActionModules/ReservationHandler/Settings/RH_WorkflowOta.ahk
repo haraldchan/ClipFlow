@@ -22,8 +22,8 @@ RH_WorkflowOta(App) {
     }
 
     return (
-        App.AddText("x35 y35", "流程配置").SetFont("bold 10.5"),
-        App.AddText("x35 y+15", "启用或关闭部分预订录入流程"),
+        App.AddText("x35 y+15 w200", "录入流程设置").SetFont("bold s10.5"),
+        App.AddText("x35 y+10", "启用或关闭部分预订录入流程。"),
 
         ; controller check-boxes
         App.AddCheckbox("vwf-profile x35 y+20", "录入 Profile").OnEvent("Click", saveWorkflow),
