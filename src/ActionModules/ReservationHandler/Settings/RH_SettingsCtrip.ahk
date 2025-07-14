@@ -1,6 +1,10 @@
 RH_SettingsCtrip(App, params) {
     agent := params["agent"]
-    saveParams(*) {
+    saveParams(ctrl, _) {
+        if (ctrl.Text == "已保存") {
+            return
+        }
+
         form := JSON.parse(JSON.stringify(App.Submit(false)))
         config.write(agent, {
             agent: agent,
@@ -12,6 +16,9 @@ RH_SettingsCtrip(App, params) {
             market: form[agent . "-market"],
             source: form[agent . "-source"]
         })
+
+        ctrl.Text := "已保存"
+        SetTimer(() => ctrl.Text := "保 存", -1000)
     }
 
     return (
