@@ -83,7 +83,7 @@ class RH_OtaBookingEntry {
         this.start()
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
 
-        if (!isCheckedIn && wf.profile) {
+        if (!isCheckedIn && wf["profile"]) {
             this.profileEntry(pmsGuestNames[1])
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -97,7 +97,7 @@ class RH_OtaBookingEntry {
             }
         }
 
-        if (wf.routing) {
+        if (wf["routing"]) {
             this.routingEntry(curResv["payment"], configFields)
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
@@ -399,7 +399,7 @@ class RH_OtaBookingEntry {
     }
 
     static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, configFields, wf, initX := 372, initY := 524) {
-        if (wf.resType) {
+        if (wf["resType"]) {
             ; mkt/src code
             if (!isCheckedIn) {
                 MouseMove 636, 361
@@ -418,7 +418,7 @@ class RH_OtaBookingEntry {
             ;     utils.waitLoading()
             ; }
         }
-        if (wf.market) {
+        if (wf["market"]) {
             MouseMove 636, 381
             utils.waitLoading()
             Click 3
@@ -430,7 +430,7 @@ class RH_OtaBookingEntry {
             Send "!y"
             utils.waitLoading()
         }
-        if (wf.source) {
+        if (wf["source"]) {
             MouseMove 636, 401
             utils.waitLoading()
             Click 3
