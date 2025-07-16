@@ -5,7 +5,7 @@ class RH_OtaBookingEntry {
     static start(config := {}) {
         c := useProps(config, {
             setOnTop: false,
-            blockInput: false
+            blockInput: true
         })
 
         this.isRunning := true
@@ -137,8 +137,8 @@ class RH_OtaBookingEntry {
             return
         }
 
-        if (curResv["bbf"] && !comment.includes("CBF")) {
-            this.breakfastEntry(curResv["bbf"], rateCode != configFields["ratecode"][1] || rateCode == "CORS")
+        if (curResv["bbf"] || comment.includes("CBF")) {
+            this.breakfastEntry(curResv["bbf"], rateCode != configFields["ratecode"][1] || rateCode == "CORS", comment.includes("CBF"))
             if (!this.isRunning) {
                 msgbox("脚本已终止", popupTitle, "4096 T1")
                 return
@@ -170,6 +170,7 @@ class RH_OtaBookingEntry {
         }
 
         MsgBox("Completed.", "Reservation Handler", "T1 4096")
+        this.end()
     }
 
 
@@ -505,9 +506,9 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
     }
 
-    static breakfastEntry(bbf, packageBounded, initX := 352, initY := 548) {
-        ; if ratecode is bound with packages(blue text), skip adding BFNP
-        if (!packageBounded) {
+    static breakfastEntry(bbf, packageBounded, isCBF, initX := 352, initY := 548) {
+        ; if ratecode is bound with packages(blue text) or club floor rooms, skip adding BFNP
+        if (!packageBounded && !isCBF) {
             ;entry bbf package
             MouseMove initX, initY
             utils.waitLoading()
