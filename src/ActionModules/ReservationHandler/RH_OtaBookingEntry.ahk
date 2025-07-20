@@ -1,5 +1,6 @@
 class RH_OtaBookingEntry {
-    static profileAnchorImage := A_ScriptDir . "\src\Assets\opera-active-win.PNG"
+    static profileAnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
+    static activeWinIcon := A_ScriptDir . "\src\Assets\opera-active-win.PNG"
     static isRunning := false
 
     static start(config := {}) {
@@ -174,12 +175,12 @@ class RH_OtaBookingEntry {
     }
 
 
-    static profileEntry(guestName, initX := 471, initY := 217) {
+    static profileEntry(guestName) {
         ; open profile
         loop 10 {
             if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.profileAnchorImage)) {
-                anchorX := FoundX + 270
-                anchorY := FoundY + 36
+                anchorX := FoundX - 10
+                anchorY := FoundY
                 break
             }
             Sleep 100
@@ -188,28 +189,26 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Click
         utils.waitLoading()
-        ; MouseMove initX, initY ;471, 217
-        ; Click
-        utils.waitLoading()
         Send "!n"
         utils.waitLoading()
-        MouseMove initX - 39, initY + 68 ;432, 285
+
+        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.profileAnchorImage)
+        Sleep 100
+        MouseMove FoundX - 20, FoundY
         utils.waitLoading()
         Click 3
         utils.waitLoading()
         Send Format("{Text}{1}", guestName[1])
         utils.waitLoading()
-        MouseMove initX - 72, initY + 95 ;399, 312
-        utils.waitLoading()
-        Click 3
+        Send "{Tab}"
         utils.waitLoading()
         Send Format("{Text}{1}", guestName[2])
         utils.waitLoading()
         if (guestName.Length == 3) {
-            MouseMove initX - 17, initY + 67 ; 454, 284
+            MouseMove FoundX, FoundY
             utils.waitLoading()
-            Click 3
-            ; utils.waitLoading()
+            Click
+            utils.waitLoading()
             Send Format("{Text}{1}", guestName[3])
             utils.waitLoading()
             Send "!o"
@@ -221,8 +220,10 @@ class RH_OtaBookingEntry {
     }
 
 
-    static roomQtyEntry(roomQty, initX := 294, initY := 441) {
-        MouseMove initX, initY
+    static roomQtyEntry(roomQty) {
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+
+        MouseMove initX + 93, initY + 259
         utils.waitLoading()
         Click 3
         utils.waitLoading()
@@ -234,9 +235,11 @@ class RH_OtaBookingEntry {
     }
 
 
-    static routingEntry(payment, configFields, initX := 895, initY := 218) {
+    static routingEntry(payment, configFields) {
         ; clear fields: Agent, Company
-        MouseMove initX, initY
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+
+        MouseMove initX + 673, initY + 35
         utils.waitLoading()
         Click 3
         utils.waitLoading()
@@ -251,9 +254,9 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
 
         if (configFields["profileType"] == "Travel Agent") {
-            MouseMove initX, initY
+            MouseMove initX + 673, initY + 35
         } else {
-            MouseMove initX, initY + 20
+            MouseMove initX + 673, initY + 55
         }
 
         utils.waitLoading()
@@ -268,7 +271,8 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
 
         ; check if default routing exist
-        if (PixelGetColor(585, 388) == "0x000080") {
+        ImageSearch(&drX, &drY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        if (PixelGetColor(drX+481, drY+64) == "0x000080") {
             Send "{Space}"
             utils.waitLoading()
             Send "!o"
@@ -306,8 +310,9 @@ class RH_OtaBookingEntry {
     }
 
 
-    static roomTypeEntry(roomType, isCheckedIn, initX := 472, initY := 465) {
-        MouseMove 500, 469 ; RTC btn
+    static roomTypeEntry(roomType, isCheckedIn) {
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        MouseMove initX + 302, initY + 282 ; RTC btn
         utils.waitLoading()
         Click
         utils.waitLoading()
@@ -317,7 +322,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         this.dismissPopup()
         if (!isCheckedIn) {
-            MouseMove 350, 469 ; Room Type btn
+            MouseMove initX + 154, initY + 282 ; Room Type btn
             utils.waitLoading()
             Click
             utils.waitLoading()
@@ -334,12 +339,13 @@ class RH_OtaBookingEntry {
     }
 
 
-    static dateTimeEntry(checkin, checkout, isCheckedIn, initX := 332, initY := 356) {
+    static dateTimeEntry(checkin, checkout, isCheckedIn) {
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
         pmsCiDate := FormatTime(checkin, "MMddyyyy")
         pmsCoDate := FormatTime(checkout, "MMddyyyy")
 
         if (!isCheckedIn) {
-            MouseMove 349, 363
+            MouseMove initX + 154, initY + 176
             utils.waitLoading()
             Click
             utils.waitLoading()
@@ -352,7 +358,7 @@ class RH_OtaBookingEntry {
             this.dismissPopup()
         }
 
-        MouseMove 350, 404
+        MouseMove initX + 154, initY + 220
         utils.waitLoading()
         Click
         utils.waitLoading()
@@ -367,9 +373,11 @@ class RH_OtaBookingEntry {
     }
 
 
-    static commentOrderIdSpecialEntry(orderId, comment, remarks, initX := 839, initY := 555) {
+    static commentOrderIdSpecialEntry(orderId, comment, remarks) {
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+
         ; fill-in orderId
-        MouseMove initX, initY ; 839, 555
+        MouseMove initX + 643, initY + 371
         utils.waitLoading()
         Click 3
         utils.waitLoading()
@@ -399,11 +407,14 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
-    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, configFields, wf, initX := 372, initY := 524) {
+
+    static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, configFields, wf) {
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+
         if (wf["resType"]) {
             ; mkt/src code
             if (!isCheckedIn) {
-                MouseMove 636, 361
+                MouseMove initX + 440, initY + 177 ; 636, 361
                 utils.waitLoading()
                 Click 3
                 utils.waitLoading()
@@ -412,15 +423,9 @@ class RH_OtaBookingEntry {
                 Send "{Tab}"
                 utils.waitLoading()
             } 
-            ; else {
-            ;     MouseMove 636, 381
-            ;     utils.waitLoading()
-            ;     Click 3
-            ;     utils.waitLoading()
-            ; }
         }
         if (wf["market"]) {
-            MouseMove 636, 381
+            MouseMove initX + 440, initY + 197
             utils.waitLoading()
             Click 3
             utils.waitLoading()
@@ -432,7 +437,7 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
         }
         if (wf["source"]) {
-            MouseMove 636, 401
+            MouseMove initX + 440, initY + 217
             utils.waitLoading()
             Click 3
             utils.waitLoading()
@@ -443,7 +448,7 @@ class RH_OtaBookingEntry {
         }
 
         if (nts == 1 || roomRates.every(rate => rate == roomRates[1])) {
-            MouseClickDrag "left", 325, 506, 256, 506
+            MouseClickDrag "left", initX + 129, initY + 322, initX + 29, initY + 322
             utils.waitLoading()
             Send "{Text}" . rateCode
             utils.waitLoading()
@@ -457,7 +462,7 @@ class RH_OtaBookingEntry {
             this.dismissPopup()
         } else {
             ; daily details
-            MouseMove initX, initY ;372, 504
+            MouseMove initX + 176, initY + 340 ;372, 524
             utils.waitLoading()
             Click
             utils.waitLoading()
@@ -469,7 +474,7 @@ class RH_OtaBookingEntry {
                 Send "!e"
                 utils.waitLoading()
 
-                ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-active-win.png")
+                ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
                 if (bbf > 1) {
                     MouseMove FoundX + 143, FoundY + 69
                     Click 3
@@ -506,11 +511,14 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
     }
 
-    static breakfastEntry(bbf, packageBounded, isCBF, initX := 352, initY := 548) {
+
+    static breakfastEntry(bbf, packageBounded, isCBF) {
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+
         ; if ratecode is bound with packages(blue text) or club floor rooms, skip adding BFNP
         if (!packageBounded && !isCBF) {
             ;entry bbf package
-            MouseMove initX, initY
+            MouseMove initX + 156, initY + 364
             utils.waitLoading()
             Click
             utils.waitLoading()
@@ -527,7 +535,7 @@ class RH_OtaBookingEntry {
         }
 
         ; change "Adults"
-        MouseMove initX - 67, initY - 124 ; 285, 424
+        MouseMove initX + 89, initY + 240 ; 285, 424
         utils.waitLoading()
         Click 3
         Send "{Text}" . bbf
@@ -537,9 +545,12 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
     }
 
-    static packageEntry(package, initX := 352, initY := 548) {
+
+    static packageEntry(package) {
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+
         ;entry extra package
-        MouseMove initX, initY
+        MouseMove initX + 156, initY + 364
         utils.waitLoading()
         Click
         utils.waitLoading()
@@ -555,6 +566,7 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         this.dismissPopup()
     }
+
 
     static traceEntry(traceText) {
         Send "!t"
@@ -579,7 +591,8 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
     }
 
-    static splitPartyEntry(guestNames, roomQty, initX := 456, initY := 482) {
+
+    static splitPartyEntry(guestNames, roomQty) {
         Send "!t"
         utils.waitLoading()
         Send "{Text}party"
