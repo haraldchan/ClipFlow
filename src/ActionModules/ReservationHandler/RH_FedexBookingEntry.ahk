@@ -64,7 +64,9 @@ class FedexBookingEntry {
         ; workflow start
         this.start()
         isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
-        , !isCheckedIn && this.profileEntry(infoObj["crewNames"], index)
+        if (!isCheckedIn) {
+            this.profileEntry(infoObj["crewNames"], index)
+        }
         if (!this.isRunning) {
             msgbox("脚本已终止", popupTitle, "4096 T1")
             return
@@ -207,22 +209,6 @@ class FedexBookingEntry {
         utils.waitLoading()
         this.dismissPopup()
 
-        ; fill in ETA & ETD
-        ; MouseMove initX + 124, initY + 415
-        ; utils.waitLoading()
-        ; Click 3
-        ; utils.waitLoading()
-
-        ; ; check if resv is checked-in already
-        ; prevClb := A_Clipboard
-        ; Send "^c"
-        ; if (A_Clipboard != prevClb) {
-        ;     Send Format("{Text}{1}", ETA)
-        ;     utils.waitLoading()
-        ;     Send "{Tab}"
-        ;     utils.waitLoading()
-        ; }
-
         if (!isCheckedIn) {
             MouseMove initX + 124, initY + 415
             utils.waitLoading()
@@ -241,6 +227,53 @@ class FedexBookingEntry {
         Send Format("{Text}{1}", ETD)
         Send "{Tab}"
         utils.waitLoading()
+    }
+
+
+    static moreFieldsEntry(sCheckin, sCheckout, ETA, ETD, flightIn, flightOut) {
+        Send "!i"
+        utils.waitLoading()
+        
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+
+        MouseMove initX + 475, initY + 113
+        utils.waitLoading()
+        Click 3
+        utils.waitLoading()
+        Send Format("{Text}{1}", flightIn)
+        utils.waitLoading()
+        loop 2 {
+            Send "{Tab}"
+            utils.waitLoading()
+        }
+
+        Send Format("{Text}{1}", sCheckin)
+        Sleep 100
+        Send "{Tab}"
+        utils.waitLoading()
+        Send Format("{Text}{1}", ETA)
+        utils.waitLoading()
+
+        MouseMove initX + 713, initY + 113
+        utils.waitLoading()
+        Click 2
+        utils.waitLoading()
+        Send Format("{Text}{1}", flightOut)
+        utils.waitLoading()
+        loop 2 {
+            Send "{Tab}"
+            utils.waitLoading()
+        }
+        utils.waitLoading()
+        Send Format("{Text}{1}", sCheckout)
+        utils.waitLoading()
+        Send "{Tab}"
+        utils.waitLoading()
+        Send Format("{Text}{1}", ETD)
+        utils.waitLoading()
+        Send "!o"
+        utils.waitLoading()
+        this.dismissPopup()
     }
 
 
@@ -289,54 +322,6 @@ class FedexBookingEntry {
     }
 
 
-    static moreFieldsEntry(sCheckin, sCheckout, ETA, ETD, flightIn, flightOut) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
-
-        MouseMove initX + 40, initY + 149 ; 236, 333
-        utils.waitLoading()
-        Click
-        utils.waitLoading()
-        MouseMove initX + 484, initY + 276
-        utils.waitLoading()
-        Click 2
-        utils.waitLoading()
-        Send Format("{Text}{1}", flightIn)
-        utils.waitLoading()
-        loop 2 {
-            Send "{Tab}"
-            utils.waitLoading()
-        }
-
-        Send Format("{Text}{1}", sCheckin)
-        Sleep 100
-        Send "{Tab}"
-        utils.waitLoading()
-        Send Format("{Text}{1}", ETA)
-        utils.waitLoading()
-        MouseMove initX + 721, initY + 281
-        utils.waitLoading()
-        Click 2
-        utils.waitLoading()
-        Send Format("{Text}{1}", flightOut)
-        utils.waitLoading()
-        loop 2 {
-            Send "{Tab}"
-            utils.waitLoading()
-        }
-        utils.waitLoading()
-        Send Format("{Text}{1}", sCheckout)
-        utils.waitLoading()
-        Send "{Tab}"
-        utils.waitLoading()
-        Send Format("{Text}{1}", ETD)
-        utils.waitLoading()
-        MouseMove initX + 655, initY + 496 ; 841, 680
-        utils.waitLoading()
-        Click
-        utils.waitLoading()
-    }
-
-
     static dailyDetailsEntry(daysActual, pmsNts) {
         ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
 
@@ -352,6 +337,7 @@ class FedexBookingEntry {
         }
         Send "!e"
         utils.waitLoading()
+        Sleep 100
 
         ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-active-win.png")
         MouseMove FoundX + 226, FoundY + 142
@@ -382,27 +368,36 @@ class FedexBookingEntry {
     }
 
     ;TODO: updated this with less MouseMove
-    static postRoomChargeAlertEntry(pmsNts, daysActual, initX := 759, initY := 266) {
+    static postRoomChargeAlertEntry(pmsNts, daysActual) {
+
         Send "!t"
-        MouseMove initX + 563, initY + 82 ; 759, 266
         utils.waitLoading()
-        Click
-        Send "!n"
+        loop 3 {
+            Send "{Down}"
+            utils.waitLoading()
+        }
+        Send "{Enter}"
         utils.waitLoading()
+
+        ImageSearch(&popX, &popY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        if (PixelGetColor(popX + 55, popY + 55) == "0x000080") {
+            Send "!n"
+            utils.waitLoading()
+        }
+
         Send "{Text}OTH"
-        MouseMove initX - 242, initY + 133 ; 517, 399
         utils.waitLoading()
-        Click
-        MouseMove initX - 280, initY + 169 ; 479, 435
+        Send "{Tab}"
         utils.waitLoading()
-        Click
-        MouseMove initX - 70, initY + 211 ; 689, 477
+        loop 2 {
+            Send "{Up}"
+            Sleep 100
+        }
+        Send "{Tab}"
         utils.waitLoading()
-        Click "Down"
-        MouseMove initX - 62, initY + 211 ; 697, 477
-        utils.waitLoading()
-        Click "Up"
-        utils.waitLoading()
+        loop 25 {
+            Send "{Delete}"
+        }
         Send Format("{Text}实际需收取 {1} 晚房费。退房请补入 {2} 晚房费。", daysActual, daysActual - pmsNts)
         utils.waitLoading()
         Send "!o"
@@ -425,8 +420,9 @@ class FedexBookingEntry {
         ; check if record exists
         Send "!e"
         utils.waitLoading()
-        if (PixelGetColor(initX + 265, initY + 216) == "0xD7D7D7") {
 
+        ImageSearch(&popX, &popY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        if (PixelGetColor(popX + 64, popY + 55) == "0xD7D7D7") {
             Send "{Tab}"
             utils.waitLoading()
             Send "^c"
