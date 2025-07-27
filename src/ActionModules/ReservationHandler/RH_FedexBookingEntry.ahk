@@ -133,9 +133,6 @@ class FedexBookingEntry {
         Click
         utils.waitLoading()
 
-        ; MouseMove initX, initY ; 471, 217
-        ; Click
-        ; Sleep 3000
         MouseMove initX - 91, initY + 338 ; 380, 555 ; search existing profile
         utils.waitLoading()
         Click
@@ -347,16 +344,6 @@ class FedexBookingEntry {
         Send "{Tab}"
         utils.waitLoading()
         this.dismissPopup()
-
-        if (daysActual < pmsNts) {
-            MouseMove FoundX + 176, FoundY + 165
-            Click 3
-            Send "{Text}0"
-            utils.waitLoading()
-            Send "{Tab}"
-            utils.waitLoading()
-            this.dismissPopup()
-        }
 
         utils.waitLoading()
         Send "!o"
