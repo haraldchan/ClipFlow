@@ -638,18 +638,29 @@ class RH_OtaBookingEntry {
             Send "!a"
         }
         utils.waitLoading()
+        
         if (guestNames.length == 1) {
             return
         }
+        
+        ; sort party members
+        ImageSearch(&partyX, &partyY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        MouseMove partyX + 37, partyY + 77
+        utils.waitLoading()
+        Click
+        utils.waitLoading()
 
         ; Fill guest names
         loop roomQty {
+
             guestName := A_Index > guestNames.Length ? guestNames[1] : guestNames[A_Index]
+            
             if (A_Index == 1) {
                 Send "{Down}"
                 utils.waitLoading()
                 continue
             }
+
             Send "!r"
             utils.waitLoading()
             this.profileEntry(guestName)
