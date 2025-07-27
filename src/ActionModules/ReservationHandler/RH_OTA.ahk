@@ -35,7 +35,17 @@ class RH_OTA {
 
     static parseReservation(curResv, splitParty, withRemarks, withTrace, extraPackages, overridenRateCode) {
         ; convert roomType
-        roomType := this.roomTypeMap.keyOf(curResv["roomType"])
+        try {
+            roomType := this.roomTypeMap.keyOf(curResv["roomType"])
+        } catch {
+            rt := InputBox(Format("房型 ({1}) 未找到，请输入 RoomType Code。`n如：DKC。", curResv["roomType"]), popupTitle)
+            if (rt.Result == "Cancel") {
+                return
+            }
+
+            roomType := rt.Value
+        }
+        
 
         ; define breakfast type
         breakfastType := (roomType.substr(1, 1) == "C") ? "CBF" : "BBF"
