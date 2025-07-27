@@ -184,14 +184,47 @@ class RH_OtaBookingEntry {
                 break
             }
             Sleep 100
+
+            if (A_Index == 10 && !IsSet(anchorX)) {
+                MsgBox("界面定位失败，请重新打开预订界面。", popupTitle, "4096 T2")
+                utils.cleanReload(winGroup)
+            }
         }
         MouseMove anchorX, anchorY
         utils.waitLoading()
         Click
         utils.waitLoading()
+
+        ; search for existing profile (only with hanzi names)
+        ; if (guestName.Length == 3) {
+        ;     Send "!h"
+        ;     utils.waitLoading()
+            
+        ;     ImageSearch(&searchX, &searchY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+            
+        ;     Send Format("{Text}{1}", guestName[3])
+        ;     utils.waitLoading()
+        ;     Send "!h"
+        ;     utils.waitLoading()
+
+        ;     if (PixelGetColor(searchX + 481, searchY + 200 ) == "0x008080") {
+        ;         Send "!c"
+        ;     } else {
+        ;         ; if match found, return and exit this function
+        ;         Send "!o"
+        ;         utils.waitLoading()
+        ;         Send "!o"
+        ;         utils.waitLoading()
+        ;         this.dismissPopup()
+        ;         return
+        ;     }
+
+        ;     utils.waitLoading()
+        ; }
+
+        ; create new profile
         Send "!n"
         utils.waitLoading()
-
         ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.profileAnchorImage)
         Sleep 100
         MouseMove FoundX - 20, FoundY
@@ -213,6 +246,7 @@ class RH_OtaBookingEntry {
             utils.waitLoading()
             Send "!o"
         }
+
         utils.waitLoading()
         Send "!o"
         utils.waitLoading()
