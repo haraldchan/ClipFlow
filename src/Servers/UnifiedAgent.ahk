@@ -123,12 +123,12 @@ class UnifiedAgent extends useServerAgent {
             WinHide(this.popupTitle)
         }
         
-        if (pmnPosts.Length) {
-            this.modifyPostedProfiles(pmnPosts)
-        }
-        
         if (qmPosts.Length) {
             this.executeQmPostedActions(qmPosts)
+        }
+
+        if (pmnPosts.Length) {
+            this.modifyPostedProfiles(pmnPosts)
         }
 
         if (retryPmnPosts.Length) {
