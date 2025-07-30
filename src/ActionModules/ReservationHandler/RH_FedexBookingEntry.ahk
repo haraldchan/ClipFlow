@@ -148,7 +148,6 @@ class FedexBookingEntry {
 
         ; check profile existence
         CoordMode "Pixel", "Screen"
-        ; TODO: update this to existing win, use profileAnchorImage as coord reference
         if (PixelGetColor(initX + 109, initY + 288) != "0x0000FF") { ; profile is found 580, 505
             Send "{Enter}"
             utils.waitLoading()
@@ -279,7 +278,13 @@ class FedexBookingEntry {
         comment := ""
 
         ; select current comment
-        MouseClickDrag "Left", initX + 426, initY + 412, initX + 944, initY + 421 ;622, 596 -> 1140, 605
+        ; MouseClickDrag "Left", initX + 426, initY + 412, initX + 944, initY + 421 ;622, 596 -> 1140, 605
+        MouseMove initX + 426, initY + 412
+        Click "Down"
+        MouseMove initX + 944, initY + 421
+        Sleep 1000 ; hold to cover long comment
+        Click "Up"
+
         utils.waitLoading()
         Send "^x"
         utils.waitLoading()
@@ -354,7 +359,6 @@ class FedexBookingEntry {
         this.dismissPopup()
     }
 
-    ;TODO: updated this with less MouseMove
     static postRoomChargeAlertEntry(pmsNts, daysActual) {
 
         Send "!t"
