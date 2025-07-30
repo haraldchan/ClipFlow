@@ -1,7 +1,5 @@
 #Include "./ReservationDetails.ahk"
 #Include "./EntryBtns.ahk"
-#Include "./RH_FedexBookingEntry.ahk"
-#Include "./RH_OTA.ahk"
 #Include "./Settings/RH_Settings.ahk"
 
 RH_App(App, moduleTitle, identifier) {
@@ -22,6 +20,15 @@ RH_App(App, moduleTitle, identifier) {
 
         curResv.set(incommingResv)
         config.write("currentReservation", JSON.stringify(incommingResv))
+    }
+
+    effect(curResv, handleResvSourceUpdate)
+    handleResvSourceUpdate(cur) {
+        if (cur["agent"] == "fedex") {
+            resvSource.set("FEDEX: " . cur["resvType"])
+        } else {
+            resvSource.set(Format(": {1}  {2}", cur["agent"].toTitle(), cur["orderId"]))
+        }
     }
 
     onMount() {
@@ -71,7 +78,7 @@ RH_App(App, moduleTitle, identifier) {
         ReservationDetails(App, curResv),
         
         ; entry btns
-        EntryBtns(App, curResv, resvSource),
+        EntryBtns(App, curResv),
         onMount()
     )
 }

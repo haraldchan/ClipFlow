@@ -1,10 +1,13 @@
-EntryBtns(App, curResv, resvSource) {
+#Include "./EntryActions/RH_OTA.ahk"
+#Include "./EntryActions/RH_OtaBookingEntry.ahk"
+#Include "./EntryActions/RH_FedexBookingEntry.ahk"
+
+EntryBtns(App, curResv) {
     effect(curResv, handleEntryBtnUpdate)
     handleEntryBtnUpdate(cur) {
         entryBtns := [App.getCtrlByName("entry1"), App.getCtrlByName("entry2")]
 
         if (cur["agent"] == "fedex") {
-            resvSource.set("FEDEX: " . cur["resvType"])
             crewLastNames := cur["crewNames"].map(name => name.split(" ")[2])
 
             for btn in entryBtns {
@@ -15,7 +18,6 @@ EntryBtns(App, curResv, resvSource) {
             return
         }
 
-        resvSource.set(Format(": {1}  {2}", cur["agent"].toTitle(), cur["orderId"]))
         entryBtns[1].Text := "录入订单"
         entryBtns[2].Text := cur["roomQty"] > 1 ? "录入整个 Party " : ""
     }
