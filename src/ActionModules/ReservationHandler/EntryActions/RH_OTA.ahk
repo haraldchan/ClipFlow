@@ -6,7 +6,7 @@ class RH_OTA {
         "kingsley",
         "ctrip-ota",
         ; "ctrip-business",
-        ; "meituan"
+        "meituan"
     ]
 
     static USE(curResv, splitParty := false, withRemarks := false, withTrace := false, extraPackages := "", overridenRateCode := "") {
