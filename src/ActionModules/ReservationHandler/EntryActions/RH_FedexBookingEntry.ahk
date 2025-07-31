@@ -229,6 +229,7 @@ class FedexBookingEntry {
     static moreFieldsEntry(sCheckin, sCheckout, ETA, ETD, flightIn, flightOut) {
         Send "!i"
         utils.waitLoading()
+        Sleep 250
         
         ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
 
@@ -278,7 +279,6 @@ class FedexBookingEntry {
         comment := ""
 
         ; select current comment
-        ; MouseClickDrag "Left", initX + 426, initY + 412, initX + 944, initY + 421 ;622, 596 -> 1140, 605
         MouseMove initX + 426, initY + 412
         Click "Down"
         MouseMove initX + 944, initY + 421
