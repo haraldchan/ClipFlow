@@ -37,11 +37,13 @@ EntryBtns(App, curResv) {
                 curResv.value,
                 ctrl.name == "entry2" ? true : false,
                 App["withRemarks"].Value,
+                App["withTrace"].Value,
                 App["extraPackages"].Value.trim(),
                 App["overridenRateCode"].Value.trim()
             )
 
             App["withRemarks"].Value := false
+            App["withTrace"].Value := false
             App["extraPackages"].Value := ""
             App["overridenRateCode"].Value := ""
         }
