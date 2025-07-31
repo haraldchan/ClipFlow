@@ -55,7 +55,9 @@ class RH_OtaBookingEntry {
             "SFL", ["同楼层", "同层"],
             "HFR", ["高层", "高楼层"],
             "AER", ["远离电梯"],
-            "NER", ["近电梯"]
+            "NER", ["近电梯"],
+            "EXB", ["加床"],
+            "COT", ["BB床", "婴儿床"]
         )
 
         requests := []
@@ -194,33 +196,6 @@ class RH_OtaBookingEntry {
         utils.waitLoading()
         Click
         utils.waitLoading()
-
-        ; search for existing profile (only with hanzi names)
-        ; if (guestName.Length == 3) {
-        ;     Send "!h"
-        ;     utils.waitLoading()
-            
-        ;     ImageSearch(&searchX, &searchY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
-            
-        ;     Send Format("{Text}{1}", guestName[3])
-        ;     utils.waitLoading()
-        ;     Send "!h"
-        ;     utils.waitLoading()
-
-        ;     if (PixelGetColor(searchX + 481, searchY + 200 ) == "0x008080") {
-        ;         Send "!c"
-        ;     } else {
-        ;         ; if match found, return and exit this function
-        ;         Send "!o"
-        ;         utils.waitLoading()
-        ;         Send "!o"
-        ;         utils.waitLoading()
-        ;         this.dismissPopup()
-        ;         return
-        ;     }
-
-        ;     utils.waitLoading()
-        ; }
 
         ; create new profile
         Send "!n"
