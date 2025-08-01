@@ -145,7 +145,7 @@ class UnifiedAgent extends useServerAgent {
      * @param {String[]} posts 
     */
    modifyPostedProfiles(posts) {
-        unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
+        unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8"))).reverse()
 
         for post in unboxedPosts {
             this.RESPONSE()
@@ -168,7 +168,7 @@ class UnifiedAgent extends useServerAgent {
      * @param {String[]} posts 
      */
     executeQmPostedActions(posts) {
-        unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8")))
+        unboxedPosts := posts.map(postPath => JSON.parse(FileRead(postPath, "UTF-8"))).reverse()
 
         for post in unboxedPosts {
             this.RESPONSE()
