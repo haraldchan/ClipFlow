@@ -19,15 +19,12 @@ class ProfileModifyNext {
     ]
 
     static USE(App) {
-        today := Format(A_Now, "yyyyMMdd")
-        yesterday := FormatTime(DateAdd(today, -1, "Days"), "yyyyMMdd")
-
-        if (!FileExist(this.fdb.archive . "\" . yesterday . " - archive.json")) {
-            this.fdb.createArchive(yesterday)
+        if (!FileExist(this.fdb.archive . "\" . A_Now.yesterday() . " - archive.json")) {
+            this.fdb.createArchive(A_Now.yesterday())
         }
         
-        if (!FileExist(this.db.backup . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . " - backup.json")) {
-            this.fdb.createArchiveBackup(yesterday)
+        if (!FileExist(this.db.backup . "\" . SubStr(A_Now.yesterday(), 1, 6) . "\" . A_Now.yesterday() . " - backup.json")) {
+            this.fdb.createArchiveBackup(A_Now.yesterday())
         }
 
         ; if (!FileExist(this.db.backup . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . "_backup.json")) {
