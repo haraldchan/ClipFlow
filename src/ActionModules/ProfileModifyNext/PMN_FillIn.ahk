@@ -234,25 +234,23 @@ class PMN_FillIn {
         if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
             ; ethinic minority guests
             if (currentGuest["name"].includes("·")) {
-                parsedInfo["nameLast"] := currentGuest["name"].split("·")[1].split("").map(hanzi => useDict.getPinyin(hanzi)).join(" ")
-                parsedInfo["nameFirst"] := currentGuest["name"].split("·")[2].split("").map(hanzi => useDict.getPinyin(hanzi)).join(" ")
+                unpack([&lastName, &firstName], currentGuest["name"].split("·").map(namePart => namePart.split("").map(hanzi => useDict.getPinyin(hanzi)).join(" ")))
             } else {
-                fullname := useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
-                parsedInfo["nameLast"] := fullname[1]
-                parsedInfo["nameFirst"] := fullname[2]   
+                unpack([&lastName, &firstName], useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese))
             }
+
+            parsedInfo["nameLast"] := lastName
+            parsedInfo["nameFirst"] := firstName
         } else {
             parsedInfo["nameLast"] := currentGuest["nameLast"]
             parsedInfo["nameFirst"] := currentGuest["nameFirst"]
         }
         
         ; fallback for incomplete info
-        if (currentGuest["idType"] == "港澳台居民居住证"
-            && parsedInfo["nameLast"] == " "
-        && parsedInfo["nameFirst"] == " ") {
-            fullname := useDict.getFullnamePinyin(currentGuest["name"])
-            parsedInfo["nameLast"] := fullname[1]
-            parsedInfo["nameFirst"] := fullname[2]
+        if (currentGuest["idType"] == "港澳台居民居住证" && parsedInfo["nameLast"] == " " && parsedInfo["nameFirst"] == " ") {
+            unpack([&lastName, &firstName], useDict.getFullnamePinyin(currentGuest["name"]))
+            parsedInfo["nameLast"] := lastName
+            parsedInfo["nameFirst"] := firstName
         }
         
         ; address
