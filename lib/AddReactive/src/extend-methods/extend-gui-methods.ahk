@@ -1,49 +1,47 @@
-defineGuiMethods(gui) {
-
-    gui.Prototype.getCtrlByName := getCtrlByName
-    /**
-     * Returns a Gui.Control or AddReactive Control instance
-     * @param {String} name the name of a Gui.Control or AddReactive control
-     * @returns {Gui.Control|AddReactive}
-     */
-    getCtrlByName(gui, name) {
-        for ctrl in gui {
-            if (ctrl.Name == name) {
-                return ctrl
-            }
+class GuiExt {
+    static patch() {
+        if (!ARConfig.useExtendMethods) {
+            return
         }
 
-        for arc in gui.arcs {
-            if (arc.name == name) {
-                return arc
+        for method, status in ARConfig.enableExtendMethods.gui.OwnProps() {
+            if (method == "listview") {
+                for lvMethod, lvStatus in status.OwnProps() {
+                    if (lvStatus) {
+                        Gui.ListView.Prototype.%lvMethod% := ObjBindMethod(this, lvMethod)
+                    }
+                }
+                continue
+            }
+
+            if (status) {
+                Gui.Prototype.%method% := ObjBindMethod(this, method)
             }
         }
-
-        throw ValueError(Format("Control name ({1}) not found.", name))
     }
 
-    gui.Prototype.getCtrlByType := getCtrlByType
-    /**
-     * Returns a Gui.Control instance
-     * @param {String} ctrlType the type of a Gui.Control
-     * @returns {Gui.Control}
-     */
-    getCtrlByType(gui, ctrlType) {
+    static getCtrlByName(gui, name) {
+        if (gui[name]) {
+            return gui[name]
+        }
+
+        if (gui.arcs[name]) {
+            return gui.arcs[name]
+        }
+
+        throw ValueError("Control name not found.", -1, name)
+    }
+
+    static getCtrlByType(gui, ctrlType) {
         for ctrl in gui {
             if (ctrl.Type == ctrlType) {
                 return ctrl
             }
         }
-        throw TypeError(Format("Control type ({1}) not found.", ctrlType))
+        throw TypeError("Control type not found.", -1, ctrlType)
     }
 
-    gui.Prototype.getCtrlByTypeAll := getCtrlByTypeAll
-    /**
-     * Returns an array of Gui.Control instances
-     * @param {String} ctrlType the type of Gui.Controls
-     * @returns {Gui.Control[]}
-     */
-    getCtrlByTypeAll(gui, ctrlType) {
+    static getCtrlByTypeAll(gui, ctrlType) {
         ctrlArray := []
 
         for ctrl in gui {
@@ -55,27 +53,16 @@ defineGuiMethods(gui) {
         return ctrlArray
     }
 
-    gui.Prototype.getComponent := getComponent
-    /**
-     * Returns a Component instace
-     * @param {String} componentName the name of a component
-     * @returns {Component}
-     */
-    getComponent(gui, componentName) {
+    static getComponent(gui, componentName) {
         for component in gui.components {
             if (component.name == componentName) {
                 return component
             }
         }
-        throw TypeError(Format("Component({1}) not found.", componentName))
+        throw TypeError("Component not found.", -1, componentName)
     }
 
-    gui.Prototype.getCtrlByText := getCtrlByText
-    /**
-     * Returns a Gui.Control
-     * @param {String|Func} text 
-     */
-    getCtrlByText(gui, text) {
+    static getCtrlByText(gui, text) {
         for ctrl in gui {
             if (text is Func && text(ctrl.Text)) {
                 return ctrl
@@ -84,16 +71,10 @@ defineGuiMethods(gui) {
             }
         }
 
-        throw ValueError(Format("Control with Text ({1}) not found.", text))
+        throw ValueError("Control with Text not found.", -1, text)
     }
 
-    gui.ListView.Prototype.getCheckedRowNumbers := getCheckedRows
-    /**
-     * Returns an array of checked row numbers of a ListView
-     * @param LV the Gui.ListView
-     * @returns {Array} 
-     */
-    getCheckedRows(LV) {
+    static getCheckedRows(LV) {
         checkedRowNumbers := []
         loop LV.GetCount() {
             curRow := LV.GetNext(A_Index - 1, "Checked")
@@ -108,13 +89,7 @@ defineGuiMethods(gui) {
         return checkedRowNumbers
     }
 
-    gui.ListView.Prototype.getFocusedRowNumbers := getFocusedRows
-    /**
-     * Returns an array of focused row numbers of a ListView
-     * @param LV the Gui.ListView
-     * @returns {Array} 
-     */
-    getFocusedRows(LV) {
+    static getFocusedRows(LV) {
         focusedRows := []
         rowNumber := 0
         loop {
@@ -127,5 +102,3 @@ defineGuiMethods(gui) {
         return focusedRows
     }
 }
-
-defineGuiMethods(Gui)

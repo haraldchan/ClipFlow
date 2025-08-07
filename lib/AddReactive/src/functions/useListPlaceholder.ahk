@@ -27,5 +27,5 @@ class useListPlaceholder {
         }
 
         return loadingValue
-    }
+    } 
 }
