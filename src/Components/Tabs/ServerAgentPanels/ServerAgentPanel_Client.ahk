@@ -24,26 +24,21 @@ ServerAgentPanel_Client(App, enabled) {
         "未连接", "cBlack Norm",
         "连接中...", "cBlack Norm",
         "无响应", "cRed Bold",
-        "default", "cGreen Bold"
-    )
+    ).Default("cGreen Bold")
 
     ping(ctrl, _) {
         connection.set("连接中...")
         ctrl.Enabled := false
         
         res := agent.PING()
-        if (!res) {
-            connection.set("无响应")
-        } else {
-            connection.set(Format("在线 {1}", res.sender))
-        }
+        connection.set(!res ? "无响应" : Format("在线 {1}", res.sender))
         
         ctrl.Enabled := true
     }
 
     handlePostUpdate(*) {
         posts := []
-        showMyOwnPosts := App.getCtrlByName("showMyOwnPosts").Value
+        showMyOwnPosts := App["showMyOwnPosts"].Value
         
         ; check pmn posts
         loop files (agent.pool . "\*.json") {
@@ -80,7 +75,7 @@ ServerAgentPanel_Client(App, enabled) {
 
         if (posts.Length > 0) {
             postQueue.set(posts)
-            App.getCtrlByName("postList").ModifyCol(3, "SortDesc")
+            App["postList"].ModifyCol(3, "SortDesc")
         }
     }
 

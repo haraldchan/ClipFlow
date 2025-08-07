@@ -5,8 +5,7 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
         "离线", "cRed Bold",
         "处理中...", "cBlack Norm",
         "在线", "cGreen Bold",
-        "default", "cBlack Norm"
-    )
+    ).Default("cBlack Norm")
 
     collectInterval := signal(agent.interval)
     effect(collectInterval, cur => (agent.interval := cur))
@@ -19,7 +18,7 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
         }
 
         isListening.set(ctrl.Value ? "在线" : "离线")
-        App.getCtrlByName("intervalEdit").Enabled := !ctrl.Value
+        App["intervalEdit"].Enabled := !ctrl.Value
     }
 
     comp.render := this => this.Add(
