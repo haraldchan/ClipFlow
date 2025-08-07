@@ -7,27 +7,35 @@ class Dict {
 
     static doubleLastName := JSON.parse(FileRead(this.DICT_PATH . "\double-last-name.json", "UTF-8"))
 
-    static tone := Map(
-        "ā", "a",
-        "á", "a",
-        "ǎ", "a",
-        "à", "a",
-        "ē", "e",
-        "é", "e",
-        "ě", "e",
-        "è", "e",
-        "ī", "i",
-        "í", "i",
-        "ǐ", "i",
-        "ì", "i",
-        "ō", "o",
-        "ó", "o",
-        "ǒ", "o",
-        "ò", "o",
-        "ū", "u",
-        "ú", "u",
-        "ǔ", "u",
-        "ù", "u",
+    ; static tone := Map(
+    ;     "ā", "a", 
+    ;     "á", "a",
+    ;     "ǎ", "a",
+    ;     "à", "a",
+    ;     "ē", "e",
+    ;     "é", "e",
+    ;     "ě", "e",
+    ;     "è", "e",
+    ;     "ī", "i",
+    ;     "í", "i",
+    ;     "ǐ", "i",
+    ;     "ì", "i",
+    ;     "ō", "o",
+    ;     "ó", "o",
+    ;     "ǒ", "o",
+    ;     "ò", "o",
+    ;     "ū", "u",
+    ;     "ú", "u",
+    ;     "ǔ", "u",
+    ;     "ù", "u",
+    ; )
+
+    static phoneticMap := Map(
+        "a", ["ā", "á", "ǎ", "à"],
+        "e", ["ē", "é", "ě", "è"],
+        "i", ["ī", "í", "ǐ", "ì"],
+        "o", ["ō", "ó", "ǒ", "ò"],
+        "u", ["ū", "ú", "ǔ", "ù"],
     )
 
     static regionISO := JSON.parse(FileRead(this.DICT_PATH . "\region-iso.json", "UTF-8"))
@@ -43,24 +51,25 @@ class Dict {
 class useDict {
     /**
      * Convert a Hanzi character to pinyin.
-     * @param {string} hanzi A chinese character to convert.
-     * @param {boolean} useWG Uses Wade-Giles instead of Pinyin.
-     * @returns {string} 
+     * @param {String} hanzi A chinese character to convert.
+     * @param {Boolean} useWG Uses Wade-Giles instead of Pinyin.
+     * @returns {String} 
      */
     static getPinyin(hanzi, useWG := false) {
         for pinyin, hanCharacters in Dict.pinyin {
             if (hanCharacters.includes(hanzi)) {
-                return !useWG ? pinyin : Dict.pinyinWade[pinyin]
+                return useWG ? Dict.pinyinWade[pinyin] : pinyin 
             }
         }
         ; if not found in Dict, fetch from baidu hanyu
         return this.fetchPinyin(hanzi, useWG)
     }
 
+    
     /**
      * Fetching pinyin of certain Hanzi from hanyu.baidu.com
-     * @param hanzi A chinese character to convert.
-     * @param {boolean} useWG Uses Wade-Giles instead of Pinyin.
+     * @param {String} hanzi A chinese character to convert.
+     * @param {Boolean} useWG Uses Wade-Giles instead of Pinyin.
      * @returns {String} 
      */
     static fetchPinyin(hanzi, useWG := false) {
@@ -74,34 +83,43 @@ class useDict {
         whr.WaitForResponse()
         page := whr.ResponseText
         Sleep 500
-        toned := page.split('<span class="pinyin">')[2].split("</span>")[1].replace("[", "").replace("]", "").trim()
+        pinyinWithPhonetic := page.split('<span class="pinyin">')[2].split("</span>")[1].replaceThese(["[", "]"], "").trim()
 
-        for tonedChar, char in Dict.tone {
-            if (toned.includes(tonedChar)) {
-                unToned := toned.replace(tonedChar, char).trim()
+        ; for tonedChar, char in Dict.tone {
+        ;     if (pinyinWithPhonetic.includes(tonedChar)) {
+        ;         pinyinWithoutPhonetic := pinyinWithPhonetic.replace(tonedChar, char).trim()
+        ;     }
+        ; }
+
+        for char, charsWithPhonetic in Dict.phoneticMap {
+            matchedPhoneticChar := charsWithPhonetic.find(c => pinyinWithPhonetic.includes(c))
+
+            if (matchedPhoneticChar) {
+                pinyinWithoutPhonetic := pinyinWithPhonetic.replace(matchedPhoneticChar, char)
             }
         }
 
         whr := ""
 
         ; update pinyin dictionary
-        Dict.pinyin[unToned] := Dict.pinyin[unToned] . hanzi
+        Dict.pinyin[pinyinWithoutPhonetic] := Dict.pinyin[pinyinWithoutPhonetic] . hanzi
         FileDelete(Dict.DICT_PATH . "\pinyin.json")
         FileAppend(JSON.stringify(Dict.pinyin), Dict.DICT_PATH . "\pinyin.json", "UTF-8")
 
-        return useWG == false ? unToned : Dict.pinyinWade[unToned]
+        return useWG ? Dict.pinyinWade[pinyinWithoutPhonetic] : pinyinWithoutPhonetic
     }
+
 
     /**
      * Convert the pinyin of last name and first name.
-     * @param {string} fullname The name to convert.
-     * @param {boolean} useWG Uses Wade-Giles instead of Pinyin.
-     * @returns {array} [last name, first name]
+     * @param {String} fullname The name to convert.
+     * @param {Boolean} useWG Uses Wade-Giles instead of Pinyin.
+     * @returns {Array} [last name, first name]
      */
     static getFullnamePinyin(fullname, useWG := false) {
         if (Dict.doubleLastName.Has(fullname.substr(1, 2))) {
             lastname := Dict.doubleLastName[fullname.substr(1, 2)]
-            if (useWG == true) {
+            if (useWG) {
                 lastname := lastname.split(" ").map(pinyin => Dict.pinyinWade[pinyin]).join("-")
             }
             lastnameLength := 2
@@ -113,32 +131,34 @@ class useDict {
         firstName := fullname.substr(lastnameLength + 1)
                              .split("")
                              .map(hanzi => this.getPinyin(hanzi, useWG))
-                             .join(useWG == false ? " " : "-")
+                             .join(useWG ? "-" : " ")
 
         return [lastname.trim(), firstname.trim()]
     }
 
+    
     /**
-     * Get the ISO 3166-1 alpha-2 regional code.
-     * @param {string} country The chinese country name to convert.
-     * @returns {any} 
+     * Gets the ISO 3166-1 alpha-2 regional code.
+     * @param {String} country The chinese country name to convert.
+     * @returns {String} 
      */
-    static getCountryCode(country) {
-        ; for region, code in Dict.regionISO {
-        ;     if (country == region) {
-        ;         return code
-        ;     }
-        ; }
-        return Dict.regionISO[country]
-    }
+    static getCountryCode(country) => Dict.regionISO[country]
+    
 
     /**
-     * Get the province name by address
-     * @param {string} address 
-     * @returns {any} 
+     * Gets the province name by first 6 digits of CHN id.
+     * @param {String} idNum 
+     * @returns {String}
+     */
+    static getProvinceById(idNum) => Dict.provincesById[idNum.substr(1, 2)]
+    
+
+    /**
+     * Gets the province name by address
+     * @param {String} address 
+     * @returns {String} 
      */
     static getProvince(address) {
-
         for province, code in Dict.provinces {
             if (address.includes(province)) {
                 if (code != "") {
@@ -156,15 +176,11 @@ class useDict {
         }
     }
 
-    static getProvinceById(idNum) {
-        return Dict.provincesById[idNum.substr(1, 2)]
-    }
 
-    static getIdTypeCode(idType) {
-        for type, code in Dict.idTypes {
-            if (type = idType) {
-                return code
-            }
-        }
-    }
+    /**
+     * Gets the id type code with a given id type.
+     * @param {String} idType 
+     * @returns {String} returns idType code
+     */
+    static getIdTypeCode(idType) => Dict.idTypes[idType]
 }
