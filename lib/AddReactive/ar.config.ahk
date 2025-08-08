@@ -48,8 +48,8 @@ class ARConfig {
             getCtrlByText:    true,
             getComponent:     true,
             listview: {
-                getCheckedRows: true,
-                getFocusedRows: true
+                getCheckedRowNumbers: true,
+                getFocusedRowNumbers: true
             }
         }
     }
@@ -70,6 +70,7 @@ class ARConfig {
                 daysBetween:     true,
                 tomorrow:        true,
                 nextDay:         true,
+                yesterday:       true,
                 toFormat:        true, 
             }
         }
