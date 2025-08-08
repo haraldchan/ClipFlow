@@ -7,29 +7,6 @@ class Dict {
 
     static doubleLastName := JSON.parse(FileRead(this.DICT_PATH . "\double-last-name.json", "UTF-8"))
 
-    ; static tone := Map(
-    ;     "ā", "a", 
-    ;     "á", "a",
-    ;     "ǎ", "a",
-    ;     "à", "a",
-    ;     "ē", "e",
-    ;     "é", "e",
-    ;     "ě", "e",
-    ;     "è", "e",
-    ;     "ī", "i",
-    ;     "í", "i",
-    ;     "ǐ", "i",
-    ;     "ì", "i",
-    ;     "ō", "o",
-    ;     "ó", "o",
-    ;     "ǒ", "o",
-    ;     "ò", "o",
-    ;     "ū", "u",
-    ;     "ú", "u",
-    ;     "ǔ", "u",
-    ;     "ù", "u",
-    ; )
-
     static phoneticMap := Map(
         "a", ["ā", "á", "ǎ", "à"],
         "e", ["ē", "é", "ě", "è"],
@@ -84,12 +61,6 @@ class useDict {
         page := whr.ResponseText
         Sleep 500
         pinyinWithPhonetic := page.split('<span class="pinyin">')[2].split("</span>")[1].replaceThese(["[", "]"], "").trim()
-
-        ; for tonedChar, char in Dict.tone {
-        ;     if (pinyinWithPhonetic.includes(tonedChar)) {
-        ;         pinyinWithoutPhonetic := pinyinWithPhonetic.replace(tonedChar, char).trim()
-        ;     }
-        ; }
 
         for char, charsWithPhonetic in Dict.phoneticMap {
             matchedPhoneticChar := charsWithPhonetic.find(c => pinyinWithPhonetic.includes(c))
