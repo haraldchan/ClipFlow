@@ -44,7 +44,8 @@ class useConfigJSON {
 
     _readFirstMatch(key, config) {
         if (config.Has(key)) {
-            return config[key]
+            result := config[key]
+            return IsObject(result) ? JSON.parse(JSON.stringify(result)) : result 
         }
 
         for k, v in config {
@@ -59,7 +60,8 @@ class useConfigJSON {
 
     _readExactMatch(keys, config, index := 1) {
         if (index == keys.Length) {
-            return config[keys[index]]
+            result := config[keys[index]]
+            return IsObject(result) ? JSON.parse(JSON.stringify(result)) : result 
         }
 
         return this._readExactMatch(keys, config[keys[index]], index + 1)
@@ -95,7 +97,7 @@ class useConfigJSON {
 
         for k, v in config {
             if (v is Map) {
-                return this._writeFirstMatch(key, v, newValue)
+                this._writeFirstMatch(key, v, newValue)
             }
         }
     }
@@ -106,6 +108,10 @@ class useConfigJSON {
             return
         }
 
-        return this._writeExactMatch(keys, config[keys[index]], newValue, index + 1)
+        for k, v in config {
+            if (k == keys[index]) {
+                this._setExactMatch(keys, v, newValue, index + 1)
+            }
+        }
     }
 }
