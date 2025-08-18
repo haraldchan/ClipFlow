@@ -153,5 +153,11 @@ class useDict {
      * @param {String} idType 
      * @returns {String} returns idType code
      */
-    static getIdTypeCode(idType) => Dict.idTypes[idType]
+    static getIdTypeCode(idType) {
+        try {
+            return Dict.idTypes[idType]
+        } catch {
+            return ""
+        }
+    }
 }
