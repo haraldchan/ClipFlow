@@ -110,7 +110,7 @@ class useConfigJSON {
 
         for k, v in config {
             if (k == keys[index]) {
-                this._setExactMatch(keys, v, newValue, index + 1)
+                this._writeExactMatch(keys, v, newValue, index + 1)
             }
         }
     }
