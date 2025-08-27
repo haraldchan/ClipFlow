@@ -19,6 +19,7 @@ class computed extends signal {
         this.subs := []
         this.comps := []
         this.effects := []
+        this.debugger := false
 
         if (this.signal is Array) {
             for s in this.signal {
@@ -29,8 +30,27 @@ class computed extends signal {
             this.signal.addComp(this)
             this.value := this.mutation.Call(this.signal.value)
         }
+
+        ; debug mode
+        if (!IsSet(DebugUtils) && !IsSet(debugger)) {
+            return
+        }
+
+        if (ARConfig.debugMode && !(this is debugger)) {
+            this.createDebugger := DebugUtils.createDebugger
+            this.debugger := this.createDebugger(this)
+            if (InStr(this.debugger.value["caller"]["file"], "\AddReactive\devtools")) {
+                this.debugger := false
+            } else {
+                IsSet(CALL_TREE) && CALL_TREE.addDebugger(this.debugger)
+            }
+        }
     }
 
+    /**
+     * Interface for subscribed signal to sync value to date.
+     * @param {signal} subbedSignal subscribed signal
+     */
     sync(subbedSignal) {
         prevValue := this.value
 
@@ -68,15 +88,27 @@ class computed extends signal {
         }
     }
 
-    addSub(controlInstance) {
-        this.subs.Push(controlInstance)
+    /**
+     * Interface for AddReactiveControl instances to subscribe.
+     * @param {AddReactive} AddReactiveControl 
+     */
+    addSub(AddReactiveControl) {
+        this.subs.Push(AddReactiveControl)
     }
 
+    /**
+     * Interface for computed instances to subscribe.
+     * @param {computed} computed 
+     */
     addComp(computed) {
         this.comps.Push(computed)
     }
 
-    addEffect(effectFn) {
-        this.effects.Push(effectFn)
+    /**
+     * Interface for effect instances to subscribe.
+     * @param {effect} effect
+     */
+    addEffect(effect) {
+        this.effects.Push(effect)
     }
 }

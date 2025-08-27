@@ -182,6 +182,11 @@ class AddReactiveListView extends AddReactive {
         super.__New(GuiObject, "ListView", options, columnDetails, depend, key)
     }
 
+    /**
+     * Applies new options to columns
+     * @param {Object} newColumnDetails 
+     * @param {String} columnOptions 
+     */
     setColumndDetails(newColumnDetails, columnOptions := "") {
         colDiff := newColumnDetails.keys.Length - this.titleKeys.Length
         if (colDiff > 0) {
@@ -255,6 +260,186 @@ class ARDateTime extends AddReactiveDateTime {
     ; alias
 }
 
+
+class AddReactiveTreeView extends AddReactive {
+    __New(GuiObject, options := "", depend := 0, key := 0) {
+        checkType(options, [String, Object.Prototype])
+
+        this.key := key
+        super.__New(GuiObject, "TreeView", options, "", depend, key)
+    }
+
+    class ShadowNode {
+        /**
+         * Make a copy node with the original tree
+         * @param {Gui.TreeView} TreeView 
+         * @param {Object} originNode 
+         */
+        __New(TreeView, originNode) {
+            this.name := originNode.name
+            this.content := originNode.content
+            this.parent := ""
+            this.childrens := []
+            this.nodeId := 0
+        }   
+
+        /**
+         * Creates a node on TreeView control
+         * @param {Gui.TreeView} TreeView 
+         * @param {Number} parentId 
+         */
+        createTreeViewNode(TreeView, parentId := 0) {
+            if (parentId) {
+                this.nodeId := TreeView.Add(this.name, parentId)
+            } else {
+                this.nodeId := TreeView.Add(this.name)
+            }
+        }
+    }
+
+    class ShadowTree {
+        /**
+         * Creates copy tree base on the depend tree-structured object/
+         * @param {Gui.TreeView} TreeView 
+         */
+        __New(TreeView) {
+            this.TreeView := TreeView
+            this.root := ""
+        }
+
+        /**
+         * Creates a copy with original tree-structured object.
+         * @param {Object} originTree 
+         */
+        copy(originTree) {
+            ; clear tree and copy root
+            this.root := ""
+            this.addChildren(originTree.root)
+
+            ; copyChildrens
+            this.copyChildren(originTree.root)
+        }
+
+        /**
+         * Copy children node and add it to shadow tree.
+         * @param {Object} originNode 
+         */
+        copyChildren(originNode) {
+            if (originNode.childrens.Length == 0) {
+                return
+            }
+
+            for node in originNode.childrens {
+                this.addChildren(node, node.parent.name)
+                this.copyChildren(node)
+            }
+        }
+
+        /**
+         * Print tree nodes with a custom function.
+         * @param {Func} fn 
+         */
+        print(fn := node => node) {
+            results := []
+            this._printTree(fn, results)
+
+            return results
+        }
+        _printTree(fn := node => node, results := [], curNode := this.root) {
+            results.Push(fn(curNode))
+
+            if (curNode.childrens.Length > 0) {
+                for childNode in curNode.childrens {
+                    this._printTree(fn, results)
+                }
+            }
+        }
+
+        /**
+         * Gets a ShadowNode with `content.name`.
+         * @param {String} name content.name
+         * @param {ShadowNode} curNode starting node
+         * @returns {false|ShadowNode}
+         */
+        getNode(name, curNode := this.root) {
+            if (name == curNode.name) {
+                return curNode
+            }
+
+            if (curNode.childrens.Length > 0) {
+                for childNode in curNode.childrens {
+                    res := this.getNode(name, childNode)
+                    if (res) {
+                        return res
+                    }
+                }
+            }
+
+            return false
+        }
+
+        /**
+         * Gets a ShadowNode with Item ID of a TreeView node.
+         * @param {Number} nodeId Item ID of the target TreeView node
+         * @param {ShadowNode} curNode starting node
+         * @returns {false|ShadowNode}
+         */
+        getNodeById(nodeId, curNode := this.root) {
+            if (nodeId == curNode.nodeId) {
+                return curNode
+            }
+
+            if (curNode.childrens.Length > 0) {
+                for childNode in curNode.childrens {
+                    res := this.getNodeById(nodeId, childNode)
+                    if (res) {
+                        return res
+                    }
+                }
+            }
+
+            return false
+        }
+
+        /**
+         * Adds a children node to a node.
+         * @param {Object} originNode 
+         * @param {String} parentName `content.name` of a node
+         */
+        addChildren(originNode, parentName := 0) {
+            newShadowNode := AddReactiveTreeView.ShadowNode(this.TreeView, originNode)
+
+            if (!parentName && !this.root) {
+                this.root := newShadowNode
+                newShadowNode.createTreeViewNode(this.TreeView)
+                return newShadowNode
+            }
+
+            if (!parentName && this.root) {
+                this.root.childrens.Push(newShadowNode)
+                newShadowNode.parent := this.root
+                newShadowNode.createTreeViewNode(this.TreeView, this.root.nodeId)
+                return newShadowNode
+            }
+
+            parentShadowNode := this.getNode(parentName)
+            if (!parentShadowNode) {
+                return false
+            }
+
+            newShadowNode.parent := parentShadowNode
+            parentShadowNode.childrens.Push(newShadowNode)
+            newShadowNode.createTreeViewNode(this.TreeView, parentShadowNode.nodeId)
+
+            return newShadowNode
+        }
+    }
+}
+class ARTreeView extends AddReactiveTreeView {
+    ; alias
+}
+
+
 ; mount to Gui.Prototype
 Gui.Prototype.AddReactiveText := AddReactiveText
 Gui.Prototype.ARText := ARText
@@ -277,3 +462,7 @@ Gui.Prototype.AddReactiveGroupBox := AddReactiveGroupBox
 Gui.Prototype.ARGroupBox := ARGroupBox
 Gui.Prototype.AddReactiveDateTime := AddReactiveDateTime
 Gui.Prototype.ARDateTime := ARDateTime
+Gui.Prototype.AddReactiveDateTime := AddReactiveTreeView
+Gui.Prototype.ARDateTime := ARTreeView
+Gui.Prototype.AddReactiveTreeView := AddReactiveTreeView
+Gui.Prototype.ARTreeView := ARTreeView

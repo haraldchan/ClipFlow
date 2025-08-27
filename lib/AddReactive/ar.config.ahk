@@ -1,4 +1,7 @@
 class ARConfig {
+    static debugMode := true
+    static useDevtoolsUI := false
+
     static useExtendMethods := true
     static enableExtendMethods := {
         array: {
@@ -34,12 +37,15 @@ class ARConfig {
             split:         true,
             substr:        true,
         },
+        integer: {
+            times:     true
+        },
         map: {
             keys:      true,
             values:    true,
             getKey:    true,
             deepClone: true,
-            default:   true,
+            setDefault:   true,
         },
         gui: {
             getCtrlByName:    true,

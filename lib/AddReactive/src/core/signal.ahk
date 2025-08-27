@@ -14,12 +14,28 @@ class signal {
      */
     __New(initialValue) {
         this.value := isPlainObject(initialValue) || initialValue is Array || initialValue is Map
-            ? this._mapify(initialValue) 
+            ? this._mapify(initialValue)
             : initialValue
         this.subs := []
         this.comps := []
         this.effects := []
         this.type := ""
+        this.debugger := false
+        
+        ; debug mode
+        if (!IsSet(DebugUtils) && !IsSet(debugger)) {
+            return
+        }
+
+        if (ARConfig.debugMode && !(this is debugger)) {
+            this.createDebugger := DebugUtils.createDebugger
+            this.debugger := this.createDebugger(this)
+            if (InStr(this.debugger.value["caller"]["file"], "\AddReactive\devtools")) {
+                this.debugger := false
+            } else {
+                IsSet(CALL_TREE) && CALL_TREE.addDebugger(this.debugger)
+            }
+        }
     }
 
     /**
@@ -34,15 +50,11 @@ class signal {
 
         ; validates new value if it matches the Struct
         if (this.type is Struct) {
-            validateInstance := newSignalValue is Struct.StructInstance
-                ? this.type.new(newSignalValue.mapify())
-                : this.type.new(newSignalValue)
+            validateInstance := this.type.new(newSignalValue is Struct.StructInstance ? newSignalValue.mapify() : newSignalValue)
             validateInstance := ""
         } else if (this.type is Array && this.type[1] is Struct) {
             for item in newSignalValue {
-                validateInstance := item is Struct.StructInstance
-                    ? this.type[1].new(item.mapify())
-                    : this.type[1].new(item)
+                validateInstance := this.type[1].new(item is Struct.StructInstance ? item.mapify() : item)
                 validateInstance := ""
             }
         } else if (this.type != "") {
@@ -81,6 +93,11 @@ class signal {
                 e(effect.depend.map(dep => dep.value)*)
             }
         }
+
+        ; notify signal tracker
+        if (ARConfig.debugMode && this.debugger) {
+            this.debugger.notifyChange()
+        }
     }
 
     /**
@@ -94,7 +111,12 @@ class signal {
         }
 
         updater := this._mapify(this.value)
-        (key is Array) ? this._setExactMatch(key, updater, newValue) : this._setFirstMatch(key, updater, newValue)
+        if (key is Array) {
+            this._setExactMatch(key, updater, newValue)
+        } else {
+
+            this._setFirstMatch(key, updater, newValue)
+        }
 
         this.set(updater)
     }
@@ -141,16 +163,12 @@ class signal {
 
         if (datatype is Struct) {
             ; try creating the same struct instance for validate.
-            validateInstance := this.value is Struct.StructInstance
-                ? this.type.new(this.value.mapify())
-                : this.type.new(this.value)
+            validateInstance := this.type.new(this.value is Struct.StructInstance ? this.value.mapify() : this.value)
             validateInstance := ""
-            
+
         } else if (datatype is Array && datatype[1] is Struct) {
             for item in this.value {
-                validateInstance := item is Struct.StructInstance
-                    ? this.type[1].new(item.mapify())
-                    : this.type[1].new(item)
+                validateInstance := this.type[1].new(item is Struct.StructInstance ? item.mapify() : item)
                 validateInstance := ""
             }
         } else {
@@ -160,21 +178,38 @@ class signal {
         return this
     }
 
-    addSub(controlInstance) {
-        this.subs.Push(controlInstance)
+    /**
+     * Interface for AddReactiveControl instances to subscribe.
+     * @param {AddReactive} AddReactiveControl 
+     */
+    addSub(AddReactiveControl) {
+        this.subs.Push(AddReactiveControl)
     }
 
-    addComp(computed) {
+    /**
+     * Interface for computed instances to subscribe.
+     * @param {computed} computed 
+     */
+    addComp(computed) {        
         this.comps.Push(computed)
     }
 
-    addEffect(effectFn) {
-        this.effects.Push(effectFn)
+    /**
+     * Interface for effect instances to subscribe.
+     * @param {effect} effect
+     */
+    addEffect(effect) {
+        this.effects.Push(effect)
     }
 
+    /**
+     * Reformat an Object to Map.
+     * @param {Object} obj Object to be change.
+     * @returns {false|Map}
+     */
     _mapify(obj) {
         if (!isPlainObject(obj) && !(obj is Array) && !(obj is Map)) {
-            return
+            return false
         }
 
         if (isPlainObject(obj) || obj is Map) {
