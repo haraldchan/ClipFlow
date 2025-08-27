@@ -2,6 +2,7 @@
 #Include "./ServerAgentPanels/ServerAgentPanel_Agent.ahk"
 #Include "./ServerAgentPanels/ServerAgentPanel_Client.ahk"
 #Include "./ServerAgentPanels/QM2_Panel.ahk"
+#Include "../UnifiedAgentModal.ahk"
 
 ServerAgentPanel(App) {
     isListening := signal("离线")
