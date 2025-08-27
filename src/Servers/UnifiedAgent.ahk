@@ -2,9 +2,9 @@ class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
         this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : A_ScriptDir . "\Servers\qm-pool"
-        this.popupTitle := "Server Agent"
+        this.popupTitle := "Unified Agent"
 
-        effect(this.isListening, (cur) => this.listen(cur))
+        effect(this.isListening, cur => this.listen(cur))
 
         ; ongoing post
         this.currentHandlingPost := ""
@@ -16,12 +16,15 @@ class UnifiedAgent extends useServerAgent {
         )
 
         ; binding methods timer methods
-        this.res := ObjBindMethod(this, "keepAlive")
-        this.handlePost := ObjBindMethod(this, "postHandler")
+        ; this.res := ObjBindMethod(this, "keepAlive")
+        ; this.handlePost := ObjBindMethod(this, "postHandler")
 
         ; delete expired posts
         this.cleanup()
         this.cleanup(this.qmPool)
+
+        ; start service
+        ; this.listen()
     }
 
     cleanup(pool := this.pool) {
@@ -52,32 +55,25 @@ class UnifiedAgent extends useServerAgent {
      * <Agent>
      */
     InputBlock() {
-        if (WinExist("Server Agent")) {
-            BlockInput true
-            WinActivate("Server Agent")
-            return
+        if (!WinExist(this.popupTitle)) {
+            UnifiedAgentModal(() => this.isListening.set("离线"))
         }
+
+
+        ; if (WinExist(this.popupTitle)) {
+        ;     BlockInput true
+        ;     WinActivate(this.popupTitle)
+        ;     return
+        ; }
 
         BlockInput true
-        if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务", this.popupTitle, "4096") == "OK") {
-            this.isListening.set("离线")
+        if (this.isListening.value == "离线") {
             BlockInput false
         }
-    }
-
-    /**
-     * <Agent>
-     * @param status 
-     */
-    listen(status) {
-        if (status == "在线") {
-            SetTimer(() => this.InputBlock(), -100)
-            SetTimer(this.handlePost, this.interval)
-        }
-
-        if (status == "离线") {
-            SetTimer(this.handlePost, 0)
-        }
+        ; if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务", this.popupTitle, "4096") == "OK") {
+        ;     this.isListening.set("离线")
+        ;     BlockInput false
+        ; }
     }
 
     /**
@@ -92,8 +88,45 @@ class UnifiedAgent extends useServerAgent {
             }
         }
         
-        this.RESPONSE()
+        SetTimer(() => this.RESPONSE(), -1)
     }
+
+    /**
+     * <Agent>
+     * @param status 
+     */
+    ; listen(status) {
+    ;     if (status == "在线") {
+    ;         SetTimer(() => this.InputBlock(), -100)
+    ;         SetTimer(this.handlePost, this.interval)
+    ;     }
+
+    ;     if (status == "离线") {
+    ;         SetTimer(this.handlePost, 0)
+    ;     }
+    ; }
+    listen(status) {
+        if (status == "在线") {
+            loop {
+                ; block input
+                this.InputBlock()
+
+                ; handle post
+                Sleep 150
+                this.postHandler()
+
+                ; service offline
+                ; if (this.isListening.value == "离线") {
+                ;     break
+                ; }
+
+                Sleep this.interval
+            } until (this.isListening.value == "离线")
+        }
+    }
+
+
+
 
     /**
      * <Agent>
@@ -104,16 +137,17 @@ class UnifiedAgent extends useServerAgent {
             this.isListening.set("离线")
             return
         }
-
-        ; is handling post at the moment
-        if (this.currentHandlingPost) {
-            return
-        }
-
+        
         this.keepAlive()
-        SetTimer(, 0)
+        ; is handling post at the moment
+        ; if (this.currentHandlingPost || this.isListening.value !== "在线") {
+            ; return
+        ; }
 
-        this.isListening.set("处理中...")
+        
+        ; SetTimer(this.handlePost, 0)
+
+        ; this.isListening.set("处理中...")
 
         pmnPosts := this.COLLECT("PENDING")
         qmPosts := this.COLLECT("PENDING", this.qmPool)
