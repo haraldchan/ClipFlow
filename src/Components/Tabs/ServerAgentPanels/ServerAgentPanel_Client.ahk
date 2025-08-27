@@ -24,7 +24,7 @@ ServerAgentPanel_Client(App, enabled) {
         "未连接", "cBlack Norm",
         "连接中...", "cBlack Norm",
         "无响应", "cRed Bold",
-    ).Default("cGreen Bold")
+    ).setDefault("cGreen Bold")
 
     ping(ctrl, _) {
         connection.set("连接中...")

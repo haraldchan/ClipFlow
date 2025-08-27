@@ -5,7 +5,7 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
         "离线", "cRed Bold",
         "处理中...", "cBlack Norm",
         "在线", "cGreen Bold",
-    ).Default("cBlack Norm")
+    ).setDefault("cBlack Norm")
 
     collectInterval := signal(agent.interval)
     effect(collectInterval, cur => (agent.interval := cur))
