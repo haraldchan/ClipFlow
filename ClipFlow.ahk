@@ -22,6 +22,8 @@ App(ClipFlow)
 
 ClipFlow.Show()
 
+; DevToolsUI()
+
 ; hotkeys setup
 Pause:: ClipFlow.Show()
 F11:: utils.cleanReload(winGroup)

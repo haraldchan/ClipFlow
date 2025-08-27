@@ -55,7 +55,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     ; data states
     listContent := signal(settings.value["loadFrom"] == "FileDB" ? fdb.load() : db.load())
     queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 })
-    
+
 
     ; list UI states/effect
     lvIsCheckedAll := signal(true)
