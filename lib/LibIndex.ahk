@@ -4,6 +4,5 @@
 #Include "./useFileDB.ahk"
 #Include "./useDateBase.ahk"
 #Include "./useDict/useDict.ahk"
-#Include "./useDebug.ahk"
 #Include "./useServerAgent.ahk"
 #Include "./AddReactive/useAddReactive.ahk"
