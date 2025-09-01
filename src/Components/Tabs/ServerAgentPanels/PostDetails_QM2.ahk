@@ -9,7 +9,6 @@ PostDetails_QM2(post, moduleName, props) {
         "PaymentRelation", { desc: "Payment 关系", module: PaymentRelation }
     )
 
-    resMessage := {}
     form := {}
     handleRepost(*) {
         form := App.Submit()
@@ -43,7 +42,7 @@ PostDetails_QM2(post, moduleName, props) {
         }
 
         if (App["sendPmPost"].Value) {
-            SetTimer(handleTriggerPmPost, 1000)
+            handleTriggerPmPost()
         }
 
         return handleRepost()
@@ -51,23 +50,6 @@ PostDetails_QM2(post, moduleName, props) {
 
     db := useFileDB(config.read("dbSettings"))
     handleTriggerPmPost() {
-        if (!resMessage.hasOwnProp("id")) {
-            return
-        } else if (resMessage.HasOwnProp("status") && resMessage.status == "failed") {
-            SetTimer(, 0)
-            return
-        }
-
-        loop files (agent.qmPool . "\*.json") {
-            if (A_LoopFileName.includes(resMessage.id)) {
-                if (!A_LoopFileName.includes("MODIFIED")) {
-                    return
-                }
-            }
-        }
-
-        SetTimer(, 0)
-
         roomNums := form.shareRoomNums.trim()
         ; selectedGuests can only pass by GuestProfileList
         ; if no selectedGuest, then filter results in db by room number(request from ServerAgent_Panel)
