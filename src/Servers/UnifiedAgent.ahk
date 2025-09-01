@@ -112,13 +112,7 @@ class UnifiedAgent extends useServerAgent {
                 this.InputBlock()
 
                 ; handle post
-                Sleep 150
                 this.postHandler()
-
-                ; service offline
-                ; if (this.isListening.value == "离线") {
-                ;     break
-                ; }
 
                 Sleep this.interval
             } until (this.isListening.value == "离线")
@@ -149,8 +143,8 @@ class UnifiedAgent extends useServerAgent {
 
         ; this.isListening.set("处理中...")
 
-        pmnPosts := this.COLLECT("PENDING")
         qmPosts := this.COLLECT("PENDING", this.qmPool)
+        pmnPosts := this.COLLECT("PENDING")
         retryPmnPosts := this.COLLECT("RETRY")
 
         if (pmnPosts.Length || qmPosts.Length || retryPmnPosts.Length) {
