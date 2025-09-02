@@ -30,15 +30,11 @@ QM2_Panel(props) {
     form := {}
     delegateQmActions(module) {
         form := App.Submit()
-        SetTimer(() => (
-            resMessage := agent.delegate({
-                module: module,
-                form: form,
-                profiles: p.selectedGuests
-            })
-        ), -250)
-
-        SetTimer((*) => (App.Destroy(), WinHide(popupTitle)), -100)
+        resMessage := agent.delegate({
+            module: module,
+            form: form,
+            profiles: p.selectedGuests
+        })
 
         return 0
     }
@@ -49,12 +45,16 @@ QM2_Panel(props) {
             return 0
         }
 
+        delegateQmActions("BlankShare")
+
         if (App["sendPmPost"].Value) {
             ; SetTimer(handleTriggerPmPost, 1000)
             handleTriggerPmPost()
         }
 
-        return delegateQmActions("BlankShare")
+        SetTimer((*) => (App.Destroy(), WinHide(popupTitle)), -100)
+
+        return 0
     }
 
     db := useFileDB(config.read("dbSettings"))
