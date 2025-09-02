@@ -12,16 +12,12 @@ PostDetails_QM2(post, moduleName, props) {
     form := {}
     handleRepost(*) {
         form := App.Submit()
-        SetTimer(() => (
-            agent.delegate({
-                module: moduleName,
-                form: form,
-                profiles: post["content"]["profiles"]
-            }),
-            renameResendPost(post["id"])
-        ), -250)
-
-        App.Destroy()
+        agent.delegate({
+            module: moduleName,
+            form: form,
+            profiles: post["content"]["profiles"]
+        }),
+        renameResendPost(post["id"])
 
         return 0
     }
@@ -41,11 +37,14 @@ PostDetails_QM2(post, moduleName, props) {
             return 0
         }
 
+        handleRepost()
+
         if (App["sendPmPost"].Value) {
             handleTriggerPmPost()
         }
 
-        return handleRepost()
+        App.Destroy()
+        return 0 
     }
 
     db := useFileDB(config.read("dbSettings"))
@@ -57,12 +56,11 @@ PostDetails_QM2(post, moduleName, props) {
             ? db.load(, , agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
             : post["content"]["profiles"]
 
-        SetTimer(() => (
-            post := agent.delegate({
-                rooms: roomNums.split(" "),
-                profiles: profiles
-            })
-        ), -250)
+
+        post := agent.delegate({
+            rooms: roomNums.split(" "),
+            profiles: profiles
+        })
     }
 
     onMount() {
