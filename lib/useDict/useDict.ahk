@@ -80,8 +80,12 @@ class useDict {
         return useWG ? Dict.pinyinWade[pinyinWithoutPhonetic] : pinyinWithoutPhonetic
     }
 
-
-    static fetchPinyinHK(hanzi) {
+    /**
+     * Fetching Cantonese pinyin of certain Hanzi from NameChef.co
+     * @param hanzi A chinese character to convert.
+     * @returns {String[]}
+     */
+    static fetchPinyinCantonese(hanzi) {
         ; NameChef
         url := Format("https://www.namechef.co/zh/hkid-english-name/result/?name={1}", this.URIEncode(hanzi))
         romanised := []
@@ -146,9 +150,13 @@ class useDict {
         return [lastname.trim(), firstname.trim()]
     }
 
-
-    static getFullnamePinyinHK(fullname) {
-        fullNameRonamized := this.fetchPinyinHK(fullname)
+    /**
+     * Convert the Cantonese romanised of last name and first name.
+     * @param {String} fullname The name to convert.
+     * @returns {String}
+     */
+    static getFullnamePinyinCantonese(fullname) {
+        fullNameRonamized := this.fetchPinyinCantonese(fullname)
 
         if (Dict.doubleLastName.Has(fullname.substr(1, 2))) {
             lastname := fullNameRonamized[1] . " " . fullNameRonamized[2]
