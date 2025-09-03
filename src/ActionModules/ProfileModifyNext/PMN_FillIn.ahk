@@ -252,7 +252,7 @@ class PMN_FillIn {
             && parsedInfo["nameLast"] == " " 
             && parsedInfo["nameFirst"] == " "
         ) {
-            unpack([&lastName, &firstName], useDict.getFullnamePinyinHK(currentGuest["name"]))
+            unpack([&lastName, &firstName], useDict.getFullnamePinyinCantonese(currentGuest["name"]))
             parsedInfo["nameLast"] := lastName
             parsedInfo["nameFirst"] := firstName
         }
