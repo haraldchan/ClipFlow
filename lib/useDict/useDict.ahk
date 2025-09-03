@@ -1,5 +1,5 @@
 class Dict {
-    static DICT_PATH := A_ScriptName == "useDict_Test.ahk" ? "./dictionaries" : A_ScriptDir . "\lib\useDict\dictionaries"
+    static DICT_PATH := InStr(A_ScriptName, "useDict_Test") ? "./dictionaries" : A_ScriptDir . "\lib\useDict\dictionaries"
 
     static pinyin := JSON.parse(FileRead(this.DICT_PATH . "\pinyin.json", "UTF-8"))
 
@@ -81,6 +81,45 @@ class useDict {
     }
 
 
+    static fetchPinyinHK(hanzi) {
+        ; NameChef
+        url := Format("https://www.namechef.co/zh/hkid-english-name/result/?name={1}", this.URIEncode(hanzi))
+        romanised := []
+        
+        whr := ComObject("WinHttp.WinHttpRequest.5.1")
+        html := ComObject("HTMLFile")
+
+        whr.Open("POST", url, false)
+        whr.Send()
+        whr.WaitForResponse()
+        page := whr.ResponseText
+        
+
+        html.Write(page)        
+        tds := html.GetElementsByTagName("td")
+        loop tds.Length {
+            if (Mod(A_Index, 2)) {
+                continue
+            }
+
+            romanised.Push(tds.item(A_Index - 1).InnerText.split(" ")[1])
+        }
+
+        whr := ""
+        html := ""
+
+        return romanised
+    }
+
+    static URIEncode(Url, Flags := 0x000C3000) {
+        Local CC := 4096, Esc := "", Result := ""
+        Loop
+            VarSetStrCapacity(&Esc, CC), Result := DllCall("Shlwapi.dll\UrlEscapeW", "Str", Url, "Str", &Esc, "UIntP", &CC, "UInt", Flags, "UInt")
+        Until Result != 0x80004003 ; E_POINTER
+        Return Esc
+    }
+
+
     /**
      * Convert the pinyin of last name and first name.
      * @param {String} fullname The name to convert.
@@ -103,6 +142,21 @@ class useDict {
                              .split("")
                              .map(hanzi => this.getPinyin(hanzi, useWG))
                              .join(useWG ? "-" : " ")
+
+        return [lastname.trim(), firstname.trim()]
+    }
+
+
+    static getFullnamePinyinHK(fullname) {
+        fullNameRonamized := this.fetchPinyinHK(fullname)
+
+        if (Dict.doubleLastName.Has(fullname.substr(1, 2))) {
+            lastname := fullNameRonamized[1] . " " . fullNameRonamized[2]
+            firstname := fullNameRonamized[3] . " " . fullNameRonamized[4]
+        } else {
+            lastname := fullNameRonamized[1]
+            firstname := fullNameRonamized.slice(2).join(" ")
+        }
 
         return [lastname.trim(), firstname.trim()]
     }
@@ -154,10 +208,10 @@ class useDict {
      * @returns {String} returns idType code
      */
     static getIdTypeCode(idType) {
-        try {
-            return Dict.idTypes[idType]
-        } catch {
-            return ""
+        for k, v in Dict.idTypes {
+            if (k == idType) {
+                return v
+            }
         }
     }
 }
