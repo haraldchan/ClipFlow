@@ -247,8 +247,12 @@ class PMN_FillIn {
         }
         
         ; fallback for incomplete info
-        if (currentGuest["idType"] == "港澳台居民居住证" && parsedInfo["nameLast"] == " " && parsedInfo["nameFirst"] == " ") {
-            unpack([&lastName, &firstName], useDict.getFullnamePinyin(currentGuest["name"]))
+        if (
+            (currentGuest["region"] == "香港" || currentGuest["region"] == "澳门")
+            && parsedInfo["nameLast"] == " " 
+            && parsedInfo["nameFirst"] == " "
+        ) {
+            unpack([&lastName, &firstName], useDict.getFullnamePinyinHK(currentGuest["name"]))
             parsedInfo["nameLast"] := lastName
             parsedInfo["nameFirst"] := firstName
         }
