@@ -233,14 +233,11 @@ class PMN_FillIn {
         isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
         if (currentGuest["guestType"] == "内地旅客" || isTaiwanese) {
             ; ethinic minority guests
-            if (currentGuest["name"].includes("·")) {
-                unpack([&lastName, &firstName], currentGuest["name"].split("·").map(namePart => namePart.split("").map(hanzi => useDict.getPinyin(hanzi)).join(" ")))
-            } else {
-                unpack([&lastName, &firstName], useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese))
-            }
+            fullName := currentGuest["name"].includes("·") 
+                ? currentGuest["name"].split("·").map(namePart => namePart.split("").map(hanzi => useDict.getPinyin(hanzi)).join(" ")) 
+                : useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
 
-            parsedInfo["nameLast"] := lastName
-            parsedInfo["nameFirst"] := firstName
+            unpack([&parsedInfo["nameLast"] , &parsedInfo["nameFirst"]], fullName)
         } else {
             parsedInfo["nameLast"] := currentGuest["nameLast"]
             parsedInfo["nameFirst"] := currentGuest["nameFirst"]
@@ -252,9 +249,7 @@ class PMN_FillIn {
             && parsedInfo["nameLast"] == " " 
             && parsedInfo["nameFirst"] == " "
         ) {
-            unpack([&lastName, &firstName], useDict.getFullnamePinyinCantonese(currentGuest["name"]))
-            parsedInfo["nameLast"] := lastName
-            parsedInfo["nameFirst"] := firstName
+            unpack([&parsedInfo["nameLast"], &parsedInfo["nameFirst"]], useDict.getFullnamePinyinCantonese(currentGuest["name"]))
         }
         
         ; address
@@ -265,17 +260,16 @@ class PMN_FillIn {
         
         ; country
         parsedInfo["country"] := currentGuest["guestType"] == "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
-        
-        ; province(mainland & hk/mo/tw)
-        if (currentGuest["guestType"] == "内地旅客") {
-            parsedInfo["province"] := currentGuest["idType"] == "身份证" 
-                ? useDict.getProvinceById(currentGuest["idNum"])
-                : useDict.getProvince(currentGuest["addr"])
-        } else if (currentGuest["guestType"] == "港澳台旅客") {
-            parsedInfo["province"] := useDict.getProvince(currentGuest["region"])
-        } else {
-            parsedInfo["province"] := " "
-        }
+
+        ; province
+        parsedInfo["province"] := match(
+            currentGuest["guestType"], 
+            Map(
+                "内地旅客", useDict.getProvince(currentGuest["addr"]) || useDict.getProvinceById(currentGuest["idNum"]),
+                "港澳台旅客", useDict.getProvince(currentGuest["region"]),
+            ),  
+            " "
+        )
         
         ; id number
         parsedInfo["idNum"] := currentGuest["idNum"]
