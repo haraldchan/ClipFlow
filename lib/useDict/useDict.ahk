@@ -207,6 +207,8 @@ class useDict {
                 }
             }
         }
+
+        return false
     }
 
 
@@ -221,5 +223,7 @@ class useDict {
                 return v
             }
         }
+
+        return false
     }
 }
