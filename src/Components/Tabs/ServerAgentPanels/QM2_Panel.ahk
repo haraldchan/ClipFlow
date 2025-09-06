@@ -26,11 +26,10 @@ QM2_Panel(props) {
         }
     }
 
-    ; resMessage := {}
     form := {}
     delegateQmActions(module) {
         form := App.Submit()
-        resMessage := agent.delegate({
+        agent.delegate({
             module: module,
             form: form,
             profiles: p.selectedGuests
@@ -48,7 +47,6 @@ QM2_Panel(props) {
         delegateQmActions("BlankShare")
 
         if (App["sendPmPost"].Value) {
-            ; SetTimer(handleTriggerPmPost, 1000)
             handleTriggerPmPost()
         }
 
@@ -71,38 +69,6 @@ QM2_Panel(props) {
             })
         ), -300)
     }
-    ; handleTriggerPmPost() {
-    ;     if (!resMessage.hasOwnProp("id")) {
-    ;         return
-    ;     } else if (resMessage.HasOwnProp("status") && resMessage.status == "failed") {
-    ;         SetTimer(, 0)
-    ;         return
-    ;     }
-
-    ;     loop files (agent.qmPool . "\*.json") {
-    ;         if (A_LoopFileName.includes(resMessage.id)) {
-    ;             if (!A_LoopFileName.includes("MODIFIED")) {
-    ;                 return
-    ;             }
-    ;         }
-    ;     }
-
-    ;     SetTimer(, 0)
-
-    ;     roomNums := form.shareRoomNums.trim()
-    ;     ; selectedGuests can only pass by GuestProfileList
-    ;     ; if no selectedGuest, then filter results in db by room number(request from ServerAgent_Panel)
-    ;     profiles := p.selectedGuests.Length == 0
-    ;         ? db.load(,, agent.collectRange).filter(guest => roomNums.includes(!guest["roomNum"] ? "null" : guest["roomNum"]))
-    ;         : p.selectedGuests
-
-    ;     SetTimer(() => (
-    ;         post := agent.delegate({
-    ;             rooms: roomNums.split(" "),
-    ;             profiles: profiles
-    ;         })
-    ;     ), -250)
-    ; }
     
     handlePaymentRelationDelegate(*) {
         if (!App.getCtrlByName("pfRoom").Value || !App.getCtrlByName("pfName").Value) {
