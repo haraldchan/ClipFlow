@@ -15,16 +15,9 @@ class UnifiedAgent extends useServerAgent {
             "PaymentRelation", PaymentRelation_Action
         )
 
-        ; binding methods timer methods
-        ; this.res := ObjBindMethod(this, "keepAlive")
-        ; this.handlePost := ObjBindMethod(this, "postHandler")
-
         ; delete expired posts
         this.cleanup()
         this.cleanup(this.qmPool)
-
-        ; start service
-        ; this.listen()
     }
 
     cleanup(pool := this.pool) {
@@ -59,21 +52,10 @@ class UnifiedAgent extends useServerAgent {
             UnifiedAgentModal(() => this.isListening.set("离线"))
         }
 
-
-        ; if (WinExist(this.popupTitle)) {
-        ;     BlockInput true
-        ;     WinActivate(this.popupTitle)
-        ;     return
-        ; }
-
         BlockInput true
         if (this.isListening.value == "离线") {
             BlockInput false
         }
-        ; if (MsgBox("Profile Modify 代行服务运行中...`n`n1.按下 Ctrl+Alt+Del 解锁键鼠`n2.点击确定停止服务", this.popupTitle, "4096") == "OK") {
-        ;     this.isListening.set("离线")
-        ;     BlockInput false
-        ; }
     }
 
     /**
@@ -95,16 +77,6 @@ class UnifiedAgent extends useServerAgent {
      * <Agent>
      * @param status 
      */
-    ; listen(status) {
-    ;     if (status == "在线") {
-    ;         SetTimer(() => this.InputBlock(), -100)
-    ;         SetTimer(this.handlePost, this.interval)
-    ;     }
-
-    ;     if (status == "离线") {
-    ;         SetTimer(this.handlePost, 0)
-    ;     }
-    ; }
     listen(status) {
         if (status == "在线") {
             loop {
@@ -120,8 +92,6 @@ class UnifiedAgent extends useServerAgent {
     }
 
 
-
-
     /**
      * <Agent>
      */
@@ -133,15 +103,6 @@ class UnifiedAgent extends useServerAgent {
         }
         
         this.keepAlive()
-        ; is handling post at the moment
-        ; if (this.currentHandlingPost || this.isListening.value !== "在线") {
-            ; return
-        ; }
-
-        
-        ; SetTimer(this.handlePost, 0)
-
-        ; this.isListening.set("处理中...")
 
         qmPosts := this.COLLECT("PENDING", this.qmPool)
         pmnPosts := this.COLLECT("PENDING")
