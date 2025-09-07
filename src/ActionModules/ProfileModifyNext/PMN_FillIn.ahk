@@ -224,10 +224,9 @@ class PMN_FillIn {
     }
 
     static parse(currentGuest) {
-        parsedInfo := Map()
         ; alt Name
         currentGuest["name"] := currentGuest["name"].replace("👤", "")
-        parsedInfo["nameAlt"] := currentGuest["guestType"] == "国外旅客" ? " " : currentGuest["name"]
+        nameAlt := currentGuest["guestType"] == "国外旅客" ? " " : currentGuest["name"]
 
         ; last/firstname
         isTaiwanese := currentGuest["guestType"] == "港澳台旅客" && currentGuest["region"] == "台湾"
@@ -237,32 +236,28 @@ class PMN_FillIn {
                 ? currentGuest["name"].split("·").map(namePart => namePart.split("").map(hanzi => useDict.getPinyin(hanzi)).join(" ")) 
                 : useDict.getFullnamePinyin(currentGuest["name"], isTaiwanese)
 
-            unpack([&parsedInfo["nameLast"] , &parsedInfo["nameFirst"]], fullName)
+            unpack([&nameLast , &nameFirst], fullName)
         } else {
-            parsedInfo["nameLast"] := currentGuest["nameLast"]
-            parsedInfo["nameFirst"] := currentGuest["nameFirst"]
+            nameLast := currentGuest["nameLast"]
+            nameFirst := currentGuest["nameFirst"]
         }
         
         ; fallback for incomplete info
-        if (
-            (currentGuest["region"] == "香港" || currentGuest["region"] == "澳门")
-            && parsedInfo["nameLast"] == " " 
-            && parsedInfo["nameFirst"] == " "
-        ) {
-            unpack([&parsedInfo["nameLast"], &parsedInfo["nameFirst"]], useDict.getFullnamePinyinCantonese(currentGuest["name"]))
+        if ((currentGuest["region"] == "香港" || currentGuest["region"] == "澳门") && nameLast == " " && nameFirst == " ") {
+            unpack([&nameLast, &nameFirst], useDict.getFullnamePinyinCantonese(currentGuest["name"]))
         }
         
         ; address
-        parsedInfo["addr"] := currentGuest["guestType"] == "内地旅客" ? currentGuest["addr"] : " "
+        addr := currentGuest["guestType"] == "内地旅客" ? currentGuest["addr"] : " "
         
         ; language
-        parsedInfo["language"] := currentGuest["guestType"] == "内地旅客" ? "C" : "E"
+        language := currentGuest["guestType"] == "内地旅客" ? "C" : "E"
         
         ; country
-        parsedInfo["country"] := currentGuest["guestType"] == "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
+        country := currentGuest["guestType"] == "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
 
         ; province
-        parsedInfo["province"] := match(
+        province := match(
             currentGuest["guestType"], 
             Map(
                 "内地旅客", useDict.getProvince(currentGuest["addr"]) || useDict.getProvinceById(currentGuest["idNum"]),
@@ -272,17 +267,17 @@ class PMN_FillIn {
         )
         
         ; id number
-        parsedInfo["idNum"] := currentGuest["idNum"]
+        idNum := currentGuest["idNum"]
         
         ; id Type
-        parsedInfo["idType"] := useDict.getIdTypeCode(currentGuest["idType"])
+        idType := useDict.getIdTypeCode(currentGuest["idType"])
         
         ; gender
-        parsedInfo["gender"] := currentGuest["gender"] == "男" ? "Mr" : "Ms"
+        gender := currentGuest["gender"] == "男" ? "Mr" : "Ms"
         
         ; birthday
         bd := StrSplit(currentGuest["birthday"], "-")
-        parsedInfo["birthday"] := bd[2] . bd[3] . bd[1]
+        birthday := bd[2] . bd[3] . bd[1]
         
         ; tel number
         tel := currentGuest["tel"]
@@ -291,12 +286,23 @@ class PMN_FillIn {
             s := SubStr(tel, 4, 4)
             r := SubStr(tel, 8, 4)
             
-            parsedInfo["tel"] := f . "-" . s . "-" . r
-        } else {
-            parsedInfo["tel"] := tel
+            tel := f . "-" . s . "-" . r
         }
         
-        return parsedInfo
+        return Map(
+            "nameAlt", nameAlt,
+            "nameLast", nameLast,
+            "nameFirst", nameFirst,
+            "addr", addr,
+            "language", language,
+            "country", country,
+            "province", province,
+            "idNum", idNum,
+            "idType", idType,
+            "gender", gender,
+            "birthday", birthday,
+            "tel", tel
+        )
     }
     
     static fillAction(guestProfileMap) {
