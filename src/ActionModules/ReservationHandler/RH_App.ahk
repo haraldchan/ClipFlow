@@ -19,7 +19,7 @@ RH_App(App, moduleTitle, identifier) {
         incommingResv["coDate"] := incommingResv["coDate"].replace("-", "")
 
         curResv.set(incommingResv)
-        config.write("currentReservation", JSON.stringify(incommingResv))
+        CONFIG.write("currentReservation", JSON.stringify(incommingResv))
     }
 
     effect(curResv, handleResvSourceUpdate)
@@ -36,7 +36,7 @@ RH_App(App, moduleTitle, identifier) {
         LV.ModifyCol(1, 100)
         LV.ModifyCol(2, 200)
 
-        storedResv := config.read("currentReservation")
+        storedResv := CONFIG.read("currentReservation")
         if (storedResv) {
             curResv.set(JSON.parse(storedResv))
         }

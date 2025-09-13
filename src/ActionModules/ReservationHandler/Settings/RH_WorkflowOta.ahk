@@ -1,5 +1,5 @@
 RH_WorkflowOta(App) {
-    wfConfig := config.read("workflow-ota")
+    wfConfig := CONFIG.read("workflow-ota")
 
     onMount() {
         for ctrl in App {
@@ -11,7 +11,7 @@ RH_WorkflowOta(App) {
 
     saveWorkflow(*) {
         form := JSON.parse(JSON.stringify(App.Submit(false)))
-        config.write("workflow-ota", {
+        CONFIG.write("workflow-ota", {
             profile: form["wf-profile"],
             routing: form["wf-routing"],
             resType: form["wf-resType"],

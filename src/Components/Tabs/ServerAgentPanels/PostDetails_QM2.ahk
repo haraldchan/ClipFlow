@@ -47,7 +47,7 @@ PostDetails_QM2(post, moduleName, props) {
         return 0 
     }
 
-    db := useFileDB(config.read("dbSettings"))
+    db := useFileDB(CONFIG.read("dbSettings"))
     handleTriggerPmPost() {
         roomNums := form.shareRoomNums.trim()
         ; selectedGuests can only pass by GuestProfileList

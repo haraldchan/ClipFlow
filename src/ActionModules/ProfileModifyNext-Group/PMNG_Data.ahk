@@ -1,6 +1,5 @@
 class PMNG_Data {
     static saveFileName := ""
-    static operaLogo := A_ScriptDir . "\src\Assets\opera-logo.PNG"
 
     static reportFiling(blockcode, initX := 433, initY := 598) {
         WinSetAlwaysOnTop true, "ahk_class SunAwtFrame"
@@ -8,8 +7,8 @@ class PMNG_Data {
         WinMaximize "ahk_class SunAwtFrame"
         WinActivate "ahk_class SunAwtFrame"
 
-        if (utils.checkClearWin(popupTitle, this.operaLogo) = "Cancel"){
-            utils.cleanReload(winGroup)
+        if (utils.checkClearWin(POPUP_TITLE, IMAGES["opera-logo.png"]) = "Cancel"){
+            utils.cleanReload(WIN_GROUP)
         }
 
         utils.waitLoading()
@@ -75,7 +74,7 @@ class PMNG_Data {
 
             if (A_Index = 30) {
                 MsgBox("保存出错，脚本已终止。", "ReportMaster", "T1 4096")
-                utils.cleanReload(winGroup)
+                utils.cleanReload(WIN_GROUP)
             }
         }
 

@@ -1,6 +1,4 @@
 class RH_OtaBookingEntry {
-    static profileAnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
-    static activeWinIcon := A_ScriptDir . "\src\Assets\opera-active-win.PNG"
     static isRunning := false
 
     static start(config := {}) {
@@ -33,8 +31,8 @@ class RH_OtaBookingEntry {
     static dismissPopup() {
         loop {
             if (
-                ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\alert.png")
-                || ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\info.png")
+                ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.png"])
+                || ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.png"])
             ) {
                 Send "{Escape}"
                 utils.waitLoading()
@@ -75,7 +73,7 @@ class RH_OtaBookingEntry {
 
     ; the initX, initY for USE() should be top-left corner of current booking window
     static USE(curResv, roomType, comment, pmsGuestNames, splitParty, packages, configFields, sendTrace) {
-        wf := config.read("workflow-ota")
+        wf := CONFIG.read("workflow-ota")
 
         rateCode := configFields["ratecode"][curResv["bbf"] + 1]
         if (!rateCode) {
@@ -84,18 +82,18 @@ class RH_OtaBookingEntry {
 
         ; workflow start
         this.start()
-        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\isCheckedIn.png")
+        isCheckedIn := ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["isCheckedIn.png"])
 
         if (!isCheckedIn && wf["profile"]) {
             this.profileEntry(pmsGuestNames[1])
             if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
+                msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                 return
             }
 
             this.roomQtyEntry(curResv["roomQty"])
             if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
+                msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                 return
             }
         }
@@ -103,26 +101,26 @@ class RH_OtaBookingEntry {
         if (wf["routing"]) {
             this.routingEntry(curResv["payment"], configFields)
             if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
+                msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                 return
             }
         }
 
         this.roomTypeEntry(roomType, isCheckedIn)
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
         this.dateTimeEntry(curResv["ciDate"], curResv["coDate"], isCheckedIn)
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
         this.commentOrderIdSpecialEntry(curResv["orderId"], comment, curResv["remarks"])
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -136,14 +134,14 @@ class RH_OtaBookingEntry {
             wf
         )
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
         if (curResv["bbf"] || comment.includes("CBF")) {
             this.breakfastEntry(curResv["bbf"], rateCode != configFields["ratecode"][1] || rateCode == "CORS", comment.includes("CBF"))
             if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
+                msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                 return
             }
         }
@@ -151,7 +149,7 @@ class RH_OtaBookingEntry {
         if (packages) {
             packages.split(" ").map(package => this.packageEntry(package))
             if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
+                msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                 return
             }
         }
@@ -159,7 +157,7 @@ class RH_OtaBookingEntry {
         if (sendTrace) {
             this.traceEntry(curResv["remarks"])
             if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
+                msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                 return
             }
         }
@@ -167,7 +165,7 @@ class RH_OtaBookingEntry {
         if (splitParty) {
             this.splitPartyEntry(pmsGuestNames, curResv["roomQty"])
             if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
+                msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                 return
             }
         }
@@ -180,7 +178,7 @@ class RH_OtaBookingEntry {
     static profileEntry(guestName) {
         ; open profile
         loop 10 {
-            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.profileAnchorImage)) {
+            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
                 anchorX := FoundX - 10
                 anchorY := FoundY
                 break
@@ -188,8 +186,8 @@ class RH_OtaBookingEntry {
             Sleep 100
 
             if (A_Index == 10 && !IsSet(anchorX)) {
-                MsgBox("界面定位失败，请重新打开预订界面。", popupTitle, "4096 T2")
-                utils.cleanReload(winGroup)
+                MsgBox("界面定位失败，请重新打开预订界面。", POPUP_TITLE, "4096 T2")
+                utils.cleanReload(WIN_GROUP)
             }
         }
         MouseMove anchorX, anchorY
@@ -200,7 +198,7 @@ class RH_OtaBookingEntry {
         ; create new profile
         Send "!n"
         utils.waitLoading()
-        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.profileAnchorImage)
+        ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])
         Sleep 100
         MouseMove FoundX - 20, FoundY
         utils.waitLoading()
@@ -230,7 +228,7 @@ class RH_OtaBookingEntry {
 
 
     static roomQtyEntry(roomQty) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         MouseMove initX + 93, initY + 259
         utils.waitLoading()
@@ -246,7 +244,7 @@ class RH_OtaBookingEntry {
 
     static routingEntry(payment, configFields) {
         ; clear fields: Agent, Company
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         MouseMove initX + 673, initY + 35
         utils.waitLoading()
@@ -280,7 +278,7 @@ class RH_OtaBookingEntry {
         this.dismissPopup()
 
         ; check if default routing exist
-        ImageSearch(&drX, &drY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&drX, &drY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
         if (PixelGetColor(drX+481, drY+64) == "0x000080") {
             Send "{Space}"
             utils.waitLoading()
@@ -320,7 +318,7 @@ class RH_OtaBookingEntry {
 
 
     static roomTypeEntry(roomType, isCheckedIn) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
         MouseMove initX + 302, initY + 282 ; RTC btn
         utils.waitLoading()
         Click
@@ -349,7 +347,7 @@ class RH_OtaBookingEntry {
 
 
     static dateTimeEntry(checkin, checkout, isCheckedIn) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
         pmsCiDate := FormatTime(checkin, "MMddyyyy")
         pmsCoDate := FormatTime(checkout, "MMddyyyy")
 
@@ -383,7 +381,7 @@ class RH_OtaBookingEntry {
 
 
     static commentOrderIdSpecialEntry(orderId, comment, remarks) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         ; fill-in orderId
         MouseMove initX + 643, initY + 371
@@ -418,7 +416,7 @@ class RH_OtaBookingEntry {
 
 
     static roomRatesEntry(rateCode, roomRates, nts, isCheckedIn, bbf, configFields, wf) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         if (wf["resType"]) {
             ; mkt/src code
@@ -483,7 +481,7 @@ class RH_OtaBookingEntry {
                 Send "!e"
                 utils.waitLoading()
 
-                ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+                ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
                 if (bbf > 1) {
                     MouseMove FoundX + 143, FoundY + 69
                     Click 3
@@ -522,7 +520,7 @@ class RH_OtaBookingEntry {
 
 
     static breakfastEntry(bbf, packageBounded, isCBF) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         ; if ratecode is bound with packages(blue text) or club floor rooms, skip adding BFNP
         if (!packageBounded && !isCBF) {
@@ -556,7 +554,7 @@ class RH_OtaBookingEntry {
 
 
     static packageEntry(package) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         ;entry extra package
         MouseMove initX + 156, initY + 364
@@ -619,7 +617,7 @@ class RH_OtaBookingEntry {
         }
         
         ; sort party members
-        ImageSearch(&partyX, &partyY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&partyX, &partyY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
         MouseMove partyX + 37, partyY + 77
         utils.waitLoading()
         Click

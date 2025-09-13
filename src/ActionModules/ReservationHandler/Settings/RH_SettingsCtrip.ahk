@@ -6,7 +6,7 @@ RH_SettingsCtrip(App, params) {
         }
 
         form := JSON.parse(JSON.stringify(App.Submit(false)))
-        config.write(agent, {
+        CONFIG.write(agent, {
             agent: agent,
             profileNamePoa: form[agent . "-profileNamePoa"],
             profileName: form[agent . "-profileName"],

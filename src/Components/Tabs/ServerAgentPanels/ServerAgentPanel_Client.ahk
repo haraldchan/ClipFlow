@@ -145,7 +145,7 @@ ServerAgentPanel_Client(App, enabled) {
     comp.render := this => this.Add(
         App.AddGroupBox("Section x350 y110 w350 r18"),
         App.AddCheckBox((enabled ? "Checked" : "") . " xs10 yp", "客户端（前台）选项")
-           .OnEvent("Click", (ctrl, _) => (comp.disable(!ctrl.Value), config.write("clientEnabled", ctrl.Value))),
+           .OnEvent("Click", (ctrl, _) => (comp.disable(!ctrl.Value), CONFIG.write("clientEnabled", ctrl.Value))),
         
         ; test connection
         App.ARButton("xs20 w60 h30 yp+30", "测试连接").OnEvent("Click", ping),

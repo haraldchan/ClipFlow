@@ -1,6 +1,4 @@
 class FedexBookingEntry {
-    static profileAnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
-    static activeWinIcon := A_ScriptDir . "\src\Assets\opera-active-win.PNG"
     static isRunning := false
 
     static start(config := {}) {
@@ -33,8 +31,8 @@ class FedexBookingEntry {
     static dismissPopup() {
         loop {
             if (
-                ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\alert.png")
-                || ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\Assets\info.png")
+                ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["alert.png"])
+                || ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.png"])
             ) {
                 Send "{Escape}"
                 utils.waitLoading()
@@ -68,31 +66,31 @@ class FedexBookingEntry {
             this.profileEntry(infoObj["crewNames"], index)
         }
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
         this.dateTimeEntry(pmsCiDate, pmsCoDate, infoObj["ETA"], infoObj["ETD"], isCheckedIn)
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
         this.moreFieldsEntry(schdCiDate, schdCoDate, infoObj["ETA"], infoObj["ETD"], infoObj["flightIn"], infoObj["flightOut"])
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
         this.commentEntry(infoObj)
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
         this.dailyDetailsEntry(infoObj["daysActual"], pmsNts)
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -100,14 +98,14 @@ class FedexBookingEntry {
         if (infoObj["daysActual"] > pmsNts) {
             this.postRoomChargeAlertEntry(pmsNts, infoObj["daysActual"])
             if (!this.isRunning) {
-                msgbox("脚本已终止", popupTitle, "4096 T1")
+                msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                 return
             }
         }
 
         this.crsNumEntry(infoObj["tracking"])
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -121,7 +119,7 @@ class FedexBookingEntry {
 
         ; open profile
         loop 10 {
-            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.profileAnchorImage)) {
+            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
                 anchorX := FoundX - 10
                 anchorY := FoundY
                 break
@@ -176,7 +174,7 @@ class FedexBookingEntry {
 
 
     static dateTimeEntry(checkin, checkout, ETA, ETD, isCheckedIn) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         ; fill-in checkin/checkout
         if (!isCheckedIn) {
@@ -231,7 +229,7 @@ class FedexBookingEntry {
         utils.waitLoading()
         Sleep 250
         
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         MouseMove initX + 475, initY + 113
         utils.waitLoading()
@@ -275,7 +273,7 @@ class FedexBookingEntry {
 
 
     static commentEntry(infoObj) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
         comment := ""
 
         ; select current comment
@@ -325,7 +323,7 @@ class FedexBookingEntry {
 
 
     static dailyDetailsEntry(daysActual, pmsNts) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         MouseMove initX + 176, initY + 340 ; 372, 524
         utils.waitLoading()
@@ -370,7 +368,7 @@ class FedexBookingEntry {
         Send "{Enter}"
         utils.waitLoading()
 
-        ImageSearch(&popX, &popY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&popX, &popY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
         if (PixelGetColor(popX + 55, popY + 55) == "0x000080") {
             Send "!n"
             utils.waitLoading()
@@ -401,7 +399,7 @@ class FedexBookingEntry {
 
 
     static crsNumEntry(tracking) {
-        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&initX, &initY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
 
         MouseMove initX + 543, initY + 321
         utils.waitLoading()
@@ -412,7 +410,7 @@ class FedexBookingEntry {
         Send "!e"
         utils.waitLoading()
 
-        ImageSearch(&popX, &popY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.activeWinIcon)
+        ImageSearch(&popX, &popY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-active-win.png"])
         if (PixelGetColor(popX + 64, popY + 55) == "0xD7D7D7") {
             Send "{Tab}"
             utils.waitLoading()

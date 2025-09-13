@@ -1,6 +1,4 @@
 class PMN_FillIn {
-    static AnchorImage := A_ScriptDir . "\src\Assets\AltNameAnchor.PNG"
-    static ErrorImage := A_ScriptDir . "\src\Assets\error.PNG"
     static FOUND := "0x000080"
     static NOT_FOUND := "0x008080"
     static isRunning := false
@@ -39,7 +37,7 @@ class PMN_FillIn {
         WinActivate "ahk_class SunAwtFrame"
         Sleep 300
 
-        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, this.ErrorImage)) {
+        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["error.png"])) {
             Send "!o"
             utils.waitLoading()
             Send "!c"
@@ -127,13 +125,13 @@ class PMN_FillIn {
     static getCurrentId() {
         prevClip := A_Clipboard
 
-        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
+        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
             anchorX := FoundX - 10
             anchorY := FoundY
         } else {
-            MsgBox("界面定位失败", popupTitle, "T2 4096")
+            MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
             agent.abort()
-            utils.cleanReload(winGroup)
+            utils.cleanReload(WIN_GROUP)
         }
 
         MouseMove anchorX + 393, anchorY + 50
@@ -165,12 +163,12 @@ class PMN_FillIn {
         loop {
             Sleep 100
             if (A_Index > 30) {
-                MsgBox("界面定位失败", popupTitle, "T2 4096")
+                MsgBox("界面定位失败", POPUP_TITLE, "T2 4096")
                 agent.abort()
-                utils.cleanReload(winGroup)
+                utils.cleanReload(WIN_GROUP)
             }
 
-            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
+            if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
                 x := Number(FoundX) + 350
                 y := Number(FoundY) + 80
                 break
@@ -192,7 +190,7 @@ class PMN_FillIn {
         Send "{Esc}" ; cancel the "save changes msgbox"
         utils.waitLoading()
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -202,7 +200,7 @@ class PMN_FillIn {
         }
 
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -213,7 +211,7 @@ class PMN_FillIn {
         Sleep 500
 
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -306,7 +304,7 @@ class PMN_FillIn {
     }
     
     static fillAction(guestProfileMap) {
-        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, this.AnchorImage)) {
+        if (ImageSearch(&FoundX, &FoundY, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["AltNameAnchor.png"])) {
             anchorX := FoundX - 10
             anchorY := FoundY
         } else {
@@ -337,7 +335,7 @@ class PMN_FillIn {
         Send Format("{Text}{1}", guestProfileMap["language"])
 
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -360,7 +358,7 @@ class PMN_FillIn {
         Send Format("{Text}{1}", guestProfileMap["province"])
 
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -396,7 +394,7 @@ class PMN_FillIn {
         }
 
         if (!this.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 

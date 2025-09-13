@@ -1,13 +1,11 @@
 #Include "../ProfileModifyNext/PMN_FillIn.ahk"
 
 class PMNG_Execute {
-    static operaLogo := A_ScriptDir . "\src\Assets\opera-logo.PNG"
-
     static startModify(inhRooms, groupGuests) {
         PMN_FillIn.start()
 
-        if (utils.checkClearWin(popupTitle, this.operaLogo) = "Cancel"){
-            utils.cleanReload(winGroup)
+        if (utils.checkClearWin(POPUP_TITLE, IMAGES["opera-logo.png"]) = "Cancel"){
+            utils.cleanReload(WIN_GROUP)
         }
         this.openInHouse()
 
@@ -25,13 +23,13 @@ class PMNG_Execute {
                 if (index > inhRooms.filter(r => r == curRoom.value).Length && remaining > 0) {
                     this.search(room, 1, isNewShare) ; find main resv and make share on it
                     if (!PMN_FillIn.isRunning) {
-                        msgbox("脚本已终止", popupTitle, "4096 T1")
+                        msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                         return
                     }
                     this.makeShare()
                     isNewShare := true
                     if (!PMN_FillIn.isRunning) {
-                        msgbox("脚本已终止", popupTitle, "4096 T1")
+                        msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                         return
                     }
                     Send "!r" ; clear
@@ -42,7 +40,7 @@ class PMNG_Execute {
                     utils.waitLoading()
                     this.modify(guest)
                     if (!PMN_FillIn.isRunning) {
-                        msgbox("脚本已终止", popupTitle, "4096 T1")
+                        msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                         return
                     }
                     guest["roomNum"] := ""
@@ -88,7 +86,7 @@ class PMNG_Execute {
         Send "!h" ; alt+h => search
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -100,7 +98,7 @@ class PMNG_Execute {
         Send "{Enter}"
         utils.waitLoading() 
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -141,7 +139,7 @@ class PMNG_Execute {
             utils.waitLoading()
         }
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
         Send "{Text}0"
@@ -153,7 +151,7 @@ class PMNG_Execute {
         Send "{Text}6"
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -176,7 +174,7 @@ class PMNG_Execute {
         MouseMove initX - 625, initY - 92 ; 324, 507
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -190,7 +188,7 @@ class PMNG_Execute {
         Send "!o"
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -206,7 +204,7 @@ class PMNG_Execute {
             utils.waitLoading()
         }
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 

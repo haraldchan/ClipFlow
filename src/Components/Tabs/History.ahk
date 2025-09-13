@@ -1,5 +1,5 @@
 History(App) {
-	clipHistory := signal(config.read("clipHistory"))
+	clipHistory := signal(CONFIG.read("clipHistory"))
 	fillBlank(clipHistory.value)
 
 	OnClipboardChange (*) => (
@@ -12,7 +12,7 @@ History(App) {
 		if (A_Clipboard = "") {
         	return
     	}
-		updated := config.read("clipHistory")
+		updated := CONFIG.read("clipHistory")
 		
 		for item in updated {
 			if (A_Clipboard == item) {
@@ -24,7 +24,7 @@ History(App) {
 			updated.Pop()
 		}
 		updated.InsertAt(1, A_Clipboard)
-		config.write("clipHistory", updated)
+		CONFIG.write("clipHistory", updated)
 	}
 
 	fillBlank(history){
@@ -38,7 +38,7 @@ History(App) {
 	}
 
 	updateHistoryList(){
-		updatedHistory := config.read("clipHistory")
+		updatedHistory := CONFIG.read("clipHistory")
 		fillBlank(updatedHistory)
 	}
 

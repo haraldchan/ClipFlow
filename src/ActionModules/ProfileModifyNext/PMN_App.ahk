@@ -96,7 +96,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         ; updating from add guest modal
         if (currentGuest.value["idNum"] == incomingGuest["idNum"] && !incomingGuest["isMod"]) {
             handleGuestInfoUpdateFromAdd(incomingGuest)
-            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
+            MsgBox(Format("已更新信息：{1}", incomingGuest["name"]), POPUP_TITLE, "T1.5")
 
         ; updating from saved guest modal
         } else if (incomingGuest["isMod"]) {
@@ -104,7 +104,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             if (updatedGuest == "") {
                 return
             }
-            MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), popupTitle, "T1.5")
+            MsgBox(Format("已保存修改：{1}", updatedGuest["name"]), POPUP_TITLE, "T1.5")
 
         ; adding guest
         } else {
@@ -117,7 +117,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
                 db.add(JSON.stringify(incomingGuest))
             }
 
-            MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), popupTitle, "T1.5")
+            MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), POPUP_TITLE, "T1.5")
         }
 
         currentGuest.set(JSON.parse(A_Clipboard))
@@ -131,7 +131,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         handleListContentUpdate()
 
         ; restore previous clip to clb
-        clipHistory := config.read("clipHistory")
+        clipHistory := CONFIG.read("clipHistory")
         A_Clipboard := clipHistory.Length > 1 ? clipHistory[1] : ""
     } 
 
@@ -174,7 +174,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             ; FileDB
             fdb.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
         } catch {
-            MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
+            MsgBox("无匹配目标...", POPUP_TITLE, "4096 T1.5")
             return
         }
 
@@ -182,7 +182,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             try {
                 db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], item => item["tsId"] == matchedGuest.value["tsId"])
             } catch {
-                MsgBox("无匹配目标...", popupTitle, "4096 T1.5")
+                MsgBox("无匹配目标...", POPUP_TITLE, "4096 T1.5")
                 return
             }
         }
@@ -307,7 +307,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
         if (searchBy.value == "waterfall") {
             if (queryFilter.value["search"] == "") {
-                MsgBox("瀑流模式必须提供房号。", popupTitle, "T2")
+                MsgBox("瀑流模式必须提供房号。", POPUP_TITLE, "T2")
                 App.Show()
                 return
             }
@@ -320,7 +320,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             ; pick selected guests
             for row in LV.getCheckedRowNumbers() {
                 if (LV.getCheckedRowNumbers()[1] == "0") {
-                    MsgBox("未选中 Profile。", popupTitle, "T2")
+                    MsgBox("未选中 Profile。", POPUP_TITLE, "T2")
                     App.Show()
                     return
                 }
@@ -400,7 +400,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
     ; hotkey setup
     setHotkeys() {
-        HotIfWinActive(popupTitle)
+        HotIfWinActive(POPUP_TITLE)
         Hotkey "!f", (*) => App.getCtrlByName("searchBox").Focus()
         Hotkey "!Left", (*) => toggleDate("-")
         Hotkey "!Right", (*) => toggleDate("+")

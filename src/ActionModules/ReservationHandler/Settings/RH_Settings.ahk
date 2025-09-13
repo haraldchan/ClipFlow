@@ -11,7 +11,7 @@ RH_Settings(*) {
     App := Gui(, title)
     App.SetFont(, "微软雅黑")
 
-    entryParams := config.read("entryParams")
+    entryParams := CONFIG.read("entryParams")
 
     return (
         tabs := App.AddTab3("x15 h500 w370", ["捷旅", "奇利", "携程 OTA", "携程商旅尊享", "携程商旅协议", "美团", "流程设置"]),

@@ -6,15 +6,15 @@ App(App) {
 
 	keepOnTop(*){
 		onTop.set(onTop => !onTop)
-		WinSetAlwaysOnTop onTop.value, popupTitle
+		WinSetAlwaysOnTop onTop.value, POPUP_TITLE
 	}
 
 	clearList(*) {
-		if (FileExist(config.path)) {
-			FileDelete(config.path)
+		if (FileExist(CONFIG.path)) {
+			FileDelete(CONFIG.path)
 		}
-		config.createLocal()
-    	utils.cleanReload(winGroup)
+		CONFIG.createLocal()
+    	utils.cleanReload(WIN_GROUP)
 	}
 
 	return (

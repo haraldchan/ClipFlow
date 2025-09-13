@@ -38,7 +38,7 @@ class RH_OTA {
         try {
             roomType := this.roomTypeMap.keyOf(curResv["roomType"])
         } catch {
-            rt := InputBox(Format("房型 ({1}) 未找到，请输入 RoomType Code。`n如：DKC。", curResv["roomType"]), popupTitle)
+            rt := InputBox(Format("房型 ({1}) 未找到，请输入 RoomType Code。`n如：DKC。", curResv["roomType"]), POPUP_TITLE)
             if (rt.Result == "Cancel") {
                 return
             }
@@ -110,7 +110,7 @@ class RH_OTA {
         }
 
         agentConfigName := (curResv["agent"] == "ctrip-ota" && curResv["payment"].includes("商旅")) ? "ctrip-ota-shanglv" : curResv["agent"]
-        configFields := config.read(agentConfigName)
+        configFields := CONFIG.read(agentConfigName)
 
         if (overridenRateCode) {
             configFields["ratecode"] := [overridenRateCode, overridenRateCode, overridenRateCode]

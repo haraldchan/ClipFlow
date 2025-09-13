@@ -9,10 +9,10 @@ FlowModes(App) {
 
 	moduleNames := modules.map(module => module.name)
 
-	moduleSelectedStored := config.read("moduleSelected")
+	moduleSelectedStored := CONFIG.read("moduleSelected")
 	if (!moduleSelectedStored) {
 		moduleSelectedStored := 1
-		config.write("moduleSelected", 1)
+		CONFIG.write("moduleSelected", 1)
 	}
 
     moduleSelected := moduleSelectedStored > modules.Length ? 1 : moduleSelectedStored
@@ -20,8 +20,8 @@ FlowModes(App) {
 	return (
 		App.AddDropDownList("y+10 w250 Choose" . moduleSelected, moduleNames)
 		   .OnEvent("Change", (d*) => 
-			config.write("moduleSelected", d[1].value)
-			utils.cleanReload(winGroup)
+			CONFIG.write("moduleSelected", d[1].value)
+			utils.cleanReload(WIN_GROUP)
 		),
 		modules[moduleSelected].USE(App)
 	)

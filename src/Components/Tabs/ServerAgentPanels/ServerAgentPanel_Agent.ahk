@@ -26,7 +26,7 @@ ServerAgentPanel_Agent(App, enabled, isListening) {
         App.AddCheckBox((enabled ? "Checked" : "") . " xs10 yp", "服务端（后台）选项")
            .OnEvent("Click", (ctrl, _) => (
                 comp.disable(!ctrl.Value), 
-                config.write("agentEnabled", ctrl.Value),
+                CONFIG.write("agentEnabled", ctrl.Value),
                 !ctrl.Value && isListening.set("离线")
         )),
         

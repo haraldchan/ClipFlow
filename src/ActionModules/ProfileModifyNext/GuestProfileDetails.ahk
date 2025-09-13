@@ -32,7 +32,7 @@ GuestProfileDetails(selectedGuest, fillIn, App) {
     copyListField(LV, row) {
         A_Clipboard := LV.GetText(row, 2)
         key := LV.GetText(row, 1)
-        MsgBox(Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard), popupTitle, "4096 T1")
+        MsgBox(Format("已复制信息: `n`n{1} : {2}", key, A_Clipboard), POPUP_TITLE, "4096 T1")
     }
 
     fillInPms(){

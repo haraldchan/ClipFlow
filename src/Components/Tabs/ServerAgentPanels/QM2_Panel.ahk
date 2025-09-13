@@ -50,12 +50,12 @@ QM2_Panel(props) {
             handleTriggerPmPost()
         }
 
-        SetTimer((*) => (App.Destroy(), WinHide(popupTitle)), -100)
+        SetTimer((*) => (App.Destroy(), WinHide(POPUP_TITLE)), -100)
 
         return 0
     }
 
-    db := useFileDB(config.read("dbSettings"))
+    db := useFileDB(CONFIG.read("dbSettings"))
     handleTriggerPmPost() {
         roomNums := form.shareRoomNums.trim()
         profiles := p.selectedGuests.Length == 0

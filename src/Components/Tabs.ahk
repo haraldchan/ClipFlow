@@ -5,8 +5,8 @@
 Tabs(App) {
 
 	return (
-		Tab3 := App.AddTab3("x15" . " Choose" . config.read("tabPos"), ["Flow Modes", "History", "ServerAgents"]),
-		Tab3.OnEvent("Change", (*) => config.write("tabPos", Tab3.Value))
+		Tab3 := App.AddTab3("x15" . " Choose" . CONFIG.read("tabPos"), ["Flow Modes", "History", "ServerAgents"]),
+		Tab3.OnEvent("Change", (*) => CONFIG.write("tabPos", Tab3.Value))
 
 		Tab3.UseTab(1),
 		FlowModes(App),

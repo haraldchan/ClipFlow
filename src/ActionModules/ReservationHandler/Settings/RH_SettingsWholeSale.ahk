@@ -6,7 +6,7 @@ RH_SettingsWholeSale(App, params) {
         }
 
         form := JSON.parse(JSON.stringify(App.Submit(false)))
-        config.write(agent, {
+        CONFIG.write(agent, {
             agent: agent,
             profileName: form[agent . "-profileName"],
             profileType: form[agent . "-isTA"] == true ? "Travel Agent" : "Company",

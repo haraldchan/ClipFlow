@@ -22,9 +22,9 @@ ServerAgentPanel(App) {
         App.AddText("x30 y75 h40 w580", "ProfileModifyNext Server").SetFont("s13 q5 Bold"),
         
         ; server-side options
-        ServerAgentPanel_Agent(App, config.read("agentEnabled"), isListening),
+        ServerAgentPanel_Agent(App, CONFIG.read("agentEnabled"), isListening),
         
         ; client-side options
-        ServerAgentPanel_Client(App, config.read("clientEnabled"))
+        ServerAgentPanel_Client(App, CONFIG.read("clientEnabled"))
     )
 }

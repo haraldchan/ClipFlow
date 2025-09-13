@@ -4,19 +4,20 @@
 CoordMode "Mouse", "Screen"
 TraySetIcon A_ScriptDir . "\src\Assets\CFTray.ico"
 
-; Initializing configuration
-version := "1.5.2"
-popupTitle := "ClipFlow " . version
-winGroup := ["ahk_class SunAwtFrame"]
-config := useConfigJSON(
+; global consts
+VERSION := "1.5.3"
+POPUP_TITLE := "ClipFlow " . VERSION
+WIN_GROUP := ["ahk_class SunAwtFrame"]
+IMAGES := useImages(A_ScriptDir . "\src\Assets")
+CONFIG := useConfigJSON(
 	"./clipflow.config.json",
 	"clipflow.config.json",
 )
 
 ; Gui
-ClipFlow := Gui(, popupTitle)
+ClipFlow := Gui(, POPUP_TITLE)
 ClipFlow.SetFont(, "微软雅黑")
-ClipFlow.OnEvent("Close", (*) => utils.quitApp("ClipFlow", popupTitle, winGroup))
+ClipFlow.OnEvent("Close", (*) => utils.quitApp("ClipFlow", POPUP_TITLE, WIN_GROUP))
 
 App(ClipFlow)
 
@@ -26,13 +27,13 @@ ClipFlow.Show()
 
 ; hotkeys setup
 Pause:: ClipFlow.Show()
-F11:: utils.cleanReload(winGroup)
+F11:: utils.cleanReload(WIN_GROUP)
 ^F11:: {
-	if (FileExist(config.path)) {
-		FileDelete(config.path)
+	if (FileExist(CONFIG.path)) {
+		FileDelete(CONFIG.path)
 	}
-	config.createLocal()
-	utils.cleanReload(winGroup)
+	CONFIG.createLocal()
+	utils.cleanReload(WIN_GROUP)
 }
-#Hotif WinActive(popupTitle)
+#Hotif WinActive(POPUP_TITLE)
 Esc:: ClipFlow.Hide()

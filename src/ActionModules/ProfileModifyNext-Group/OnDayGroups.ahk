@@ -11,12 +11,12 @@ OnDayGroups(App, selectedGroup) {
     }
 
     if (XL_FILE_PATH == "") {
-        MsgBox("未找到 OnDayGroup Excel 文件，请手动添加", popupTitle, "4096 T1")
+        MsgBox("未找到 OnDayGroup Excel 文件，请手动添加", POPUP_TITLE, "4096 T1")
         App.Opt("+OwnDialogs") 
         XL_FILE_PATH := FileSelect(3, , "请选择 OnDayGroup Excel 文件")
         if (XL_FILE_PATH == "") {
-            config.write("moduleSelected", 1)
-            utils.cleanReload(winGroup)
+            CONFIG.write("moduleSelected", 1)
+            utils.cleanReload(WIN_GROUP)
         }
     }
 

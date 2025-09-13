@@ -20,7 +20,7 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
 
     copyIdNumber(LV, row) {
         A_Clipboard := getSelectedCell(LV, row, "idNum")
-        MsgBox(Format("已复制证件号码: `n`n{1} : {2}", getSelectedCell(LV, row, "name"), A_Clipboard), popupTitle, "4096 T1")
+        MsgBox(Format("已复制证件号码: `n`n{1} : {2}", getSelectedCell(LV, row, "name"), A_Clipboard), POPUP_TITLE, "4096 T1")
     }
  
     handleUpdateItem(LV, row) {

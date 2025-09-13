@@ -10,7 +10,7 @@ class PMN_Waterfall {
                 }
 
                 if (!PMN_FillIn.isRunning) {
-                    msgbox("脚本已终止", popupTitle, "4096 T1")
+                    msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                     return "Ended Unexpectedly"
                 }
 
@@ -18,7 +18,7 @@ class PMN_Waterfall {
                 Sleep 1000
 
                 if (!PMN_FillIn.isRunning) {
-                    msgbox("脚本已终止", popupTitle, "4096 T1")
+                    msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
                     return "Ended Unexpectedly"
                 }
             }
@@ -49,7 +49,7 @@ class PMN_Waterfall {
             Send "{Esc}"
             utils.waitLoading()
 
-            if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, A_ScriptDir . "\src\Assets\opera-logo.PNG")) {
+            if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["opera-logo.PNG"])) {
                 break
             }
         }
@@ -69,7 +69,7 @@ class PMN_Waterfall {
         Send "!r"
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -89,14 +89,14 @@ class PMN_Waterfall {
         utils.waitLoading()
 
         CoordMode "Pixel", "Screen"
-        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, A_ScriptDir . "\src\assets\info.PNG")) {
+        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenHeight, IMAGES["info.PNG"])) {
             Send "{Enter}"
             PMN_FillIn.end()
             return "not found"
         }
 
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
 
@@ -108,10 +108,10 @@ class PMN_Waterfall {
         Send "{Enter}"
         utils.waitLoading()
         if (!PMN_FillIn.isRunning) {
-            msgbox("脚本已终止", popupTitle, "4096 T1")
+            msgbox("脚本已终止", POPUP_TITLE, "4096 T1")
             return
         }
-        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, PMN_FillIn.ErrorImage)) {
+        if (ImageSearch(&_, &_, 0, 0, A_ScreenWidth, A_ScreenWidth, IMAGES["error.png"])) {
             return this.handleWindowError()
         }
 

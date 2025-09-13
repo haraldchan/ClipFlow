@@ -97,7 +97,7 @@ class UnifiedAgent extends useServerAgent {
      */
     postHandler() {
         if (!WinExist("ahk_class SunAwtFrame")) {
-            MsgBox("后台 Opera PMS 不在线。", popupTitle, "4096 T1")
+            MsgBox("后台 Opera PMS 不在线。", POPUP_TITLE, "4096 T1")
             this.isListening.set("离线")
             return
         }
