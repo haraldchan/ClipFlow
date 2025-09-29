@@ -240,8 +240,8 @@ class PMN_FillIn {
             nameFirst := currentGuest["nameFirst"]
         }
         
-        ; fallback for incomplete info
-        if ((currentGuest["region"] == "香港" || currentGuest["region"] == "澳门") && nameLast == " " && nameFirst == " ") {
+        ; fallback for incomplete info(hk/mo)
+        if (currentGuest["guestType"] == "港澳台旅客" && !isTaiwanese && nameLast == " " && nameFirst == " ") {
             unpack([&nameLast, &nameFirst], useDict.getFullnamePinyinCantonese(currentGuest["name"]))
         }
         
