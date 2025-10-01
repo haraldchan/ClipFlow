@@ -5,7 +5,7 @@ CoordMode "Mouse", "Screen"
 TraySetIcon A_ScriptDir . "\src\Assets\CFTray.ico"
 
 ; global consts
-VERSION := "1.5.3"
+VERSION := "1.6.0"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\src\Assets")
