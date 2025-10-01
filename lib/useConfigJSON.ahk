@@ -4,7 +4,7 @@ class useConfigJSON {
         this.configFilename := configFilename
         this.configDest := configDest
         this.path := this.createLocal()
-        this.currentConfig := JSON.parse(FileRead(this.path))
+        this.currentConfig := JSON.parse(FileRead(this.path, "UTF-8"))
     }
 
     updateKeys() {
