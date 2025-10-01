@@ -1,7 +1,6 @@
 #Include "./GuestProfileDetails.ahk"
 
-GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile) {
-    isDateBaseTester := ProfileModifyNext.testers.find(tester => tester == A_ComputerName)
+GuestProfileList(App, fdb, listContent, queryFilter, searchBy, fillPmsProfile) {
 
     columnDetails := {
         keys: ["roomNum","name", "gender", "idType", "idNum", "addr"],
@@ -26,12 +25,8 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
     handleUpdateItem(LV, row) {
         selectedItem := listContent.value.find(item => item["idNum"] == getSelectedCell(LV, row, "idNum"))
         selectedItem["roomNum"] := getSelectedCell(LV, row, "roomNum")
-        ; FileDB
+    
         SetTimer(() => fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
-        ; DateDase
-        if (isDateBaseTester) {
-            db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
-        }
     }
 
     showProfileDetails(LV, row, *) {
@@ -57,12 +52,7 @@ GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfil
 
         LV.Modify(row,,, selectedItem["name"])
 
-        ; FileDB
         SetTimer(() => fdb.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], selectedItem["fileName"]), -1)
-        ; DateDase
-        if (isDateBaseTester) {
-            db.updateOne(JSON.stringify(selectedItem), queryFilter.value["date"], item => item["tsId"] == selectedItem["tsId"])
-        }
     }
 
     return (    

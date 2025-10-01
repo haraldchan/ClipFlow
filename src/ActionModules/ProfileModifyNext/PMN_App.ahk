@@ -3,9 +3,7 @@
 #Include "./PMN_FillIn.ahk"
 #Include "./PMN_Waterfall.ahk"
 
-PMN_App(App, moduleTitle, fdb, db, identifier) {
-    isDateBaseTester := ProfileModifyNext.testers.find(tester => tester == A_ComputerName)
-
+PMN_App(App, moduleTitle, db, identifier) {
     ; server agent delegate
     delegate := signal(false)
     serverConnection := signal("")
@@ -41,7 +39,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
 
     ; settings
-    settings := signal({ fillOverwrite: false, loadFrom: "FileDB" })
+    settings := signal({ fillOverwrite: false })
     fillBtnText := computed(
         [delegate, settings], 
         (curDelegate, curSettings) => handleFillInBtnTextUpdate(curDelegate, curSettings)
@@ -53,7 +51,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
 
     ; data states
-    listContent := signal(settings.value["loadFrom"] == "FileDB" ? fdb.load() : db.load())
+    listContent := signal(db.load())
     queryFilter := signal({ date: FormatTime(A_Now, "yyyyMMdd"), search: "", range: 60 })
 
 
@@ -108,14 +106,9 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
 
         ; adding guest
         } else {
-            ; FileDB
             incomingGuest["fileName"] := A_Now . "==" . Random(10000, 99999)
             incomingGuest["regTime"] := A_Now
-            fdb.add(JSON.stringify(incomingGuest))
-            ; DateBase
-            if (isDateBaseTester) {
-                db.add(JSON.stringify(incomingGuest))
-            }
+            db.add(JSON.stringify(incomingGuest))
 
             MsgBox(Format("已保存信息：{1}", incomingGuest["name"]), POPUP_TITLE, "T1.5")
         }
@@ -136,24 +129,20 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
     } 
 
     handleGuestInfoUpdateFromAdd(captured) {
-        recentGuests := settings.value["loadFrom"] == "FileDB" ? fdb.load() : db.load()
+        recentGuests := db.load()
         for guest in recentGuests {
             if (guest["idNum"] == captured["idNum"]) {
                 captured["regTime"] := guest["regTime"]
                 captured["fileName"] := guest["fileName"]
-                ; FileDB
-                fdb.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
-                ; DateBase
-                if (isDateBaseTester) {
-                    db.updateOne(JSON.stringify(captured), queryFilter.value["date"], item => item["tsId"] == guest["tsId"])
-                }
+
+                db.updateOne(JSON.stringify(captured), queryFilter.value["date"], guest["fileName"])
                 return
             }
         }
     }
 
     handleGuestInfoUpdateFromMod(updater) {
-        recentGuests := settings.value["loadFrom"] == "FileDB" ? fdb.load(, , 60 * 24) : db.load(, 60 * 24)
+        recentGuests := db.load(, , 60 * 24)
         matchedGuest := signal(Map())
         items := updater.keys()
 
@@ -171,20 +160,10 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         }
 
         try {
-            ; FileDB
-            fdb.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
+            db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], matchedGuest.value["fileName"])
         } catch {
             MsgBox("无匹配目标...", POPUP_TITLE, "4096 T1.5")
             return
-        }
-
-        if (isDateBaseTester) {
-            try {
-                db.updateOne(JSON.stringify(matchedGuest.value), queryFilter.value["date"], item => item["tsId"] == matchedGuest.value["tsId"])
-            } catch {
-                MsgBox("无匹配目标...", POPUP_TITLE, "4096 T1.5")
-                return
-            }
         }
 
         return matchedGuest.value
@@ -194,13 +173,8 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         colTitles := App.getCtrlByType("ListView").arcWrapper.titleKeys
         useListPlaceholder(listContent, colTitles, "Loading...")
 
-        App.getCtrlByName("range").Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
-
-        if (settings.value["loadFrom"] == "FileDB") {
-            loadedItems := fdb.load(, queryFilter.value["date"], queryFilter.value["range"]) 
-        } else {
-            loadedItems := db.load(queryFilter.value["date"], queryFilter.value["range"]) 
-        }
+        App["range"].Enabled := (queryFilter.value["date"] == FormatTime(A_Now, "yyyyMMdd"))
+        loadedItems := db.load(, queryFilter.value["date"], queryFilter.value["range"]) 
 
         if (loadedItems.Length == 0) {
             useListPlaceholder(listContent, colTitles, "No Data")
@@ -286,16 +260,6 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
             MsgBox("Opera 未启动！ ", "Profile Modify Next", "T1")
             return
         }
-
-        ; if (delegate.value) {
-        ;     serverConnection.set("代行已发送！")
-        ;     connectionStatus := App.getCtrlByName("connectionStatus")
-        ;     connectionStatus.Visible := true
-        ;     SetTimer(() => (connectionStatus.Visible := false, App.Hide()), -2000)
-        ; } else {
-        ;     App.Hide() 
-        ;     Sleep 500 
-        ; }
         
         App.Hide() 
         Sleep 500 
@@ -484,7 +448,7 @@ PMN_App(App, moduleTitle, fdb, db, identifier) {
         App.AddButton("vqm2Agent x+5 w80 h25 Disabled", "&QM2 Agent").OnEvent("Click", showQm2Panel),
 
         ; profile list
-        GuestProfileList(App, fdb, db, listContent, queryFilter, searchBy, fillPmsProfile),
+        GuestProfileList(App, db, listContent, queryFilter, searchBy, fillPmsProfile),
 
         ; waterfall controls
         App.ARCheckBox("$selectAllBtn Hidden w80 h20 xp6 y+5", "全选 (&A)"),

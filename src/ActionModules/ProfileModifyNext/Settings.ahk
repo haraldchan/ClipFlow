@@ -29,15 +29,7 @@ PMN_Settings(settingSignal) {
 
     onMount() {
         Settings.getCtrlByName("ow").Value := settingSignal.value["fillOverwrite"]
-        btns := [Settings.getCtrlByName("fdb"), Settings.getCtrlByName("ddb")]
-        for btn in btns {
-            if (btn.Text == settingSignal.value["loadFrom"]) {
-                btn.Value := true
-            }
-        }
     }
-
-
 
     return (
         Settings.AddText("x10 w260", helpInfo),
@@ -46,13 +38,6 @@ PMN_Settings(settingSignal) {
         Settings.AddCheckbox("vow x10 w260", "默认覆盖填入（直接在原 Profile 修改）")
                 .OnEvent("Click", (ctrl, _) => settingSignal.update("fillOverwrite", ctrl.value)),
         
-        ; load from FileDB/DateBase
-        Settings.AddText("x10 y+10", "来源数据库"),
-        Settings.AddRadio("vfdb x+10 Checked", "FileDB")
-                .OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
-        Settings.AddRadio("vddb x+10", "DateBase")
-                .OnEvent("Click", (ctrl, _) => settingSignal.update("loadFrom", ctrl.Text)),
-
         onMount(),
         Settings.Show()
     )

@@ -10,32 +10,15 @@ class ProfileModifyNext {
         archive: A_ScriptDir . "\src\ActionModules\ProfileModifyNext\GuestProfilesArchive",
         backup: "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\GuestProfilesBackup",
     }
-    static fdb := useFileDB(this.dbSetting)
-    static db := useDateBase(this.dbSetting)
-    static testers := [
-        ; "4CE325BJNW", 
-        ; "4CE325BJS4", 
-        ; "4CE325BJRC"
-    ]
+    static db := useFileDB(this.dbSetting)
 
     static USE(App) {
         yesterday := A_Now.yesterday().toFormat("yyyyMMdd")
 
-        if (!FileExist(this.fdb.archive . "\" . yesterday . " - archive.json")) {
-            this.fdb.createArchive(yesterday)
+        if (!FileExist(this.db.archive . "\" . yesterday . " - archive.json")) {
+            this.db.createArchive(yesterday)
         }
         
-        if (!FileExist(this.db.backup . "\" . A_Now.yesterday().toFormat("yyyyMM") . "\" . yesterday . " - backup.json")) {
-            this.fdb.createArchiveBackup(yesterday)
-        }
-
-        ; if (!FileExist(this.db.backup . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . "_backup.json")) {
-        ;     this.db.createBackup({ 
-        ;         path: this.db.main . "\" . SubStr(yesterday, 1, 6) . "\" . yesterday . ".json",
-        ;         filename: yesterday
-        ;     })
-        ; }
-        
-        PMN_App(App, this.title, this.fdb, this.db, this.identifier)
+        PMN_App(App, this.title, this.db, this.identifier)
     }
 }
