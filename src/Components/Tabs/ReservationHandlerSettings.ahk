@@ -22,7 +22,8 @@ ReservationHandlerSettings(App) {
     }
 
     return (
-        App.AddDDL("y+10 w250 Choose1" , agentList.values().map(item => item.name))
+        App.AddText("x30 y+10 w65 h20 0x200", "当前 Agent").SetFont("Bold"),
+        App.AddDDL("x+10 w250 Choose1" , agentList.values().map(item => item.name))
            .OnEvent("Change", (ctrl, _) => selectedAgent.set(agentList.keys()[ctrl.Value])),
 
         Dynamic(selectedAgent, agentComponentSet),
