@@ -1,12 +1,6 @@
 #Include "../../ActionModules/action-module-index.ahk"
 
-FlowModes(App) {
-	modules := [
-		ProfileModifyNext,
-		ProfileModifyNext_Group,
-		ReservationHandler,
-	]
-
+FlowModes(App, modules) {
 	moduleNames := modules.map(module => module.name)
 
 	moduleSelectedStored := CONFIG.read("moduleSelected")
