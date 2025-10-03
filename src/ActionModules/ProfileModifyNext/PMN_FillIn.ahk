@@ -255,14 +255,12 @@ class PMN_FillIn {
         country := currentGuest["guestType"] == "国外旅客" ? useDict.getCountryCode(currentGuest["country"]) : "CN"
 
         ; province
-        province := match(
-            currentGuest["guestType"], 
-            Map(
-                "内地旅客", useDict.getProvince(currentGuest["addr"]) || useDict.getProvinceById(currentGuest["idNum"]),
-                "港澳台旅客", useDict.getProvince(currentGuest["region"]),
-            ),  
-            " "
-        )
+        province := ""
+        if (currentGuest["guestType"] == "内地旅客") {
+            province := useDict.getProvince(currentGuest["addr"]) || useDict.getProvinceById(currentGuest["idNum"])
+        } else if (currentGuest["guestType"] == "港澳台旅客") {
+            province := useDict.getProvince(currentGuest["region"])
+        }
         
         ; id number
         idNum := currentGuest["idNum"]
