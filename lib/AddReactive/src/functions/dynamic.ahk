@@ -48,14 +48,19 @@ class Dynamic {
 
         ; pass component instances reference
         instances := this.components
-    }
+    }   
 
     _renderDynamic(currentValue) {
         for component in this.components {
             component.visible(false)
         }
 
-        this.components.find(instance => instance.name == this.componentEntries[currentValue].name).visible(true)
+        componentToShow := 
+            ArrayExt.find(this.components, instance => instance.name == this.componentEntries[currentValue].name) 
+            || ArrayExt.find(this.components, instance => instance.name == currentValue)
+
+
+        componentToShow.visible(true)
     }
 
     _handleNestedComponentRender(childComponents){
