@@ -29,10 +29,21 @@ ClipFlow.Show()
 Pause:: ClipFlow.Show()
 F11:: utils.cleanReload(WIN_GROUP)
 ^F11:: {
+	if (DirExist(CONFIG.read("sharedClipsDir"))) {
+		DirDelete(CONFIG.read("sharedClipsDir"), true)
+	}
+	DirCreate(CONFIG.read("sharedClipsDir"))
+	DirCreate(CONFIG.read("sharedClipsDirMeta"))
+
+	if (DirExist(A_MyDocuments . "\clipflow-clips")) {
+		DirDelete(A_MyDocuments . "\clipflow-clips", true)
+	}
+
 	if (FileExist(CONFIG.path)) {
 		FileDelete(CONFIG.path)
 	}
 	CONFIG.createLocal()
+	
 	utils.cleanReload(WIN_GROUP)
 }
 #Hotif WinActive(POPUP_TITLE)
