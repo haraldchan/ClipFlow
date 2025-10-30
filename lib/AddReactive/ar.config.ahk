@@ -1,11 +1,12 @@
 class ARConfig {
-    static debugMode := true
+    static debugMode := false
     static useDevtoolsUI := false
 
     static useExtendMethods := true
     static enableExtendMethods := {
         array: {
             some:      true,
+            includes:  true,
             every:     true,
             filter:    true,
             find:      true,
@@ -36,6 +37,8 @@ class ARConfig {
             replaceThese:  true,
             split:         true,
             substr:        true,
+            repeat:        true,
+            slice:         true
         },
         integer: {
             times:     true

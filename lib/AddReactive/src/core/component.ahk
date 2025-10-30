@@ -17,7 +17,7 @@ class Component {
         checkType(name, String, "Parameter #1 is not a string")
         this.GuiObj := GuiObj
         this.name := name
-        this.props := {}
+        this._props := {}
         this.ctrls := []
         this.children := () => {}
         this.childComponents := []
@@ -84,15 +84,15 @@ class Component {
         
         for name, val in props.OwnProps() {
             if (name == this.name) {
-                this.props := val
+                this._props := val
             }
         }
     }
 
     defineChildren() {
-        if (this.props.HasOwnProp("children")) {
-            checkType(this.props.children, Func)
-            this.children := this.props.children.Bind(this.GuiObj)
+        if (this._props.HasOwnProp("children")) {
+            checkType(this._props.children, Func)
+            this.children := this._props.children.Bind(this.GuiObj)
         }
     }
 
