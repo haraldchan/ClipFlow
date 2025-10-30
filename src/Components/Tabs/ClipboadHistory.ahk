@@ -1,10 +1,17 @@
+#Include "./ClipboardHistory/ClipHistoryItem.ahk"
+#Include "./ClipboardHistory/ShareClips.ahk"
+
 ClipboardHistory(App) {
+    SHARED_CLIPS_DIR := CONFIG.read("sharedClipsDir")
+    SHARED_CLIPS_DIR_META := CONFIG.read("sharedClipsDirMeta")
     IMG_EXTS := ["jpg", "jpeg", "gif", "png", "tiff", "bmp", "ico"]
     CLIP_HISTORY_LENGTH := 6
     CLIP_HISTORY_DIR := A_MyDocuments . "\clipflow-clips"
     if (!DirExist(CLIP_HISTORY_DIR)) {
         DirCreate(CLIP_HISTORY_DIR)
     }
+
+    sendToShareClips := signal(true) 
     
     clipTemplate := { type: "", text: "", content: "" }
     clipHistoryContent := []
@@ -16,7 +23,7 @@ ClipboardHistory(App) {
     loop CLIP_HISTORY_LENGTH - clipHistoryContent.Length {
         clipHistoryContent.Push(clipTemplate)
     }
-
+    
     clipHistory := signal(clipHistoryContent)
 
     OnClipboardChange((*) => (handleClipHistoryUpdate(), handleLocalClipsCleaning(), 1))
@@ -36,7 +43,7 @@ ClipboardHistory(App) {
     }
 
     handleContentSplit(saveClip := false) {
-        SplitPath(A_Clipboard, &fileName, &dir, &ext, &_, &drive)
+        SplitPath(A_Clipboard, &fileName, &dir, &ext, &fileNameNoExt, &drive)
 
         capturedType := match(dir, OrderedMap(
             (*) => dir.slice(1,5) == "http", "URL",
@@ -45,8 +52,33 @@ ClipboardHistory(App) {
             (*) => drive && !ext, "Folder"
         ), Format(".{1} file", ext))
 
+        timeStamp := A_Now . A_MSec
+        rand := Random(100, 999)
+        clipName := Format("{1}\{2}={3}.clip", CLIP_HISTORY_DIR, timeStamp, rand)
+
         if (saveClip) {
-            FileAppend(ClipboardAll(), Format("{1}\{2}{3}.clip", CLIP_HISTORY_DIR, A_Now, A_MSec))
+            FileAppend(ClipboardAll(), clipName)
+        }
+
+        if (saveClip && sendToShareClips.value) {
+            dest := SHARED_CLIPS_DIR_META . "\" . fileName
+
+            jsonIndexer := {
+                type: capturedType,
+                text: capturedType == "Text" ? A_Clipboard : dest,
+                contentPath: (capturedType.includes("file") || capturedType == "Image") ? dest : ""
+            }
+
+            if (capturedType.includes("file") || capturedType == "Image") {
+                FileCopy(A_Clipboard, dest, true)
+            }
+
+            FileAppend(
+                JSON.stringify(jsonIndexer), 
+                Format("{1}\{2}={3}.json", SHARED_CLIPS_DIR, timeStamp, rand), 
+                "UTF-8"
+            )
+            
         }
 
         return {
@@ -61,12 +93,12 @@ ClipboardHistory(App) {
         loop files, CLIP_HISTORY_DIR . "\*.clip" {
             SplitPath(A_LoopFileFullPath,,,,&filename)
             clipList.Push({
-                filename: Integer(filename),
+                timeStamp: Integer(filename.split("=")[1]),
                 fullpath: A_LoopFileFullPath
             })
         }
 
-        sortedClipList := clipList.sort((a, b) => b.filename - a.filename)
+        sortedClipList := clipList.sort((a, b) => b.timeStamp - a.timeStamp)
         for clip in sortedClipList {
             if (A_Index <= CLIP_HISTORY_LENGTH) {
                 continue
@@ -76,96 +108,9 @@ ClipboardHistory(App) {
         }
     }
 
-    return CLIP_HISTORY_LENGTH.times(() => ClipHistoryBlock(App, clipHistory, A_Index))
-}
-
-
-ClipHistoryBlock(App, clipHistory, index) {
-    icon := computed(clipHistory, curHistory => curHistory[index]["type"] == "URL" ? "⇱" : "🗁")
-    thisImagePath := computed(clipHistory, curHistory => curHistory[index]["type"] == "Image" ? curHistory[index]["text"] : "")
-    
-    effect(clipHistory, handleCtrlVisibility)
-    handleCtrlVisibility(curHistory) {
-        App["chbPlaceHolder" . index].Visible := false
-        App["chbCopyBtn" . index].Visible := false
-        App["chbOpenBtn" . index].Visible := false
-        App["chbPic" . index].Visible := false
-        
-        if (curHistory[index]["type"] == "Image") {
-            App["chbPic" . index].Visible := true
-            return
-        }
-
-        if (curHistory[index]["type"].includes("file") 
-            || curHistory[index]["type"] == "Folder" 
-            || curHistory[index]["type"] == "URL"
-        ) {
-            App["chbOpenBtn" . index].Visible := true
-            return
-        }
-
-        if (curHistory[index]["type"] == "Text") {
-            App["chbCopyBtn" . index].Visible := true
-            return
-        }
-
-        App["chbPlaceHolder" . index].Visible := true
-    }
-
-    handleOpenFromPath(*) {
-        Run clipHistory.value[index]["text"]
-    }
-
-    handleHistoryTextCopy(ctrl, _) {
-		A_Clipboard := clipHistory.value[index]["text"]
-		
-		ctrl.Enabled := false
-		ctrl.SetFont("s10")
-		ctrl.Text := "☑"
-
-		SetTimer(() => (
-			ctrl.Text := "⿻", 
-			ctrl.SetFont("s14"),
-			ctrl.Enabled := true
-		), -1000)
-	}
-
-    handleHistoryImageCopy(ctrl, _) {
-        Sleep 200
-        A_Clipboard := clipHistory.value[index]["content"]
-        copyBtn := App["chbCopyBtn" . index]
-
-        ctrl.Visible := false
-        copyBtn.Visible := true
-        copyBtn.Enabled := false
-        copyBtn.SetFont("s10")
-        copyBtn.Text := "☑"
-
-		SetTimer(() => (
-			copyBtn.Text := "⿻", 
-			copyBtn.SetFont("s14"),
-            copyBtn.Visible := false,
-            copyBtn.Enabled := true,
-            ctrl.Visible := true
-		), -1000)
-    }
-
-    onMount() {
-        handleCtrlVisibility(clipHistory.value)
-    }
-
     return (
-        App.ARGroupBox("Section x20 w300 r3 " . (index == 1 ? "y+10" : "y+20"), "{1}", clipHistory, { index: index, keys: ["type"] }).SetFont("bold"),
-        App.AddButton("x+1 w0 h0", ""), ; just to prevent focusing on the edit
-        App.AREdit("ReadOnly xs10 yp+20 w230 r3", "{1}", clipHistory, { index: index, keys: ["text"] }),
-        App.AddButton(("vchbPlaceHolder" . index) . " x+1 w49 h49", ""),
-        App.ARButton(("vchbCopyBtn" . index) . " xp+0 yp+0 w49 h49 Hidden", "⿻").SetFont("s14")
-           .OnClick(handleHistoryTextCopy),
-        App.ARButton(("vchbOpenBtn" . index) . " xp+0 yp+0 w49 h49 Hidden", "{1}", icon).SetFont("s14")
-           .OnClick(handleOpenFromPath),
-        App.ARPic(("vchbPic" . index) . " xp+0 yp+0 w49 h49 Hidden", thisImagePath)
-           .OnClick(handleHistoryImageCopy)
-           .OnDoubleClick(handleOpenFromPath),
-        onMount()
+        CLIP_HISTORY_LENGTH.times(() => ClipHistoryItem(App, clipHistory, A_Index, { x: " x20 ", y: (A_Index == 1 ? " y+9 " : " y+21 ") })),
+        ShareClips(App, sendToShareClips),
+        0
     )
 }
