@@ -90,7 +90,7 @@ ClipHistoryItem(App, clipHistory, index, style) {
            .OnClick(handleHistoryContentCopy)
            .OnDoubleClick(handleOpenFromPath),
         ; image preview
-        App.ARPic(("vchiPic" . index) . " xp+0 yp+0 w49 h49 Hidden", thisImagePath)
+        App.ARPic(("vchiPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", thisImagePath)
            .OnClick(handleHistoryContentCopy)
            .OnDoubleClick(handleOpenFromPath),
         
