@@ -1,9 +1,14 @@
 ShareClipsItem(App, sharedClipHistory, index) {
-    thisImagePath := computed(sharedClipHistory, curHistory => curHistory[index]["type"] == "Image" ? curHistory[index]["text"] : "")
-    icon := computed(
-        sharedClipHistory, 
-        curHistory => match(curHistory[index]["type"], Map("URL", "⇱", "Text", "",), "🗁")
-    )
+    ; thisImagePath := computed(sharedClipHistory, setImagePath)
+    ; setImagePath(curHistory) {        
+    ;     if (curHistory[index]["type"] == "Image") {
+    ;         return FileExist(curHistory[index]["text"]) ? curHistory[index]["text"] : IMAGES["ImageNotFound.png"]
+    ;     }
+
+    ;     return ""
+    ; }
+    
+    icon := computed(sharedClipHistory, curHistory => match(curHistory[index]["type"], Map("URL", "⇱", "Text", "",), "🗁"))
 
     effect(sharedClipHistory, handleCtrlVisibility)
     handleCtrlVisibility(curHistory) {
@@ -14,6 +19,9 @@ ShareClipsItem(App, sharedClipHistory, index) {
         App["sciPic" . index].Visible := false
         
         if (curHistory[index]["type"] == "Image") {
+            App["chiPic" . index].Value := FileExist(curHistory[index]["text"])
+                ? curHistory[index]["text"]
+                : IMAGES["ImageNotFound.png"]
             App["sciPic" . index].Visible := true
             App["sciOpenDirBtn" . index].Visible := true
             return
@@ -81,8 +89,8 @@ ShareClipsItem(App, sharedClipHistory, index) {
            .OnClick(handleOpenFromPath),
         
         ; image preview
-        App.ARPic(("vsciPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", thisImagePath)
-           .OnClick(handleOpenFromPath),
+        App.AddPic(("vsciPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
+           .OnEvent("Click", handleOpenFromPath),
 
         onMount()
     )

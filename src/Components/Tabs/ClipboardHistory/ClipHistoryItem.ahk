@@ -1,6 +1,6 @@
 ClipHistoryItem(App, clipHistory, index, style) {
     icon := computed(clipHistory, curHistory => curHistory[index]["type"] == "URL" ? "⇱" : "🗁")
-    thisImagePath := computed(clipHistory, curHistory => curHistory[index]["type"] == "Image" ? curHistory[index]["text"] : "")
+    ; thisImagePath := computed(clipHistory, curHistory => curHistory[index]["type"] == "Image" ? curHistory[index]["text"] : "")
     
     effect(clipHistory, handleCtrlVisibility)
     handleCtrlVisibility(curHistory) {
@@ -10,6 +10,9 @@ ClipHistoryItem(App, clipHistory, index, style) {
         App["chiPic" . index].Visible := false
         
         if (curHistory[index]["type"] == "Image") {
+            App["chiPic" . index].Value := FileExist(curHistory[index]["text"])
+                ? curHistory[index]["text"]
+                : IMAGES["ImageNotFound.png"]
             App["chiPic" . index].Visible := true
             return
         }
@@ -69,6 +72,7 @@ ClipHistoryItem(App, clipHistory, index, style) {
     }
 
     onMount() {
+        App["chiPic" . index].OnEvent("DoubleClick", handleHistoryContentCopy) 
         handleCtrlVisibility(clipHistory.value)
     }
 
@@ -90,9 +94,9 @@ ClipHistoryItem(App, clipHistory, index, style) {
            .OnClick(handleHistoryContentCopy)
            .OnDoubleClick(handleOpenFromPath),
         ; image preview
-        App.ARPic(("vchiPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", thisImagePath)
-           .OnClick(handleHistoryContentCopy)
-           .OnDoubleClick(handleOpenFromPath),
+        App.AddPic(("vchiPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
+           .OnEvent("Click", handleHistoryContentCopy)
+        ;    .OnDoubleClick(handleOpenFromPath),
         
         onMount()
     )
