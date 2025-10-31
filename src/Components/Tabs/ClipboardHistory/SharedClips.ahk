@@ -3,6 +3,7 @@
 SharedClips(App, sendToSharedClips) {
     SHARED_CLIPS_DIR := CONFIG.read("sharedClipsDir")
     PAGE_LENGTH := 5
+    SHARED_CLIPS_KEEP_HOURS := 24
 
     clipTemplate := { type: "", text: "", contentPath: "" }
     
@@ -17,6 +18,13 @@ SharedClips(App, sendToSharedClips) {
         pageIndex := 1
 
         loop files, SHARED_CLIPS_DIR . "\*.json" {
+            if (A_LoopFileTimeCreated.hoursBetween(A_Now) > SHARED_CLIPS_KEEP_HOURS) {
+                FileDelete(A_LoopFileFullPath)
+                continue
+            }
+
+            ; TODO: also add cleaning for meta folder
+
             sharedClipHistoryAll.InsertAt(1, JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8")))
         }
 
