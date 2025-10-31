@@ -1,6 +1,6 @@
-#Include "./ShareClipsItem.ahk"
+#Include "./SharedClipsItem.ahk"
 
-ShareClips(App, sendToSharedClips) {
+SharedClips(App, sendToSharedClips) {
     SHARED_CLIPS_DIR := CONFIG.read("sharedClipsDir")
     PAGE_LENGTH := 5
 
@@ -31,7 +31,7 @@ ShareClips(App, sendToSharedClips) {
         initSharedClipHistory()
         sharedClipHistory.set(sharedClipHistoryAll.slice(pageIndex, pageIndex + PAGE_LENGTH))
     }
-    
+
     handlePageFlip(ctrl, _) {
         if (ctrl.Text == "下一页") {
             pageIndex := pageIndex + 5 > sharedClipHistoryAll.Length 
@@ -51,7 +51,8 @@ ShareClips(App, sendToSharedClips) {
         App.AddGroupBox("Section x330 y61 w380 r25", "Shared Clips").SetFont("s9 bold"),
         
         ; sync clips to SHARED_CLIPS_DIR
-        App.AddCheckbox("xs15 yp+25 h20 " . (sendToSharedClips.value ? "Checked" : ""), "同步到共享剪贴板"),
+        App.AddCheckbox("xs15 yp+25 h20 " . (sendToSharedClips.value ? "Checked" : ""), "同步到共享剪贴板")
+           .OnEvent("Click", (ctrl, _) => sendToSharedClips.set(ctrl.Value)),
         
         ; flip btns
         App.AddButton("x+35 w20 h20", "↻").OnEvent("Click", handleRefresh),

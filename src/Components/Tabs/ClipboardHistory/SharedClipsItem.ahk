@@ -81,7 +81,7 @@ ShareClipsItem(App, sharedClipHistory, index) {
            .OnClick(handleOpenFromPath),
         
         ; image preview
-        App.ARPic(("vsciPic" . index) . " xp+0 yp+0 w49 h49 Hidden", thisImagePath)
+        App.ARPic(("vsciPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", thisImagePath)
            .OnClick(handleOpenFromPath),
 
         onMount()
