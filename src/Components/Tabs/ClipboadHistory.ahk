@@ -1,5 +1,5 @@
 #Include "./ClipboardHistory/ClipHistoryItem.ahk"
-#Include "./ClipboardHistory/ShareClips.ahk"
+#Include "./ClipboardHistory/SharedClips.ahk"
 
 ClipboardHistory(App) {
     SHARED_CLIPS_DIR := CONFIG.read("sharedClipsDir")
@@ -11,7 +11,8 @@ ClipboardHistory(App) {
         DirCreate(CLIP_HISTORY_DIR)
     }
 
-    sendToShareClips := signal(true) 
+    sendToSharedClips := signal(CONFIG.read("sendToSharedClips"))
+    effect(sendToSharedClips, isSend => CONFIG.write("sendToSharedClips", isSend))
     
     clipTemplate := { type: "", text: "", content: "" }
     clipHistoryContent := []
@@ -60,7 +61,7 @@ ClipboardHistory(App) {
             FileAppend(ClipboardAll(), clipName)
         }
 
-        if (saveClip && sendToShareClips.value) {
+        if (saveClip && sendToSharedClips.value) {
             dest := SHARED_CLIPS_DIR_META . "\" . fileName
 
             jsonIndexer := {
@@ -110,7 +111,6 @@ ClipboardHistory(App) {
 
     return (
         CLIP_HISTORY_LENGTH.times(() => ClipHistoryItem(App, clipHistory, A_Index, { x: " x20 ", y: (A_Index == 1 ? " y+9 " : " y+21 ") })),
-        ShareClips(App, sendToShareClips),
-        0
+        SharedClips(App, sendToSharedClips)
     )
 }
