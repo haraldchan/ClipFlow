@@ -32,14 +32,15 @@ PostDetails_QM2(post, moduleName, props) {
         }
     }
 
-    handleBlankShareDelegate(*) {
-        if (!App["shareRoomNums"].Value) {
+    handleModuleEventDelegate(*) {
+        if (moduleName == "BlankShare" && !App["shareRoomNums"].Value) {
             return 0
         }
 
         handleRepost()
 
-        if (App["sendPmPost"].Value) {
+        if (moduleName == "BlankShare" && App["sendPmPost"].Value) {
+            msgbox "here"
             handleTriggerPmPost()
         }
 
@@ -47,7 +48,7 @@ PostDetails_QM2(post, moduleName, props) {
         return 0 
     }
 
-    db := useFileDB(CONFIG.read("dbSettings"))
+    db := useFileDB(config.read("dbSettings"))
     handleTriggerPmPost() {
         roomNums := form.shareRoomNums.trim()
         ; selectedGuests can only pass by GuestProfileList
@@ -64,7 +65,7 @@ PostDetails_QM2(post, moduleName, props) {
     }
 
     onMount() {
-        App[moduleName . "Action"].OnEvent("Click", handleBlankShareDelegate, -1)
+        App[moduleName . "Action"].OnEvent("Click", handleModuleEventDelegate, -1)
         App[moduleName . "Action"].Opt("+Default")
     }
 
