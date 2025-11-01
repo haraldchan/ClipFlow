@@ -1,25 +1,17 @@
-ShareClipsItem(App, sharedClipHistory, index) {
-    ; thisImagePath := computed(sharedClipHistory, setImagePath)
-    ; setImagePath(curHistory) {        
-    ;     if (curHistory[index]["type"] == "Image") {
-    ;         return FileExist(curHistory[index]["text"]) ? curHistory[index]["text"] : IMAGES["ImageNotFound.png"]
-    ;     }
-
-    ;     return ""
-    ; }
-    
+ShareClipsItem(App, sharedClipHistory, index) {    
     icon := computed(sharedClipHistory, curHistory => match(curHistory[index]["type"], Map("URL", "⇱", "Text", "",), "🗁"))
 
     effect(sharedClipHistory, handleCtrlVisibility)
     handleCtrlVisibility(curHistory) {
-        App["sciPlaceHolderR" . index].Visible := false
+        App["sciPlaceHolder" . index].Visible := false
         App["sciCopyBtn" . index].Visible := false
         App["sciOpenBtn" . index].Visible := false
         App["sciOpenDirBtn" . index].Visible := false
         App["sciPic" . index].Visible := false
         
+        
         if (curHistory[index]["type"] == "Image") {
-            App["chiPic" . index].Value := FileExist(curHistory[index]["text"])
+            App["sciPic" . index].Value := FileExist(curHistory[index]["text"])
                 ? curHistory[index]["text"]
                 : IMAGES["ImageNotFound.png"]
             App["sciPic" . index].Visible := true
@@ -36,7 +28,7 @@ ShareClipsItem(App, sharedClipHistory, index) {
             return
         }
 
-        App["sciPlaceHolderR" . index].Visible := true
+        App["sciPlaceHolder" . index].Visible := true
         App["sciCopyBtn" . index].Visible := true
     }
 
@@ -60,7 +52,11 @@ ShareClipsItem(App, sharedClipHistory, index) {
     }
 
     handleOpenFromPath(*) {
-        Run sharedClipHistory.value[index]["text"]
+        try {
+            Run sharedClipHistory.value[index]["text"]
+        } catch Error as e {
+            MsgBox("无法找到指定文件（它可能已被移动、重命名或删除）", POPUP_TITLE, "4096 T2")
+        }
     }
 
     onMount() {
@@ -81,8 +77,8 @@ ShareClipsItem(App, sharedClipHistory, index) {
         App.ARButton(("vsciOpenDirBtn" . index) . " xp+0 yp+0 w49 h49", "🗀").SetFont("s14")
            .OnClick(handleOpenDir),
 
-        ; placeholder r btn
-        App.AddButton(("vsciPlaceHolderR" . index) . " x+0 w49 h49", ""),
+        ; placeholder btn
+        App.AddButton(("vsciPlaceHolder" . index) . " x+0 w49 h49", ""),
         
         ; file open btn
         App.ARButton(("vsciOpenBtn" . index) . " xp+0 yp+0 w49 h49 Hidden", "{1}", icon).SetFont("s14")

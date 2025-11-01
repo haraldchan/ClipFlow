@@ -1,6 +1,5 @@
 ClipHistoryItem(App, clipHistory, index, style) {
     icon := computed(clipHistory, curHistory => curHistory[index]["type"] == "URL" ? "⇱" : "🗁")
-    ; thisImagePath := computed(clipHistory, curHistory => curHistory[index]["type"] == "Image" ? curHistory[index]["text"] : "")
     
     effect(clipHistory, handleCtrlVisibility)
     handleCtrlVisibility(curHistory) {
@@ -34,7 +33,11 @@ ClipHistoryItem(App, clipHistory, index, style) {
     }
 
     handleOpenFromPath(*) {
-        Run clipHistory.value[index]["text"]
+        try {
+            Run clipHistory.value[index]["text"]
+        } catch Error as e {
+            MsgBox("无法找到指定文件（它可能已被移动、重命名或删除）", POPUP_TITLE, "4096 T2")
+        }
     }
 
     handleHistoryTextCopy(ctrl, _) {
@@ -72,7 +75,7 @@ ClipHistoryItem(App, clipHistory, index, style) {
     }
 
     onMount() {
-        App["chiPic" . index].OnEvent("DoubleClick", handleHistoryContentCopy) 
+        App["chiPic" . index].OnEvent("DoubleClick", handleOpenFromPath) 
         handleCtrlVisibility(clipHistory.value)
     }
 
@@ -96,7 +99,6 @@ ClipHistoryItem(App, clipHistory, index, style) {
         ; image preview
         App.AddPic(("vchiPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
            .OnEvent("Click", handleHistoryContentCopy)
-        ;    .OnDoubleClick(handleOpenFromPath),
         
         onMount()
     )
