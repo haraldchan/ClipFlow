@@ -70,10 +70,12 @@ ClipboardHistory(App) {
                 contentPath: (capturedType.includes("file") || capturedType == "Image") ? dest : ""
             }
 
+            ; copy file/image to meta dir
             if (capturedType.includes("file") || capturedType == "Image") {
                 FileCopy(A_Clipboard, dest, true)
             }
 
+            ; add json indexer
             FileAppend(
                 JSON.stringify(jsonIndexer), 
                 Format("{1}\{2}={3}.json", SHARED_CLIPS_DIR, timeStamp, rand), 
