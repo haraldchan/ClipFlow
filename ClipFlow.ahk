@@ -5,7 +5,7 @@ CoordMode "Mouse", "Screen"
 TraySetIcon A_ScriptDir . "\src\Assets\CFTray.ico"
 
 ; global consts
-VERSION := "1.6.1"
+VERSION := "1.6.2"
 POPUP_TITLE := "ClipFlow " . VERSION
 WIN_GROUP := ["ahk_class SunAwtFrame"]
 IMAGES := useImages(A_ScriptDir . "\src\Assets")
@@ -29,12 +29,6 @@ ClipFlow.Show()
 Pause:: ClipFlow.Show()
 F11:: utils.cleanReload(WIN_GROUP)
 ^F11:: {
-	; if (DirExist(CONFIG.read("sharedClipsDir"))) {
-		; DirDelete(CONFIG.read("sharedClipsDir"), true)
-	; }
-	; DirCreate(CONFIG.read("sharedClipsDir"))
-	; DirCreate(CONFIG.read("sharedClipsDirMeta"))
-
 	if (DirExist(A_MyDocuments . "\clipflow-clips")) {
 		DirDelete(A_MyDocuments . "\clipflow-clips", true)
 	}
