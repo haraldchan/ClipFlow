@@ -10,6 +10,9 @@ ClipboardHistory(App) {
     if (!DirExist(CLIP_HISTORY_DIR)) {
         DirCreate(CLIP_HISTORY_DIR)
     }
+    if (!DirExist(SHARED_CLIPS_DIR)) {
+        DirCreate(SHARED_CLIPS_DIR)
+    }
 
     sendToSharedClips := signal(CONFIG.read("sendToSharedClips"))
     effect(sendToSharedClips, isSend => CONFIG.write("sendToSharedClips", isSend))
@@ -29,12 +32,12 @@ ClipboardHistory(App) {
 
     OnClipboardChange((*) => (handleClipHistoryUpdate(), handleLocalClipsCleaning(), 1))
     handleClipHistoryUpdate() {
+        newHistory := [clipHistory.value*]
+        newHistory.InsertAt(1, handleContentSplit(true))
+
         if (clipHistory.value.find(c => c["text"] == A_Clipboard)) {
             return
         }
-
-        newHistory := [clipHistory.value*]
-        newHistory.InsertAt(1, handleContentSplit(true))
 
         if (newHistory.Length > CLIP_HISTORY_LENGTH) {
             newHistory.Pop()
@@ -62,6 +65,10 @@ ClipboardHistory(App) {
         }
 
         if (saveClip && sendToSharedClips.value) {
+            if (!DirExist(SHARED_CLIPS_DIR_META)) {
+                DirCreate(SHARED_CLIPS_DIR_META)
+            } 
+
             dest := SHARED_CLIPS_DIR_META . "\" . fileName
 
             jsonIndexer := {
@@ -71,17 +78,18 @@ ClipboardHistory(App) {
             }
 
             ; copy file/image to meta dir
-            if (capturedType.includes("file") || capturedType == "Image") {
-                FileCopy(A_Clipboard, dest, true)
-            }
+            if !(A_Clipboard == dest) {
+                if (capturedType.includes("file") || capturedType == "Image") {
+                    FileCopy(A_Clipboard, dest, true)
+                }
 
-            ; add json indexer
-            FileAppend(
-                JSON.stringify(jsonIndexer), 
-                Format("{1}\{2}={3}.json", SHARED_CLIPS_DIR, timeStamp, rand), 
-                "UTF-8"
-            )
-            
+                ; add json indexer
+                FileAppend(
+                    JSON.stringify(jsonIndexer), 
+                    Format("{1}\{2}={3}.json", SHARED_CLIPS_DIR, timeStamp, rand), 
+                    "UTF-8"
+                )                    
+            }  
         }
 
         return {

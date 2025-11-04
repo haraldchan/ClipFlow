@@ -3,7 +3,7 @@
 SharedClips(App, sendToSharedClips) {
     SHARED_CLIPS_DIR := CONFIG.read("sharedClipsDir")
     PAGE_LENGTH := 5
-    SHARED_CLIPS_KEEP_HOURS := 24
+    SHARED_CLIPS_KEEP_HOURS := 8
 
     clipTemplate := { type: "", text: "", contentPath: "" }
     
@@ -12,18 +12,16 @@ SharedClips(App, sendToSharedClips) {
     initSharedClipHistory()
     sharedClipHistory := signal(sharedClipHistoryAll.slice(pageIndex, PAGE_LENGTH + 1))
 
-
+    App["tabs"].OnEvent("Change", (ctrl, _) => ctrl.Text == "剪贴板历史" && handleRefresh())
     initSharedClipHistory(*) {
         sharedClipHistoryAll := []
         pageIndex := 1
 
-        loop files, SHARED_CLIPS_DIR . "\*.json" {
+        loop files, SHARED_CLIPS_DIR . "\*.json", "R" {
             if (A_LoopFileTimeCreated.hoursBetween(A_Now) > SHARED_CLIPS_KEEP_HOURS) {
                 FileDelete(A_LoopFileFullPath)
                 continue
             }
-
-            ; TODO: also add cleaning for meta folder
 
             sharedClipHistoryAll.InsertAt(1, JSON.parse(FileRead(A_LoopFileFullPath, "UTF-8")))
         }
@@ -37,6 +35,8 @@ SharedClips(App, sendToSharedClips) {
 
     handleRefresh(*) {
         initSharedClipHistory()
+        App["flip-prev"].Enabled := false
+        App["flip-next"].Enabled := true
         sharedClipHistory.set(sharedClipHistoryAll.slice(pageIndex, pageIndex + PAGE_LENGTH))
     }
 
@@ -50,13 +50,16 @@ SharedClips(App, sendToSharedClips) {
                 ? 1
                 : pageIndex - 5
         }
+    
+        App["flip-prev"].Enabled := pageIndex > 1
+        App["flip-next"].Enabled := !(pageIndex == sharedClipHistoryAll.Length - PAGE_LENGTH + 1)
 
         sharedClipHistory.set(sharedClipHistoryAll.slice(pageIndex, pageIndex + PAGE_LENGTH))
     }
 
 
     return (
-        App.AddGroupBox("Section x330 y61 w380 r25", "Shared Clips").SetFont("s9 bold"),
+        App.AddGroupBox("Section x330 y61 w380 r25", "Shared Clips - 共享剪贴板").SetFont("s9 bold"),
         
         ; sync clips to SHARED_CLIPS_DIR
         App.AddCheckbox("xs15 yp+25 h20 " . (sendToSharedClips.value ? "Checked" : ""), "同步到共享剪贴板")
@@ -64,8 +67,8 @@ SharedClips(App, sendToSharedClips) {
         
         ; flip btns
         App.AddButton("x+35 w20 h20", "↻").OnEvent("Click", handleRefresh),
-        App.AddButton("x+10 w80 h20", "上一页").OnEvent("Click", handlePageFlip),
-        App.AddButton("x+10 w80 h20", "下一页").OnEvent("Click", handlePageFlip),
+        App.AddButton("vflip-prev x+10 w80 h20 Disabled", "上一页").OnEvent("Click", handlePageFlip),
+        App.AddButton("vflip-next x+10 w80 h20", "下一页").OnEvent("Click", handlePageFlip),
 
         ; shared clip items
         PAGE_LENGTH.times(() => ShareClipsItem(App, sharedClipHistory, A_Index))

@@ -1,65 +1,105 @@
 ShareClipsItem(App, sharedClipHistory, index) {    
-    icon := computed(sharedClipHistory, curHistory => match(curHistory[index]["type"], Map("URL", "⇱", "Text", "",), "🗁"))
+    curIcon := 0
+    i := SystemIcons.iconRef
 
     effect(sharedClipHistory, handleCtrlVisibility)
     handleCtrlVisibility(curHistory) {
-        App["sciPlaceHolder" . index].Visible := false
-        App["sciCopyBtn" . index].Visible := false
-        App["sciOpenBtn" . index].Visible := false
-        App["sciOpenDirBtn" . index].Visible := false
-        App["sciPic" . index].Visible := false
-        
-        
-        if (curHistory[index]["type"] == "Image") {
-            App["sciPic" . index].Value := FileExist(curHistory[index]["text"])
+        copyBtn := App["sci-copy-btn" . index]
+        openBtn := App["sci-open-btn" . index]
+        pic := App["sci-pic" . index]
+
+        pic.Visible := false
+        openBtn.setIcon(i.ICON_FOLDER_LINK)
+
+        if (!curHistory[index]["type"]) {
+            copyBtn.removeIcon()
+            openBtn.removeIcon()
+            return
+        }
+        else if (curHistory[index]["type"] == "Image") {
+            copyBtn.Visible := false
+            pic.Visible := true
+            
+            pic.Value := FileExist(curHistory[index]["text"])
                 ? curHistory[index]["text"]
                 : IMAGES["ImageNotFound.png"]
-            App["sciPic" . index].Visible := true
-            App["sciOpenDirBtn" . index].Visible := true
             return
         }
+        else if (curHistory[index]["type"] == "Text") {
+            curIcon := i.ICON_TEXT
+            openBtn.removeIcon()
+        }
+        else {
+            iconIndex := match(curHistory[index]["type"], Map(
+               t => t.startsWith(".7z") || t.startsWith(".zip"), i.ICON_ZIP,
+                t => t.startsWith(".doc"), i.ICON_WORD,
+                t => t.startsWith(".xls"), i.ICON_EXCEL,
+                t => t.startsWith(".ppt"), i.ICON_PPT,
+                t => t.endsWith("file"), i.ICON_FILE,
+                "Folder", i.ICON_FOLDER,
+                "URL", i.ICON_URL,
+            ))
 
-        if (curHistory[index]["type"].includes("file") 
-            || curHistory[index]["type"] == "Folder" 
-            || curHistory[index]["type"] == "URL"
-        ) {
-            App["sciOpenBtn" . index].Visible := true
-            App["sciOpenDirBtn" . index].Visible := true
-            return
+            curIcon := iconIndex
         }
 
-        App["sciPlaceHolder" . index].Visible := true
-        App["sciCopyBtn" . index].Visible := true
+
+        copyBtn.setIcon(curIcon)
+        copyBtn.Visible := true
     }
 
 
-    handleHistoryTextCopy(ctrl, index) {
-		A_Clipboard := sharedClipHistory.value[index]["text"]
-		
-		ctrl.Enabled := false
-		ctrl.SetFont("s10")
-		ctrl.Text := "☑"
+    handleHistoryContentCopy(ctrl, _) {     
+        Sleep 200
+
+        if (!sharedClipHistory.value[index]["text"]) {
+            return
+        }
+
+        A_Clipboard := sharedClipHistory.value[index]["text"]
+        copyBtn := App["sci-copy-btn" . index]
+        pic := App["sci-pic" . index]
+        isPic := ctrl is Gui.Pic
+
+        pic.Visible := false
+        copyBtn.Visible := true
+        copyBtn.setIcon(i.ICON_COPIED)
+        copyBtn.Enabled := false
 
 		SetTimer(() => (
-			ctrl.Text := "⿻", 
-			ctrl.SetFont("s14"),
-			ctrl.Enabled := true
+            copyBtn.Enabled := true,
+            pic.Visible := isPic,
+            copyBtn.Visible := !isPic,
+            copyBtn.setIcon(curIcon)
 		), -1000)
-	}
-
-    handleOpenDir(*) {
-        Run CONFIG.read("sharedClipsDirMeta")
     }
 
-    handleOpenFromPath(*) {
+    handleOpenFromPath(ctrl, _) {
+        if (!sharedClipHistory.value[index]["text"]) {
+            return
+        }
+
         try {
-            Run sharedClipHistory.value[index]["text"]
+            if (sharedClipHistory.value[index]["type"] == "Text") {
+                return
+            }
+            
+            Run(sharedClipHistory.value[index]["text"])
         } catch Error as e {
             MsgBox("无法找到指定文件（它可能已被移动、重命名或删除）", POPUP_TITLE, "4096 T2")
         }
     }
 
+    handleOpenDirMeta(*) {
+        if (!sharedClipHistory.value[index]["text"] || sharedClipHistory.value[index]["type"] == "Text") {
+            return
+        }
+
+        Run Format('explorer /select, "{1}"', sharedClipHistory.value[index]["contentPath"])
+    }
+
     onMount() {
+        App["sci-pic" . index].OnEvent("DoubleClick", handleOpenFromPath)
         handleCtrlVisibility(sharedClipHistory.value)
     }
 
@@ -68,25 +108,19 @@ ShareClipsItem(App, sharedClipHistory, index) {
         
         ; clipboard text
         App.AREdit("ReadOnly xs10 yp+20 w230 r3", "{1}", sharedClipHistory, { index: index, keys: ["text"] }),
-        
-        ; copy btn
-        App.ARButton(("vsciCopyBtn" . index) . " x+0 w49 h49", "⿻").SetFont("s14")
-           .OnClick((ctrl, _) => handleHistoryTextCopy(ctrl, index)),
-        
-        ; dir open btn
-        App.ARButton(("vsciOpenDirBtn" . index) . " xp+0 yp+0 w49 h49", "🗀").SetFont("s14")
-           .OnClick(handleOpenDir),
 
-        ; placeholder btn
-        App.AddButton(("vsciPlaceHolder" . index) . " x+0 w49 h49", ""),
-        
-        ; file open btn
-        App.ARButton(("vsciOpenBtn" . index) . " xp+0 yp+0 w49 h49 Hidden", "{1}", icon).SetFont("s14")
-           .OnClick(handleOpenFromPath),
-        
-        ; image preview
-        App.AddPic(("vsciPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
-           .OnEvent("Click", handleOpenFromPath),
+        ; copy btns
+        App.ARButton(("vsci-copy-btn" . index) . " x+0 w49 h49 @IconOnly", "")
+           .OnClick(handleHistoryContentCopy)
+           .OnDoubleClick(handleOpenFromPath),
+
+        ; pic preview
+        App.AddPic(("vsci-pic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
+           .OnEvent("Click", handleHistoryContentCopy),
+
+        ; open btn
+        App.ARButton(("vsci-open-btn" . index) . " x+0 w49 h49 @IconOnly", "")
+           .OnClick(handleOpenDirMeta),
 
         onMount()
     )

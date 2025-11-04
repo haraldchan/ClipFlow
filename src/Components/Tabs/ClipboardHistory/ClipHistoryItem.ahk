@@ -1,81 +1,89 @@
 ClipHistoryItem(App, clipHistory, index, style) {
-    icon := computed(clipHistory, curHistory => curHistory[index]["type"] == "URL" ? "⇱" : "🗁")
-    
+    i := SystemIcons.iconRef
+    curIcon := i.ICON_BLANK
+
     effect(clipHistory, handleCtrlVisibility)
     handleCtrlVisibility(curHistory) {
-        App["chiPlaceHolder" . index].Visible := false
-        App["chiCopyBtn" . index].Visible := false
-        App["chiOpenBtn" . index].Visible := false
-        App["chiPic" . index].Visible := false
-        
-        if (curHistory[index]["type"] == "Image") {
-            App["chiPic" . index].Value := FileExist(curHistory[index]["text"])
+        btn := App["chi-function-btn" . index]
+        pic := App["chi-pic" . index]
+
+        btn.removeIcon()
+        btn.Visible := false
+        pic.Visible := false
+
+        if (!curHistory[index]["type"]) {
+            btn.Visible := true
+            return
+        }
+        else if (curHistory[index]["type"] == "Image") {
+            pic.Value := FileExist(curHistory[index]["text"])
                 ? curHistory[index]["text"]
                 : IMAGES["ImageNotFound.png"]
-            App["chiPic" . index].Visible := true
+            pic.Visible := true
             return
         }
+        else if (curHistory[index]["type"] == "Text") {
+            curIcon := i.ICON_TEXT
+        }
+        else {
+            iconIndex := match(curHistory[index]["type"], Map(
+                t => t.startsWith(".7z") || t.startsWith(".zip"), i.ICON_ZIP,
+                t => t.startsWith(".doc"), i.ICON_WORD,
+                t => t.startsWith(".xls"), i.ICON_EXCEL,
+                t => t.startsWith(".ppt"), i.ICON_PPT,
+                t => t.endsWith("file"), i.ICON_FILE,
+                "Folder", i.ICON_FOLDER,
+                "URL", i.ICON_URL,
+            ))
 
-        if (curHistory[index]["type"].includes("file") 
-            || curHistory[index]["type"] == "Folder" 
-            || curHistory[index]["type"] == "URL"
-        ) {
-            App["chiOpenBtn" . index].Visible := true
-            return
+            curIcon := iconIndex
+            btn.Visible := true
         }
 
-        if (curHistory[index]["type"] == "Text") {
-            App["chiCopyBtn" . index].Visible := true
-            return
-        }
-
-        App["chiPlaceHolder" . index].Visible := true
+        btn.setIcon(curIcon)
+        btn.Visible := true
     }
 
-    handleOpenFromPath(*) {
+
+    handleOpenFromPath(ctrl, _) {
         try {
-            Run clipHistory.value[index]["text"]
+            if (clipHistory.value[index]["type"] == "Text") {
+                return
+            }
+            
+            Run(clipHistory.value[index]["text"])
         } catch Error as e {
             MsgBox("无法找到指定文件（它可能已被移动、重命名或删除）", POPUP_TITLE, "4096 T2")
         }
     }
 
-    handleHistoryTextCopy(ctrl, _) {
-		A_Clipboard := clipHistory.value[index]["text"]
-		
-		ctrl.Enabled := false
-		ctrl.SetFont("s10")
-		ctrl.Text := "☑"
-
-		SetTimer(() => (
-			ctrl.Text := "⿻", 
-			ctrl.SetFont("s14"),
-			ctrl.Enabled := true
-		), -1000)
-	}
-
     handleHistoryContentCopy(ctrl, _) {
-        Sleep 200
-        A_Clipboard := clipHistory.value[index]["content"]
-        copyBtn := App["chiCopyBtn" . index]
+        if (!clipHistory.value[index]["text"]) {
+            return
+        }
 
-        ctrl.Visible := false
-        copyBtn.Visible := true
-        copyBtn.Enabled := false
-        copyBtn.SetFont("s10")
-        copyBtn.Text := "☑"
+        Sleep 200
+        
+        A_Clipboard := clipHistory.value[index]["content"]
+        btn := App["chi-function-btn" . index]
+        pic := App["chi-pic" . index]
+        isPic := ctrl is Gui.Pic
+
+        pic.Visible := false
+        btn.Visible := true
+        btn.setIcon(i.ICON_COPIED)
+        btn.Enabled := false
 
 		SetTimer(() => (
-			copyBtn.Text := "⿻", 
-			copyBtn.SetFont("s14"),
-            copyBtn.Visible := false,
-            copyBtn.Enabled := true,
-            ctrl.Visible := true
+            btn.Enabled := true,
+            pic.Visible := isPic,
+            btn.Visible := !isPic,
+            btn.setIcon(curIcon)
 		), -1000)
     }
 
     onMount() {
-        App["chiPic" . index].OnEvent("DoubleClick", handleOpenFromPath) 
+        App["chi-pic" . index].OnEvent("DoubleClick", handleOpenFromPath) 
         handleCtrlVisibility(clipHistory.value)
     }
 
@@ -85,19 +93,14 @@ ClipHistoryItem(App, clipHistory, index, style) {
         ; non-display btn, just to prevent focusing on the edit
         App.AddButton("x+1 w0 h0", ""), 
 
-        ; clipboard text
+        ; copy/open file btn
         App.AREdit("ReadOnly xs10 yp+20 w230 r3", "{1}", clipHistory, { index: index, keys: ["text"] }),
-        App.AddButton(("vchiPlaceHolder" . index) . " x+1 w49 h49", ""),
-        
-        ; text copy btn
-        App.ARButton(("vchiCopyBtn" . index) . " xp+0 yp+0 w49 h49 Hidden", "⿻").SetFont("s14")
-           .OnClick(handleHistoryTextCopy),
-        ; file open btn
-        App.ARButton(("vchiOpenBtn" . index) . " xp+0 yp+0 w49 h49 Hidden", "{1}", icon).SetFont("s14")
+        App.ARButton(("vchi-function-btn" . index) . " x+1 w49 h49 @IconOnly", "")
            .OnClick(handleHistoryContentCopy)
            .OnDoubleClick(handleOpenFromPath),
-        ; image preview
-        App.AddPic(("vchiPic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
+        
+        ; image 
+        App.AddPic(("vchi-pic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
            .OnEvent("Click", handleHistoryContentCopy)
         
         onMount()
