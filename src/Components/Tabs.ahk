@@ -27,7 +27,7 @@ Tabs(App) {
 	curModuleProps := modules.values()[curModule]
 
 	return (
-		Tab3 := App.AddTab3("x15" . " Choose" . CONFIG.read("tabPos"), ["插件模式", "剪贴板历史", curModuleProps.tabs*]),
+		Tab3 := App.AddTab3("vtabs x15" . " Choose" . CONFIG.read("tabPos"), ["插件模式", "剪贴板历史", curModuleProps.tabs*]),
 		Tab3.OnEvent("Change", (*) => CONFIG.write("tabPos", Tab3.Value))
 
 		Tab3.UseTab("插件模式"),
