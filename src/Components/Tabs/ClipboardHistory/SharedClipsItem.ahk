@@ -104,22 +104,22 @@ ShareClipsItem(App, sharedClipHistory, index) {
     }
 
     return (
-        App.ARGroupBox("Section w350 r3 x340" . (index == 1 ? " y+9 " : " y+15 "), "{1}", sharedClipHistory, { index: index, keys: ["type"] }).SetFont("bold"),
+        App.ARGroupBox("Section w350 r2 x340" . (index == 1 ? " y+9 " : " y+15 "), "{1}", sharedClipHistory, { index: index, keys: ["type"] }).SetFont("bold"),
         
         ; clipboard text
-        App.AREdit("ReadOnly xs10 yp+20 w230 r3", "{1}", sharedClipHistory, { index: index, keys: ["text"] }),
+        App.AREdit("ReadOnly xs10 yp+20 w230 r2", "{1}", sharedClipHistory, { index: index, keys: ["text"] }),
 
         ; copy btns
-        App.ARButton(("vsci-copy-btn" . index) . " x+0 w49 h49 @IconOnly", "")
+        App.ARButton(("vsci-copy-btn" . index) . " x+0 w40 h40 @IconOnly", "")
            .OnClick(handleHistoryContentCopy)
            .OnDoubleClick(handleOpenFromPath),
 
         ; pic preview
-        App.AddPic(("vsci-pic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
+        App.AddPic(("vsci-pic" . index) . " xp+0 yp+0 w40 h40 0x40 Hidden", "")
            .OnEvent("Click", handleHistoryContentCopy),
 
         ; open btn
-        App.ARButton(("vsci-open-btn" . index) . " x+0 w49 h49 @IconOnly", "")
+        App.ARButton(("vsci-open-btn" . index) . " x+0 w40 h40 @IconOnly", "")
            .OnClick(handleOpenDirMeta),
 
         onMount()
