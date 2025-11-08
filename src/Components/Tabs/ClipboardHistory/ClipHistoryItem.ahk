@@ -60,7 +60,7 @@ ClipHistoryItem(App, clipHistory, index, style) {
     handleHistoryContentCopy(ctrl, _) {
         if (!clipHistory.value[index]["text"]) {
             return
-        }
+        }   
 
         Sleep 200
         
@@ -88,19 +88,19 @@ ClipHistoryItem(App, clipHistory, index, style) {
     }
 
     return (
-        App.ARGroupBox("Section w300 r3" . style.x . style.y, "{1}", clipHistory, { index: index, keys: ["type"] }).SetFont("bold"),
+        App.ARGroupBox("Section w300 r2" . style.x . style.y, "{1}", clipHistory, { index: index, keys: ["type"] }).SetFont("bold"),
 
         ; non-display btn, just to prevent focusing on the edit
         App.AddButton("x+1 w0 h0", ""), 
 
         ; copy/open file btn
-        App.AREdit("ReadOnly xs10 yp+20 w230 r3", "{1}", clipHistory, { index: index, keys: ["text"] }),
-        App.ARButton(("vchi-function-btn" . index) . " x+1 w49 h49 @IconOnly", "")
+        App.AREdit("ReadOnly xs10 yp+20 w230 r2", "{1}", clipHistory, { index: index, keys: ["text"] }),
+        App.ARButton(("vchi-function-btn" . index) . " x+1 w42 h42 @IconOnly", "")
            .OnClick(handleHistoryContentCopy)
            .OnDoubleClick(handleOpenFromPath),
         
         ; image 
-        App.AddPic(("vchi-pic" . index) . " xp+0 yp+0 w49 h49 0x40 Hidden", "")
+        App.AddPic(("vchi-pic" . index) . " xp+0 yp+0 w42 h42 0x40 Hidden", "")
            .OnEvent("Click", handleHistoryContentCopy)
         
         onMount()
