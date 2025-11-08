@@ -32,12 +32,12 @@ ClipboardHistory(App) {
 
     OnClipboardChange((*) => (handleClipHistoryUpdate(), handleLocalClipsCleaning(), 1))
     handleClipHistoryUpdate() {
-        newHistory := [clipHistory.value*]
-        newHistory.InsertAt(1, handleContentSplit(true))
-
         if (clipHistory.value.find(c => c["text"] == A_Clipboard)) {
             return
         }
+
+        newHistory := [clipHistory.value*]
+        newHistory.InsertAt(1, handleContentSplit(true))
 
         if (newHistory.Length > CLIP_HISTORY_LENGTH) {
             newHistory.Pop()
@@ -47,7 +47,7 @@ ClipboardHistory(App) {
     }
 
     handleContentSplit(saveClip := false) {
-        SplitPath(A_Clipboard, &fileName, &dir, &ext, &fileNameNoExt, &drive)
+        SplitPath(StrLower(A_Clipboard), &fileName, &dir, &ext, &fileNameNoExt, &drive)
 
         capturedType := match(dir, OrderedMap(
             (*) => dir.slice(1,5) == "http", "URL",
