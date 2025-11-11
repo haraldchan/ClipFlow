@@ -6,8 +6,12 @@ class ProfileModifyNext_Group {
     static popupTitle := "ClipFlow - " . this.name
 
     static USE(App) {
-        this.dbSettings := CONFIG.read("dbSettings")
-        this.db := useFileDB(this.dbSettings)
+        dbConfig := CONFIG.read("dbConfig")
+        this.db := useFileDB({
+            main: dbConfig["host"] . "\" . dbConfig["main"],
+            archive: dbConfig["host"] . "\" . dbConfig["archive"],
+            backup: dbConfig["host"] . "\" . dbConfig["backup"],
+        })
 
         PMNG_App(App, this.title, this.db)
     }

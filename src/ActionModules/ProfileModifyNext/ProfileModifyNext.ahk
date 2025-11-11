@@ -7,8 +7,12 @@ class ProfileModifyNext {
     static identifier := "04047fce826f48f751891b4721f7ac70" ; MD5 hash: ProfileModifyNext
 
     static USE(App) {
-        this.dbSettings := CONFIG.read("dbSettings")
-        this.db := useFileDB(this.dbSettings)
+        dbConfig := CONFIG.read("dbConfig")
+        this.db := useFileDB({
+            main: dbConfig["host"] . "\" . dbConfig["main"],
+            archive: dbConfig["host"] . "\" . dbConfig["archive"],
+            backup: dbConfig["host"] . "\" . dbConfig["backup"],
+        })
 
         yesterday := A_Now.yesterday().toFormat("yyyyMMdd")
 
