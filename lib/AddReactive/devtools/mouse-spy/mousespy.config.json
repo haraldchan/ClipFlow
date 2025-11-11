@@ -4,7 +4,7 @@
     "moveToAnchor":"+!q"
   },
   "misc":{
-    "updateInterval":"50"
+    "updateInterval":"100"
   },
   "stepFillerTemplates":{
     "Template 1":"Click\nSleep 200",

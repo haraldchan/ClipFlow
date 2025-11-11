@@ -48,7 +48,7 @@ class Dynamic {
 
         ; pass component instances reference
         instances := this.components
-    }   
+    }
 
     _renderDynamic(currentValue) {
         for component in this.components {
