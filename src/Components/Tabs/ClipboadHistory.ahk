@@ -3,7 +3,7 @@
 
 ClipboardHistory(App) {
     SHARED_CLIPS_DIR := CONFIG.read("sharedClipsDir")
-    SHARED_CLIPS_DIR_META := CONFIG.read("sharedClipsDirMeta")
+    SHARED_CLIPS_DIR_META := SHARED_CLIPS_DIR . "\meta"
     IMG_EXTS := ["jpg", "jpeg", "gif", "png", "tiff", "bmp", "ico"]
     CLIP_HISTORY_LENGTH := 6
     CLIP_HISTORY_DIR := A_MyDocuments . "\clipflow-clips"
