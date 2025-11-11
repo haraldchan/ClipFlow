@@ -1,16 +1,24 @@
 class useFileDB {
-	__New(dbSettings) {
-		s := useProps(dbSettings, {
-			main: dbSettings is Map ? dbSettings["main"] : dbSettings.main,
+	__New(dbConfig) {
+		s := useProps(dbConfig, {
+			main: dbConfig is Map ? dbConfig["main"] : dbConfig.main,
 			archive: "",
 			backup: "",
-			cleanPeriod: 180
+			cleanPeriodDays: 180
 		})
 
 		this.main := s.main
 		this.archive := s.archive
 		this.backup := s.backup
-		this.cleanPeriod := s.cleanPeriod
+		this.cleanPeriodDays := s.cleanPeriodDays
+	}
+
+	cleanup() {
+		loop files, this.main . "\*", "D" {
+			if (DateDiff(A_Now, A_LoopFileName, "Days") > this.cleanPeriodDays) {
+				DirDelete(A_LoopFileFullPath, true)
+			}
+		}
 	}
 
 	/**
@@ -19,7 +27,17 @@ class useFileDB {
 	 * @param {String} date 
 	 * @param {String} saveName 
 	 */
-	add(jsonString, date := FormatTime(A_Now, "yyyyMMdd"), saveName := JSON.parse(jsonString)["fileName"]) {
+	add(jsonString, date := FormatTime(A_Now, "yyyyMMdd"), saveName := "") {
+		if (!saveName) {
+			res := JSON.parse(jsonString)["fileName"]
+			if (res is Error) {
+				MsgBox("Unable to add data.`nError: " . res.Message,, "0x10")
+				return
+			}
+
+			saveName := res
+		}
+
 		dateFolder := "\" . date
 		fileName := "\" . saveName . ".json"
 		; create dateFolder if not exist yet
@@ -32,7 +50,7 @@ class useFileDB {
 		FileAppend(jsonString, this.main . dateFolder . fileName, "UTF-8")
 		Sleep 100
 		; cleanup outdated if cleanPeriod is unset/0
-		if (this.cleanPeriod > 0) {
+		if (this.cleanPeriodDays > 0) {
 			this.cleanup()
 		}
 	}
@@ -42,23 +60,17 @@ class useFileDB {
 	 * @param {String} db 
 	 * @param {String}  queryDate 
 	 * @param {Number}  queryPeriodInput 
+	 * @returns {String[]} 
 	 */
-	findByPeriod(db, queryDate, queryPeriodInput) {
+	getPathsByPeriod(db, queryDate, queryPeriodInput) {
 		matchFilePaths := []
 		loop files, (db . "\" . queryDate . "\*.json") {
 			if (DateDiff(A_Now, A_LoopFileTimeCreated, "Minutes") <= queryPeriodInput) {
 				matchFilePaths.InsertAt(1, A_LoopFileFullPath)
 			}
 		}
-		return matchFilePaths
-	}
 
-	cleanup() {
-		loop files, this.main . "\*", "D" {
-			if (DateDiff(A_Now, A_LoopFileName, "Days") > this.cleanPeriod) {
-				DirDelete(A_LoopFileFullPath, true)
-			}
-		}
+		return matchFilePaths
 	}
 
 	/**
@@ -69,7 +81,7 @@ class useFileDB {
 	 * @return {Map[]}
 	 */
 	load(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
-		if (queryDate = FormatTime(A_Now, "yyyyMMdd")) {
+		if (queryDate == FormatTime(A_Now, "yyyyMMdd")) {
 			return this.loadOneDay(db, queryDate, queryPeriodInput)
 		} else if (FileExist(this.archive . "\" . queryDate . " - archive.json")) {
 			return this.loadArchiveOneDay(queryDate)
@@ -78,7 +90,7 @@ class useFileDB {
 				if (DateDiff(A_Now, queryDate, "Days") > 0) {
 					SetTimer(() => this.createArchive(queryDate), -100)
 				}
-				return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriod)
+				return this.loadOneDay(db, queryDate, 60 * 24 * this.cleanPeriodDays)
 			}
 		}
 	}
@@ -91,15 +103,23 @@ class useFileDB {
 	 * @return {Map[]}
 	 */
 	loadOneDay(db := this.main, queryDate := FormatTime(A_Now, "yyyyMMdd"), queryPeriodInput := 60) {
-		loadedPaths := this.findByPeriod(db, queryDate, queryPeriodInput)
+		loadedPaths := this.getPathsByPeriod(db, queryDate, queryPeriodInput)
 		parsedProfiles := []
 
 		for file in loadedPaths {
-			str := FileRead(file, "UTF-8")
-			try {
-				parsedProfiles.Push(JSON.parse(str))
-			} catch {
-				parsedProfiles.InsertAt(A_Index, this._handleMalformedJson(str).map(profile => JSON.parse(profile))*)
+			jsonStr := FileRead(file, "UTF-8")
+			; try {
+			; 	parsedProfiles.Push(JSON.parse(jsonStr))
+			; } catch {
+			; 	parsedProfiles.InsertAt(A_Index, this._handleMalformedJson(str).map(profile => JSON.parse(profile))*)
+			; }
+			
+			res := JSON.parse(jsonStr)
+			if (res is Error) {
+				parsedProfiles.InsertAt(A_Index, this._handleMalformedJson(jsonStr).map(profile => JSON.parse(profile))*)
+				FileCopy(file, file.replace(".json", ".malformed"))
+			} else {
+				parsedProfiles.Push(res)
 			}
 		}
 
@@ -148,9 +168,11 @@ class useFileDB {
 	 * @param archiveDate 
 	 */
 	createArchive(archiveDate) {
-		archiveData := JSON.stringify(this.loadOneDay(, archiveDate, 60 * 24 * this.cleanPeriod))
+		archiveDataStr := JSON.stringify(this.loadOneDay(, archiveDate, 60 * 24 * this.cleanPeriodDays))
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
-		FileAppend(archiveData, archiveFullPath, "UTF-8")
+		FileAppend(archiveDataStr, archiveFullPath, "UTF-8")
+
+		return archiveFullPath
 	}
 
 	/**
@@ -160,40 +182,20 @@ class useFileDB {
 	 */
 	loadArchiveOneDay(archiveDate) {
 		archiveFullPath := this.archive . "\" . archiveDate . " - archive.json"
-		try {
-			archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
-		} catch {
-			this.createArchive(archiveDate)
-			archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
-		}
-
+		; try {
+		; 	archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
+		; } catch {
+		; 	this.createArchive(archiveDate)
+		; 	archivedData := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
+		; }
+		res := JSON.parse(FileRead(archiveFullPath, "UTF-8"))
+		archivedData := res is Error ? JSON.parse(this.createArchive(archiveDate)) : res
+	
 		return archivedData
 	}
 
-	; createRecentBackup(period := 60) {
-	; 	if (this.IS_BACKINGUP_RECENT = true) {
-	; 		return
-	; 	} else {
-	; 		this.IS_BACKINGUP_RECENT := true
-	; 	}
-	; 	recentBackupFullPath := this.backup . "\recent.json"
-	; 	recent := FileExist(recentBackupFullPath) ? JSON.parse(FileRead(recentBackupFullPath, "UTF-8")) : []
-	; 	recent.Push(this.loadOneDay(, , period)*)
-
-	; 	if (recent.Length > this.recentLength) {
-	; 		recent.RemoveAt(1, recent.Length - this.recentLength)
-	; 	}
-
-	; 	if (FileExist(recentBackupFullPath)) {
-	; 		FileDelete(recentBackupFullPath)
-	; 	}
-
-	; 	FileAppend(JSON.stringify(recent), recentBackupFullPath, "UTF-8")
-	; 	this.IS_BACKINGUP_RECENT := false
-	; }
-
 	createArchiveBackup(backupDate) {
-		archiveData := JSON.stringify(this.loadOneDay(, backupDate, 60 * 24 * this.cleanPeriod))
+		archiveData := JSON.stringify(this.loadOneDay(, backupDate, 60 * 24 * this.cleanPeriodDays))
 		monthFolder := "\" . SubStr(backupDate, 1, 6)
 		backupFullPath := this.backup . monthFolder . "\" . backupDate . " - backup.json"
 
@@ -203,7 +205,10 @@ class useFileDB {
 		if (FileExist(backupFullPath)) {
 			FileDelete(backupFullPath)
 		}
+		
 		FileAppend(archiveData, backupFullPath, "UTF-8")
+
+		return archiveData
 	}
 
 	; restoreRecent() {
