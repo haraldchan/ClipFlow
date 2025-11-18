@@ -111,10 +111,9 @@ QM2_Panel(props) {
             App.AddRadio(A_Index == 1 ? "Checked xs10 yp+30 h20" : "xs10 yp+30 h20", modules[module])
             .OnEvent("Click", (*) => selectedModule.set(module.name))
         ),
-        Dynamic(
+        Dynamic(App,
             selectedModule,
             moduleComponents, {
-                App: App,
                 styles: {
                     xPos: "x20 ",
                     yPos: "y110 ",

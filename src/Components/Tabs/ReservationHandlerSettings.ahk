@@ -18,7 +18,7 @@ ReservationHandlerSettings(App) {
 
     agentComponentSet := Map()
     for agentKey, agentInfo in agentList {
-        agentComponentSet[agentKey] := agentInfo.settingPanel.bind(App, agentInfo.params)
+        agentComponentSet[agentKey] := agentInfo.settingPanel.bind(, agentInfo.params)
     }
 
     return (
@@ -26,7 +26,7 @@ ReservationHandlerSettings(App) {
         App.AddDDL("x+10 w250 Choose1" , agentList.values().map(item => item.name))
            .OnEvent("Change", (ctrl, _) => selectedAgent.set(agentList.keys()[ctrl.Value])),
 
-        Dynamic(selectedAgent, agentComponentSet),
+        Dynamic(App, selectedAgent, agentComponentSet),
         RHS_WorkflowOta(App)
     )
 }
