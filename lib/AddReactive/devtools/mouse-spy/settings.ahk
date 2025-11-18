@@ -1,6 +1,5 @@
 MouseSpy_Settings(App, config, MouseSpyWindowTitle) {
     unpack({ 
-        ; curMouseCoordMode: &curMouseCoordMode,
         curMouseInfo:      &curMouseInfo,
         anchorPos:         &anchorPos,
         followMouse:       &followMouse,
@@ -13,10 +12,12 @@ MouseSpy_Settings(App, config, MouseSpyWindowTitle) {
 
     hotkeySetup := {
         markAnchor: {
+            defaultHotkey: "+!s",
             hotkey: config["hotkeys"]["markAnchor"],
             callback: (*) => anchorPos.set(handleMousePosUpdate())
         },
         moveToAnchor: {
+            defaultHotkey: "+!q",
             hotkey: config["hotkeys"]["moveToAnchor"],
             callback: moveToAnchor
         }
@@ -31,6 +32,18 @@ MouseSpy_Settings(App, config, MouseSpyWindowTitle) {
         Hotkey "~*Shift", (*) => followMouse.set(false)
         Hotkey "~*Shift up", (*) => followMouse.set(true)
         
+        if (!hotkeySetup.moveToAnchor.hotkey) {
+            hotkeySetup.moveToAnchor.hotkey := hotkeySetup.moveToAnchor.defaultHotkey
+            config["hotkeys"]["moveToAnchor"] := hotkeySetup.moveToAnchor.defaultHotkey
+            App["move-to-anchor-hotkey"].Value := hotkeySetup.moveToAnchor.defaultHotkey
+            handleConfigUpdate()
+        }
+        if (!hotkeySetup.markAnchor.hotkey) {
+            hotkeySetup.markAnchor.hotkey := hotkeySetup.markAnchor.defaultHotkey
+            config["hotkeys"]["markAnchor"] := hotkeySetup.markAnchor.defaultHotkey
+            App["mark-anchor-hotkey"].Value := hotkeySetup.markAnchor.defaultHotkey
+            handleConfigUpdate()
+        }
         Hotkey hotkeySetup.moveToAnchor.hotkey, hotkeySetup.moveToAnchor.callback, "On"
         
         HotIf((*) => WinExist(MouseSpyWindowTitle) && App["use-mouse-pos-anchor"].Value)
@@ -43,8 +56,15 @@ MouseSpy_Settings(App, config, MouseSpyWindowTitle) {
     }
     
     handleSetHotkeys(ctrl, _) {
-        curHotkeyName := StrReplace(ctrl.Name, "Hotkey", "")
+        ; curHotkeyName := StrReplace(ctrl.Name, "-hotkey", "")
+        curHotkeyName := pipe(
+            name => StrReplace(name, "-hotkey", ""),
+            name => StrSplit(name, "-"),
+            name => ArrayExt.map(name, (chunk, index) => index > 1 ? StrTitle(chunk) : chunk),
+            name => ArrayExt.join(name, "")
+        )(ctrl.Name)
 
+        Sleep 200
         try {
             Hotkey hotkeySetup.%curHotkeyName%.hotkey, hotkeySetup.%curHotkeyName%.callback, "Off"
             hotkeySetup.%curHotkeyName%.hotkey := ctrl.Value
@@ -64,26 +84,42 @@ MouseSpy_Settings(App, config, MouseSpyWindowTitle) {
     }
 
     return (
-        ; { hotkeys setup
-        App.AddGroupBox("Section w350 h80", "Hotkeys").SetFont("s10 bold"),
-        ; anchor marking
-        App.AddText("xs10 yp+22 w100 h20 0x200", "Mark Anchor:"),
-        App.AddHotkey("vmark-anchor-hotkey x+10", config["hotkeys"]["markAnchor"])
-           .OnEvent("Change", handleSetHotkeys),
-        ; move to anchor
-        App.AddText("xs10 yp+25 w100 h20 0x200", "Move to Anchor:"),
-        App.AddHotkey("vmove-to-anchor-hotkey x+10", config["hotkeys"]["moveToAnchor"])
-           .OnEvent("Change", handleSetHotkeys),
-        ; }
+        StackBox(App,
+            {
+                name: "hotkey-setup",
+                fontOptions: "s10 bold",
+                groupbox: {
+                    title: "Record Options",
+                    options: "Section w345 h80"
+                }
+            },
+            () => [
+                ; anchor marking
+                App.AddText("xs10 yp+22 w100 h20 0x200", "Mark Anchor:"),
+                App.AddHotkey("vmark-anchor-hotkey x+10", config["hotkeys"]["markAnchor"]).onChange(handleSetHotkeys),
+                
+                ; move to anchor
+                App.AddText("xs10 yp+25 w100 h20 0x200", "Move to Anchor:"),
+                App.AddHotkey("vmove-to-anchor-hotkey x+10", config["hotkeys"]["moveToAnchor"]).onChange(handleSetHotkeys)
+            ]
+        ),
 
-        ; { misc
-        App.AddGroupBox("Section w350 x22 yp+40 h160", "Misc").SetFont("s10 bold"),
-        ; refresh interval
-        App.AddText("xs10 yp+22 w100 h20 0x200", "Update Interval:"),
-        App.AddEdit("vupdate-interval x+10 w110 h20 Number", config["misc"]["updateInterval"])
-           .OnEvent("LoseFocus", handleUpdateIntervalUpdate),
-        App.AddText("x+5 w50 h20 0x200", "ms"),
-        ; }
+        StackBox(App,
+            {
+                name: "misc-settings",
+                fontOptions: "s10 bold",
+                groupbox: {
+                    title: "Misc",
+                    options: "Section w345 x22 y+5 h160"
+                }
+            },
+            () => [
+                ; refresh interval
+                App.AddText("xs10 yp+22 w100 h20 0x200", "Update Interval:"),
+                App.AddEdit("vupdate-interval x+10 w110 h20 Number", config["misc"]["updateInterval"]).onBlur(handleUpdateIntervalUpdate),
+                App.AddText("x+5 w50 h20 0x200", "ms"),
+            ]
+        ),
 
         setHotkeys()
     )

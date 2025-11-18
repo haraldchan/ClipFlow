@@ -12,16 +12,26 @@ class signal {
      * @param {any} initialValue The initial value of the signal.This argument is ignored after the initial render.
      * @return {Signal}
      */
-    __New(initialValue) {
+    __New(initialValue, options := { name: "", forceUpdate: false }) {
         this.value := isPlainObject(initialValue) || initialValue is Array || initialValue is Map
             ? this._mapify(initialValue)
             : initialValue
         this.initValue := this.value
+        this.prevValue := 0
+        
+        ; options
+        this.name := options.HasOwnProp("name") ? options.name : ""
+        this.forceUpdate := options.HasOwnProp("forceUpdate") ? options.forceUpdate : false
+
+        ; subscribers
         this.subs := []
         this.comps := []
         this.effects := []
-        this.stores := []
+
+        ; type for Struct
         this.type := ""
+
+        ; debugger
         this.debugger := false
         
         ; debug mode
@@ -29,10 +39,10 @@ class signal {
             return
         }
 
-        if (ARConfig.debugMode && !(this is debugger)) {
+        if (ARConfig.debugMode && this.name && !(this is debugger)) {
             this.createDebugger := DebugUtils.createDebugger
             this.debugger := this.createDebugger(this)
-            if (InStr(this.debugger.value["caller"]["file"], "\AddReactive\devtools")) {
+            if (InStr(this.debugger.value["fromFile"], "AddReactive\devtools\devtools-ui")) {
                 this.debugger := false
             } else {
                 IsSet(CALL_TREE) && CALL_TREE.addDebugger(this.debugger)
@@ -46,9 +56,10 @@ class signal {
      * @returns {void} 
      */
     set(newSignalValue) {
-        if (newSignalValue == this.value) {
+        if (!this.forceUpdate && newSignalValue == this.value) {
             return
         }
+        this.prevValue := this.value
 
         ; validates new value if it matches the Struct
         if (this.type is Struct) {
@@ -77,11 +88,6 @@ class signal {
         ; notify all computed signals
         for comp in this.comps {
             comp.sync(this)
-        }
-
-        ; notify all stores
-        for store in this.stores {
-            store.set({ newValue: this.value })
         }
 
         ; run all effects
@@ -204,10 +210,6 @@ class signal {
      */
     addComp(computed) {        
         this.comps.Push(computed)
-    }
-
-    addStore(store) {
-        this.stores.Push(store)
     }
 
     /**

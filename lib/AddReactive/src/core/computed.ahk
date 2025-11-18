@@ -10,22 +10,44 @@ class computed extends signal {
      * @param {Func} mutation computation function expression.
      * @return {computed}
      */
-    __New(_signal, mutation) {
+    __New(_signal, mutation, options := { name: "" }) {
         checkType(_signal, [signal, computed, Array], "First parameter is not a signal.")
         checkType(mutation, Func, "Second parameter is not a Function.")
 
         this.signal := _signal
         this.mutation := mutation
+        this.prevValue := 0
+
+        ; options
+        this.name := options.HasOwnProp("name") ? options.name : ""
+
+        ; subscribers
         this.subs := []
         this.comps := []
         this.effects := []
+        
+        ; debugger
         this.debugger := false
 
         if (this.signal is Array) {
             for s in this.signal {
                 s.addComp(this)
             }
-            this.value := this._mapify(this.mutation.Call(this.signal.map(s => s.value)*))
+
+            this.insertPrevCount := this.signal.Length * 2 == this.mutation.MaxParams 
+                ? this.mutation.MaxParams
+                : Mod(this.mutation.MaxParams, this.signal.Length)
+            
+            values := []
+            for s in this.signal {
+                if (A_Index <= this.insertPrevCount) {
+                    values.Push(s.prevValue, s.value)
+                } else {
+                    values.Push(s.value)
+                }
+            }
+
+            this.value := this._mapify(this.mutation.Call(values*))
         } else {
             this.signal.addComp(this)
             this.value := this._mapify(this.mutation.Call(this.signal.value))
@@ -36,10 +58,10 @@ class computed extends signal {
             return
         }
 
-        if (ARConfig.debugMode && !(this is debugger)) {
+        if (ARConfig.debugMode && this.name && !(this is debugger)) {
             this.createDebugger := DebugUtils.createDebugger
             this.debugger := this.createDebugger(this)
-            if (InStr(this.debugger.value["caller"]["file"], "\AddReactive\devtools")) {
+            if (InStr(this.debugger.value["fromFile"], "AddReactive\devtools\devtools-ui")) {
                 this.debugger := false
             } else {
                 IsSet(CALL_TREE) && CALL_TREE.addDebugger(this.debugger)
@@ -52,10 +74,18 @@ class computed extends signal {
      * @param {signal} subbedSignal subscribed signal
      */
     sync(subbedSignal) {
-        prevValue := this.value
+        this.prevValue := this.value
 
         if (this.signal is Array) {
-            this.value := this._mapify(this.mutation.Call(this.signal.map(s => s.value)*))
+            values := []
+            for s in this.signal {
+                if (A_Index <= this.insertPrevCount) {
+                    values.Push(s.prevValue, s.value)
+                } else {
+                    values.Push(s.value)
+                }
+            }
+            this.value := this._mapify(this.mutation.Call(values*))
         } else {
             this.value := this._mapify(this.mutation.Call(subbedSignal.value))
         }
@@ -77,7 +107,7 @@ class computed extends signal {
                 if (effect.effectFn.MaxParams == 1) {
                     e(this.value)
                 } else if (effect.effectFn.MaxParams == 2) {
-                    e(this.value, prevValue)
+                    e(this.value, this.prevValue)
                 } else {
                     e()
                 }
