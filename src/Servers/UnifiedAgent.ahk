@@ -1,7 +1,12 @@
+#Include "\\10.0.2.13\fd\19-个人文件夹\HC\Software - 软件及脚本\AHK_Scripts\QM2-for-FrontDesk-main\src\PersistScripts\DepositEntry.ahk"
+
 class UnifiedAgent extends useServerAgent {
     __New(serverSettings) {
         super.__New(serverSettings)
-        this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : A_ScriptDir . "\Servers\qm-pool"
+        this.qmPool := serverSettings.HasOwnProp("qmPool") ? serverSettings.qmPool : A_ScriptDir . "\src\Servers\qm-pool"
+        this.testPool := serverSettings.HasOwnProp("testPool") ? serverSettings.testPool : A_ScriptDir . "\src\Servers\test-pool"
+        this.isTesting := true
+
         this.popupTitle := "Unified Agent"
 
         effect(this.isListening, cur => this.listen(cur))
@@ -12,12 +17,17 @@ class UnifiedAgent extends useServerAgent {
         ; QM2 modules
         this.qmModules := Map(
             "BlankShare", BlankShare_Action,
-            "PaymentRelation", PaymentRelation_Action
+            "PaymentRelation", PaymentRelation_Action,
+            "DepositEntry", DepositEntry
         )
 
         ; delete expired posts
         this.cleanup()
         this.cleanup(this.qmPool)
+        this.cleanup(this.testPool)
+
+        ; start service
+        ; this.listen()
     }
 
     cleanup(pool := this.pool) {
@@ -77,6 +87,7 @@ class UnifiedAgent extends useServerAgent {
      * <Agent>
      * @param status 
      */
+
     listen(status) {
         if (status == "在线") {
             loop {
@@ -90,7 +101,6 @@ class UnifiedAgent extends useServerAgent {
             } until (this.isListening.value == "离线")
         }
     }
-
 
     /**
      * <Agent>
@@ -107,8 +117,11 @@ class UnifiedAgent extends useServerAgent {
         qmPosts := this.COLLECT("PENDING", this.qmPool)
         pmnPosts := this.COLLECT("PENDING")
         retryPmnPosts := this.COLLECT("RETRY")
+        if (this.isTesting) {
+            testPosts := this.COLLECT("PENDING", this.testPool)
+        }
 
-        if (pmnPosts.Length || qmPosts.Length || retryPmnPosts.Length) {
+        if (pmnPosts.Length || qmPosts.Length || retryPmnPosts.Length || (IsSet(testPosts) && testPosts.Length)) {
             WinHide(this.popupTitle)
         }
         
@@ -122,6 +135,10 @@ class UnifiedAgent extends useServerAgent {
 
         if (retryPmnPosts.Length) {
             this.modifyPostedProfiles(retryPmnPosts)
+        }
+
+        if (IsSet(testPosts) && testPosts.Length) {
+            this.executeQmPostedActions(testPosts)
         }
 
         this.currentHandlingPost := ""
